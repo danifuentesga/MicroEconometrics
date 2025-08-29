@@ -5,6 +5,8 @@
 * DESCRIPCIÓN:  Ver archivo Tarea 1           *
 ****************************************************************************************/
 
+**** Por un México con datos limpios y resultados significativos al 1%  , venga....***   
+
 *------------------------------------------------------------------------------
 *                        1. CARGA DE LA BASE DE DATOS
 *------------------------------------------------------------------------------
@@ -657,6 +659,7 @@ foreach var in p08 p11 p17 p18 p19 p20 p24 p25 p38 p65b {
 foreach var in p08 p11 p17 p18 p19 p20 p24 p25 p38 p65b {
     reg `var' trat, robust
 }
+
 
 
 
