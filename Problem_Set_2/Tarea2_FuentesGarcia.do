@@ -5,6 +5,10 @@
 * NOTA: Decimales redondeados a dos
 ******************************************************************************************/
 
+*    Empezamos con la crónica del dofile que corre sin miedo 
+*    si falla, deja tu ofrenda a Angrist en forma de pvalues
+
+
 // DEFINIR DIRECTORIO GLOBAL DE TRABAJO
 global basedir "C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 2"
 
@@ -597,6 +601,7 @@ sampclus, obsclus(`obsclus_int') rho(`rho_o')
 //=========================================================
 sampsi 0 -0.008, sd(0.34) alpha(0.031) power(0.8) onesided
 sampclus, obsclus(`obsclus_int') rho(`rho_d')
+
 
 
 
