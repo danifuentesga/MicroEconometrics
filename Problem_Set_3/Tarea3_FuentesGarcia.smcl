@@ -1,0 +1,2707 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\Tarea3_FuentesGarcia.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res} 2 Oct 2025, 16:25:23
+
+{com}. do "C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\Tarea3_FuentesGarcia.do"
+{txt}
+{com}. /******************************************************************************************
+> * AUTOR: Daniel Fuentes (Github: danifuentesga )
+> * FECHA: 21-sep-2025
+> * TEMA: Tarea 3
+> * NOTA: Decimales redondeados a dos
+> ******************************************************************************************/
+. 
+. // DEFINIR DIRECTORIO GLOBAL DE TRABAJO
+. global basedir "C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3"
+{txt}
+{com}. 
+. //# PROBLEMA A) Tablas descriptivas Tratados y No Tratados (NSW)
+. 
+. //## PASO A1: Cargar base
+. use "$basedir\nsw_data.dta", clear
+{txt}
+{com}. 
+. //## PASO A2: (Opcional en consola) Descriptivos por tratamiento
+. tabstat age education black hispanic married nodegree RE74 RE75 RE78, ///
+>     by(treatment) stat(mean sd min max n) col(stat)
+
+{txt}Summary for variables: age education black hispanic married nodegree RE74 RE75 RE78
+Group variable: treatment 
+
+{ralign 9:treatment} {...}
+{c |}      Mean        SD       Min       Max         N
+{hline 10}{c +}{hline 50}
+{ralign 9:0} {...}
+{c |}{...}
+ {res} 25.05385  7.057745        17        55       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 10.08846  1.614325         3        14       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .8269231  .3790434         0         1       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .1076923  .3105893         0         1       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .1538462  .3614971         0         1       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .8346154  .3722439         0         1       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 2107.027  5687.906         0  39570.68       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 1266.909  3102.982         0  23031.98       260
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 4554.801  5483.836         0  39483.53       260
+{txt}{hline 10}{c +}{hline 50}
+{ralign 9:1} {...}
+{c |}{...}
+ {res} 25.81622  7.155019        17        48       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 10.34595   2.01065         4        16       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .8432432  .3645579         0         1       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .0594595  .2371244         0         1       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .1891892  .3927217         0         1       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .7081081  .4558666         0         1       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 2095.574   4886.62         0  35040.07       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 1532.055  3219.251         0  25142.24       185
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 6349.144  7867.402         0  60307.93       185
+{txt}{hline 10}{c +}{hline 50}
+{ralign 9:Total} {...}
+{c |}{...}
+ {res} 25.37079  7.100282        17        55       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 10.19551  1.792119         3        16       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .8337079  .3727617         0         1       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .0876404  .2830895         0         1       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .1685393  .3747658         0         1       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} .7820225  .4133367         0         1       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 2102.265  5363.582         0  39570.68       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 1377.138  3150.961         0  25142.24       445
+{space 9} {...}
+{txt}{c |}{...}
+ {res} 5300.764  6631.492         0  60307.93       445
+{txt}{hline 10}{c BT}{hline 50}
+
+{com}. 
+. //## PASO A3: Crear carpeta RESULTADOS
+. cap mkdir "$basedir\RESULTADOS"
+{txt}
+{com}. 
+. //## PASO A4: Exportar tablas LaTeX minimalistas (tratados y controles)
+. 
+. // Variables y nombres bonitos (incluye RE78 una sola vez)
+. local vars  age education black hispanic married nodegree RE74 RE75 RE78
+{txt}
+{com}. local names "Edad Educación Negro Hispano Casado "Sin Grado" RE74 RE75 RE78"
+{txt}
+{com}. 
+. // ---- Tratados (treatment==1)
+. file open ft using "$basedir\RESULTADOS\A_DESCRIPTIVE_TREATED.tex", write replace
+{txt}
+{com}. file write ft "\begin{c -(}tabular{c )-}{c -(}lccccc{c )-}" _n "\hline" _n ///
+>               "Variable & Media & Desv.Est. & Min & Max & N \\\\" _n "\hline" _n
+{txt}
+{com}. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly summarize `v' if treatment==1
+{txt}  4{com}.     local mean : display %9.2f r(mean)
+{txt}  5{com}.     local sd   : display %9.2f r(sd)
+{txt}  6{com}.     local min  : display %9.2f r(min)
+{txt}  7{com}.     local max  : display %9.2f r(max)
+{txt}  8{com}.     local n    : display %9.0f r(N)
+{txt}  9{com}.     file write ft "`nice' & `mean' & `sd' & `min' & `max' & `n' \\\\" _n
+{txt} 10{com}.     local ++i
+{txt} 11{com}. {c )-}
+{txt}
+{com}. file write ft "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close ft
+{txt}
+{com}. 
+. // ---- Controles (treatment==0)
+. file open fc using "$basedir\RESULTADOS\A_DESCRIPTIVE_CONTROL.tex", write replace
+{txt}
+{com}. file write fc "\begin{c -(}tabular{c )-}{c -(}lccccc{c )-}" _n "\hline" _n ///
+>               "Variable & Media & Desv.Est. & Min & Max & N \\\\" _n "\hline" _n
+{txt}
+{com}. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly summarize `v' if treatment==0
+{txt}  4{com}.     local mean : display %9.2f r(mean)
+{txt}  5{com}.     local sd   : display %9.2f r(sd)
+{txt}  6{com}.     local min  : display %9.2f r(min)
+{txt}  7{com}.     local max  : display %9.2f r(max)
+{txt}  8{com}.     local n    : display %9.0f r(N)
+{txt}  9{com}.     file write fc "`nice' & `mean' & `sd' & `min' & `max' & `n' \\\\" _n
+{txt} 10{com}.     local ++i
+{txt} 11{com}. {c )-}
+{txt}
+{com}. file write fc "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fc
+{txt}
+{com}. 
+. //# PROBLEMA B) Igualdad de medias en covariables entre tratados y controles
+. 
+. //## PASO B1: Definir variables y etiquetas
+. local vars  age education black hispanic married nodegree RE74 RE75 RE78
+{txt}
+{com}. local names `"Edad Educación Negro Hispano Casado "Sin Grado" RE74 RE75 RE78"'
+{txt}
+{com}. 
+. //## PASO B2: Exportar tabla con medias, t y p
+. file open fb using "$basedir\RESULTADOS\B_TTEST.tex", write replace
+{txt}
+{com}. file write fb "\begin{c -(}tabular{c )-}{c -(}lcccc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write fb "Variable & Media Control & Media Tratado & t & p \\\\" _n "\hline" _n
+{txt}
+{com}. 
+. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly ttest `v', by(treatment)
+{txt}  4{com}.     local mc : display %9.2f r(mu_1)   // media grupo control
+{txt}  5{com}.     local mt : display %9.2f r(mu_2)   // media grupo tratado
+{txt}  6{com}.     local t  : display %9.2f r(t)      // estadístico t
+{txt}  7{com}.     local p  : display %9.3f r(p)      // valor p
+{txt}  8{com}.     file write fb "`nice' & `mc' & `mt' & `t' & `p' \\\\" _n
+{txt}  9{com}.     local ++i
+{txt} 10{com}. {c )-}
+{txt}
+{com}. 
+. file write fb "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fb
+{txt}
+{com}. 
+. //# PROBLEMA C) Estimación del TOT experimental por regresión
+. 
+. //## PASO C1: Estimar TOT sin controles
+. reg RE78 treatment, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}       445
+                                                {txt}F(1, 443)         =  {res}     7.15
+                                                {txt}Prob > F          = {res}    0.0078
+                                                {txt}R-squared         = {res}    0.0178
+                                                {txt}Root MSE          =    {res} 6579.5
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 1794.342{col 26}{space 2} 670.8245{col 37}{space 1}    2.67{col 46}{space 3}0.008{col 54}{space 4} 475.9486{col 67}{space 3} 3112.736
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 4554.801{col 26}{space 2} 340.2038{col 37}{space 1}   13.39{col 46}{space 3}0.000{col 54}{space 4} 3886.187{col 67}{space 3} 5223.415
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estimates store C_nocontrols
+{txt}
+{com}. 
+. //## PASO C2: Generar variables cuadráticas
+. gen age2 = age^2
+{txt}
+{com}. gen education2 = education^2
+{txt}
+{com}. gen re752 = RE75^2
+{txt}
+{com}. gen re742 = RE74^2
+{txt}
+{com}. 
+. //## PASO C3: Estimar TOT con controles
+. reg RE78 treatment age age2 education education2 black hispanic married RE75 re752 RE74 re742, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}       445
+                                                {txt}F(12, 432)        =  {res}     2.19
+                                                {txt}Prob > F          = {res}    0.0115
+                                                {txt}R-squared         = {res}    0.0663
+                                                {txt}Root MSE          =    {res} 6496.4
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2}  1599.75{col 26}{space 2}  662.784{col 37}{space 1}    2.41{col 46}{space 3}0.016{col 54}{space 4}  297.068{col 67}{space 3} 2902.433
+{txt}{space 9}age {c |}{col 14}{res}{space 2} 154.0151{col 26}{space 2} 248.2572{col 37}{space 1}    0.62{col 46}{space 3}0.535{col 54}{space 4}-333.9271{col 67}{space 3} 641.9573
+{txt}{space 8}age2 {c |}{col 14}{res}{space 2} -1.83606{col 26}{space 2} 3.943748{col 37}{space 1}   -0.47{col 46}{space 3}0.642{col 54}{space 4}-9.587379{col 67}{space 3}  5.91526
+{txt}{space 3}education {c |}{col 14}{res}{space 2}-775.7248{col 26}{space 2} 960.9266{col 37}{space 1}   -0.81{col 46}{space 3}0.420{col 54}{space 4}-2664.398{col 67}{space 3} 1112.948
+{txt}{space 2}education2 {c |}{col 14}{res}{space 2} 62.92423{col 26}{space 2} 54.39815{col 37}{space 1}    1.16{col 46}{space 3}0.248{col 54}{space 4}-43.99372{col 67}{space 3} 169.8422
+{txt}{space 7}black {c |}{col 14}{res}{space 2}-2093.573{col 26}{space 2} 1006.275{col 37}{space 1}   -2.08{col 46}{space 3}0.038{col 54}{space 4}-4071.376{col 67}{space 3}-115.7699
+{txt}{space 4}hispanic {c |}{col 14}{res}{space 2}   275.09{col 26}{space 2} 1376.514{col 37}{space 1}    0.20{col 46}{space 3}0.842{col 54}{space 4}-2430.408{col 67}{space 3} 2980.588
+{txt}{space 5}married {c |}{col 14}{res}{space 2}-200.8849{col 26}{space 2} 893.7387{col 37}{space 1}   -0.22{col 46}{space 3}0.822{col 54}{space 4}-1957.502{col 67}{space 3} 1555.732
+{txt}{space 8}RE75 {c |}{col 14}{res}{space 2} .3436334{col 26}{space 2} .2513525{col 37}{space 1}    1.37{col 46}{space 3}0.172{col 54}{space 4}-.1503925{col 67}{space 3} .8376592
+{txt}{space 7}re752 {c |}{col 14}{res}{space 2}-.0000125{col 26}{space 2} .0000103{col 37}{space 1}   -1.21{col 46}{space 3}0.227{col 54}{space 4}-.0000327{col 67}{space 3} 7.79e-06
+{txt}{space 8}RE74 {c |}{col 14}{res}{space 2}-.2305478{col 26}{space 2} .2312924{col 37}{space 1}   -1.00{col 46}{space 3}0.319{col 54}{space 4}-.6851461{col 67}{space 3} .2240505
+{txt}{space 7}re742 {c |}{col 14}{res}{space 2} .0000107{col 26}{space 2} 8.94e-06{col 37}{space 1}    1.20{col 46}{space 3}0.231{col 54}{space 4}-6.85e-06{col 67}{space 3} .0000283
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 4727.709{col 26}{space 2} 6013.271{col 37}{space 1}    0.79{col 46}{space 3}0.432{col 54}{space 4}-7091.197{col 67}{space 3} 16546.62
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estimates store C_controls
+{txt}
+{com}. 
+. //## PASO C4: Exportar resultados a LaTeX
+. file open fc using "$basedir\RESULTADOS\C_TOT_REG.tex", write replace
+{txt}
+{com}. file write fc "\begin{c -(}tabular{c )-}{c -(}lcc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write fc "Modelo & Coef. Tratamiento & Error Est. \\\\" _n "\hline" _n
+{txt}
+{com}. 
+. // Modelo sin controles
+. mat b = e(b)
+{txt}
+{com}. mat V = e(V)
+{txt}
+{com}. local beta : display %9.2f b[1,"treatment"]
+{res}{txt}
+{com}. local se   : display %9.2f sqrt(V[1,1])
+{res}{txt}
+{com}. file write fc "Sin controles & `beta' & `se' \\\\" _n
+{txt}
+{com}. 
+. // Modelo con controles
+. estimates restore C_controls
+{txt}(results {stata estimates replay C_controls:C_controls} are active now)
+
+{com}. mat b = e(b)
+{txt}
+{com}. mat V = e(V)
+{txt}
+{com}. local beta : display %9.2f b[1,"treatment"]
+{res}{txt}
+{com}. local se   : display %9.2f sqrt(V[1,1])
+{res}{txt}
+{com}. file write fc "Con controles & `beta' & `se' \\\\" _n
+{txt}
+{com}. 
+. file write fc "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fc
+{txt}
+{com}. 
+. //# PROBLEMA D) Replicar (a)–(c) con cps_data.dta
+. 
+. //## PASO D1: Cargar base CPS
+. use "$basedir\cps_data.dta", clear
+{txt}
+{com}. 
+. //## PASO D2: Crear carpeta RESULTADOS
+. cap mkdir "$basedir\RESULTADOS"
+{txt}
+{com}. 
+. //## PASO D3: Definir variables y nombres bonitos
+. local vars  age education black hispanic married nodegree RE74 RE75 RE78
+{txt}
+{com}. local names `"Edad Educación Negro Hispano Casado "Sin Grado" RE74 RE75 RE78"'
+{txt}
+{com}. 
+. //====================================================
+. //## PASO D4: Exportar descriptivos (tratados y controles, como en a)
+. //====================================================
+. 
+. // ---- Tratados (treatment==1)
+. file open ft using "$basedir\RESULTADOS\D_DESCRIPTIVE_TREATED.tex", write replace
+{txt}
+{com}. file write ft "\begin{c -(}tabular{c )-}{c -(}lccccc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write ft "Variable & Media & Desv.Est. & Min & Max & N \\\\" _n "\hline" _n
+{txt}
+{com}. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly summarize `v' if treatment==1
+{txt}  4{com}.     local mean : display %9.2f r(mean)
+{txt}  5{com}.     local sd   : display %9.2f r(sd)
+{txt}  6{com}.     local min  : display %9.2f r(min)
+{txt}  7{com}.     local max  : display %9.2f r(max)
+{txt}  8{com}.     local n    : display %9.0f r(N)
+{txt}  9{com}.     file write ft "`nice' & `mean' & `sd' & `min' & `max' & `n' \\\\" _n
+{txt} 10{com}.     local ++i
+{txt} 11{com}. {c )-}
+{txt}
+{com}. file write ft "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close ft
+{txt}
+{com}. 
+. // ---- Controles (treatment==0)
+. file open fc using "$basedir\RESULTADOS\D_DESCRIPTIVE_CONTROL.tex", write replace
+{txt}
+{com}. file write fc "\begin{c -(}tabular{c )-}{c -(}lccccc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write fc "Variable & Media & Desv.Est. & Min & Max & N \\\\" _n "\hline" _n
+{txt}
+{com}. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly summarize `v' if treatment==0
+{txt}  4{com}.     local mean : display %9.2f r(mean)
+{txt}  5{com}.     local sd   : display %9.2f r(sd)
+{txt}  6{com}.     local min  : display %9.2f r(min)
+{txt}  7{com}.     local max  : display %9.2f r(max)
+{txt}  8{com}.     local n    : display %9.0f r(N)
+{txt}  9{com}.     file write fc "`nice' & `mean' & `sd' & `min' & `max' & `n' \\\\" _n
+{txt} 10{com}.     local ++i
+{txt} 11{com}. {c )-}
+{txt}
+{com}. file write fc "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fc
+{txt}
+{com}. 
+. //====================================================
+. //## PASO D5: Prueba de igualdad de medias (como en b)
+. //====================================================
+. file open ft using "$basedir\RESULTADOS\D_TTEST.tex", write replace
+{txt}
+{com}. file write ft "\begin{c -(}tabular{c )-}{c -(}lcccc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write ft "Variable & Media Control & Media Tratado & t & p \\\\" _n "\hline" _n
+{txt}
+{com}. 
+. local i = 1
+{txt}
+{com}. foreach v of local vars {c -(}
+{txt}  2{com}.     local nice : word `i' of `names'
+{txt}  3{com}.     quietly ttest `v', by(treatment)
+{txt}  4{com}.     local mc : display %9.2f r(mu_1)
+{txt}  5{com}.     local mt : display %9.2f r(mu_2)
+{txt}  6{com}.     local t  : display %9.2f r(t)
+{txt}  7{com}.     local p  : display %9.3f r(p)
+{txt}  8{com}.     file write ft "`nice' & `mc' & `mt' & `t' & `p' \\\\" _n
+{txt}  9{com}.     local ++i
+{txt} 10{com}. {c )-}
+{txt}
+{com}. file write ft "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close ft
+{txt}
+{com}. 
+. //====================================================
+. //## PASO D6: Estimación del TOT experimental por regresión (como en c)
+. //====================================================
+. 
+. // Sin controles
+. reg RE78 treatment, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}     2,554
+                                                {txt}F(1, 2552)        =  {res}    39.90
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.0126
+                                                {txt}Root MSE          =    {res} 8784.6
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2}-3821.967{col 26}{space 2} 605.0725{col 37}{space 1}   -6.32{col 46}{space 3}0.000{col 54}{space 4}-5008.451{col 67}{space 3}-2635.484
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 10171.11{col 26}{space 2} 181.8994{col 37}{space 1}   55.92{col 46}{space 3}0.000{col 54}{space 4} 9814.425{col 67}{space 3}  10527.8
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estimates store D_nocontrols
+{txt}
+{com}. 
+. // Con controles
+. gen age2 = age^2
+{txt}
+{com}. gen education2 = education^2
+{txt}
+{com}. gen re752 = RE75^2
+{txt}
+{com}. gen re742 = RE74^2
+{txt}
+{com}. 
+. reg RE78 treatment age age2 education education2 black hispanic married RE75 re752 RE74 re742, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}     2,554
+                                                {txt}F(12, 2541)       =  {res}   111.43
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.3477
+                                                {txt}Root MSE          =    {res} 7155.5
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 673.4995{col 26}{space 2} 652.2267{col 37}{space 1}    1.03{col 46}{space 3}0.302{col 54}{space 4}-605.4505{col 67}{space 3}  1952.45
+{txt}{space 9}age {c |}{col 14}{res}{space 2}  213.684{col 26}{space 2} 115.6973{col 37}{space 1}    1.85{col 46}{space 3}0.065{col 54}{space 4}-13.18653{col 67}{space 3} 440.5546
+{txt}{space 8}age2 {c |}{col 14}{res}{space 2}-4.479576{col 26}{space 2} 1.657284{col 37}{space 1}   -2.70{col 46}{space 3}0.007{col 54}{space 4} -7.72934{col 67}{space 3}-1.229811
+{txt}{space 3}education {c |}{col 14}{res}{space 2}-117.2113{col 26}{space 2} 258.3931{col 37}{space 1}   -0.45{col 46}{space 3}0.650{col 54}{space 4}-623.8939{col 67}{space 3} 389.4712
+{txt}{space 2}education2 {c |}{col 14}{res}{space 2} 14.67391{col 26}{space 2} 12.43465{col 37}{space 1}    1.18{col 46}{space 3}0.238{col 54}{space 4} -9.70918{col 67}{space 3} 39.05699
+{txt}{space 7}black {c |}{col 14}{res}{space 2}-1190.186{col 26}{space 2} 432.7302{col 37}{space 1}   -2.75{col 46}{space 3}0.006{col 54}{space 4}-2038.726{col 67}{space 3}-341.6458
+{txt}{space 4}hispanic {c |}{col 14}{res}{space 2} 272.7419{col 26}{space 2} 533.7209{col 37}{space 1}    0.51{col 46}{space 3}0.609{col 54}{space 4}-773.8303{col 67}{space 3} 1319.314
+{txt}{space 5}married {c |}{col 14}{res}{space 2}-332.8337{col 26}{space 2} 393.5967{col 37}{space 1}   -0.85{col 46}{space 3}0.398{col 54}{space 4}-1104.637{col 67}{space 3} 438.9693
+{txt}{space 8}RE75 {c |}{col 14}{res}{space 2} .4029084{col 26}{space 2} .0879552{col 37}{space 1}    4.58{col 46}{space 3}0.000{col 54}{space 4} .2304371{col 67}{space 3} .5753797
+{txt}{space 7}re752 {c |}{col 14}{res}{space 2}-1.37e-06{col 26}{space 2} 3.75e-06{col 37}{space 1}   -0.37{col 46}{space 3}0.714{col 54}{space 4}-8.72e-06{col 67}{space 3} 5.98e-06
+{txt}{space 8}RE74 {c |}{col 14}{res}{space 2} .1135777{col 26}{space 2} .0830228{col 37}{space 1}    1.37{col 46}{space 3}0.171{col 54}{space 4}-.0492216{col 67}{space 3} .2763769
+{txt}{space 7}re742 {c |}{col 14}{res}{space 2} 7.61e-06{col 26}{space 2} 3.42e-06{col 37}{space 1}    2.23{col 46}{space 3}0.026{col 54}{space 4} 9.16e-07{col 67}{space 3} .0000143
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 2953.931{col 26}{space 2} 2251.767{col 37}{space 1}    1.31{col 46}{space 3}0.190{col 54}{space 4}-1461.554{col 67}{space 3} 7369.417
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estimates store D_controls
+{txt}
+{com}. 
+. // Exportar tabla con coeficiente de tratamiento
+. file open fr using "$basedir\RESULTADOS\D_TOT_REG.tex", write replace
+{txt}
+{com}. file write fr "\begin{c -(}tabular{c )-}{c -(}lcc{c )-}" _n "\hline" _n
+{txt}
+{com}. file write fr "Modelo & Coef. Tratamiento & Error Est. \\\\" _n "\hline" _n
+{txt}
+{com}. 
+. // Modelo sin controles
+. estimates restore D_nocontrols
+{txt}(results {stata estimates replay D_nocontrols:D_nocontrols} are active now)
+
+{com}. mat b = e(b)
+{txt}
+{com}. mat V = e(V)
+{txt}
+{com}. local beta : display %9.2f b[1,"treatment"]
+{res}{txt}
+{com}. local se   : display %9.2f sqrt(V[1,1])
+{res}{txt}
+{com}. file write fr "Sin controles & `beta' & `se' \\\\" _n
+{txt}
+{com}. 
+. // Modelo con controles
+. estimates restore D_controls
+{txt}(results {stata estimates replay D_controls:D_controls} are active now)
+
+{com}. mat b = e(b)
+{txt}
+{com}. mat V = e(V)
+{txt}
+{com}. local beta : display %9.2f b[1,"treatment"]
+{res}{txt}
+{com}. local se   : display %9.2f sqrt(V[1,1])
+{res}{txt}
+{com}. file write fr "Con controles & `beta' & `se' \\\\" _n
+{txt}
+{com}. 
+. file write fr "\hline" _n "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fr
+{txt}
+{com}. 
+. //# PROBLEMA E) Propensity score en CPS con pscore (Becker & Ichino, 2002)
+. 
+. //## PASO E1: Instalar pscore suite (Becker & Ichino)
+. net from http://www.stata-journal.com/software/sj5-3
+{s6hlp}
+.-
+http://www.stata-journal.com/software/sj5-3/
+^Stata Journal volume 5, issue 3^
+.-
+{smcl}
+
+DIRECTORIES you could -{hilite:net cd}- to:
+{p2colset 5 23 25 2}{...}
+{p2col :{net cd ..:..}}Other Stata Journals{p_end}
+{p2colreset}{...}
+
+PACKAGES you could -{hilite:net describe}-:
+{p2colset 5 23 25 2}{...}
+{p2col :{net describe gr0017:gr0017}}A multivariable scatterplot smoother{p_end}
+{p2col :{net describe gr41_3:gr41_3}}Distribution function plots{p_end}
+{p2col :{net describe gr42_3:gr42_3}}Quantile plots, generalized{p_end}
+{p2col :{net describe sg139_1:sg139_1}}Logistic regression when binary outcome is measured{p_end}
+{p2col :}{space 2}with uncertainty{p_end}
+{p2col :{net describe sg149_1:sg149_1}}Tests for seasonal data via Edwards and Walters &{p_end}
+{p2col :}{space 2}Elwood tests{p_end}
+{p2col :{net describe snp15_5:snp15_5}}Confidence intervals for nonparametric statistics{p_end}
+{p2col :}{space 2}and their differences{p_end}
+{p2col :{net describe st0015_2:st0015_2}}Concordance correlation coefficient and associated{p_end}
+{p2col :}{space 2}measures, tests, and graphs{p_end}
+{p2col :{net describe st0026_2:st0026_2}}Estimation of average treatment effects{p_end}
+{p2col :{net describe st0071_2:st0071_2}}Maximum likelihood estimation of endogenous{p_end}
+{p2col :}{space 2}switching regression models{p_end}
+{p2col :{net describe st0085:st0085}}Making regression tables from stored estimates{p_end}
+{p2col :{net describe st0086:st0086}}Estimation of marginal effects using margeff{p_end}
+{p2col :{net describe st0087:st0087}}Boosted regression (boosting): An introductory{p_end}
+{p2col :}{space 2}tutorial and a Stata plugin{p_end}
+{p2col :{net describe st0088:st0088}}Introduction to game-theoretic calculations{p_end}
+{p2colreset}{...}
+{.-}
+
+{com}. net install st0026_2
+checking {hilite:st0026_2} consistency and verifying not already installed...
+all files already exist and are up to date.
+{txt}
+{com}. 
+. which pscore
+{txt}C:\Users\danif\ado\plus\p\pscore.ado
+
+{com}. 
+. //## PASO E2: Crear variables cuadráticas y adicionales (si no existen)
+. 
+. // Edad al cuadrado
+. cap confirm variable age2
+{txt}
+{com}. if _rc gen age2 = age^2
+{txt}
+{com}. 
+. // Educación al cuadrado
+. cap confirm variable education2
+{txt}
+{com}. if _rc gen education2 = education^2
+{txt}
+{com}. 
+. // RE75 al cuadrado
+. cap confirm variable re752
+{txt}
+{com}. if _rc gen re752 = RE75^2
+{txt}
+{com}. 
+. // RE74 al cuadrado
+. cap confirm variable re742
+{txt}
+{com}. if _rc gen re742 = RE74^2
+{txt}
+{com}. 
+. 
+. //## PASO E3: Estimar propensity score con pscore
+. local xvars age age2 education education2 black hispanic married RE75 re752 RE74 re742
+{txt}
+{com}. 
+. pscore treatment `xvars', pscore(pscore) blockid(blockid) comsup
+
+
+
+{res}**************************************************** 
+Algorithm to estimate the propensity score 
+**************************************************** 
+
+
+The treatment is treatment
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}      2,369       92.76       92.76
+{txt}          1 {c |}{res}        185        7.24      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}      2,554      100.00
+
+
+
+Estimation of the propensity score 
+
+{txt}Iteration 0:  Log likelihood = {res}-663.76796
+{txt}Iteration 1:  Log likelihood = {res}-371.49311
+{txt}Iteration 2:  Log likelihood = {res}-321.96031
+{txt}Iteration 3:  Log likelihood = {res}-304.49783
+{txt}Iteration 4:  Log likelihood = {res}-301.33094
+{txt}Iteration 5:  Log likelihood = {res}-301.19691
+{txt}Iteration 6:  Log likelihood = {res}-301.19646
+
+{txt}Probit regression                                 Number of obs   = {res}      2554
+                                                  {txt}LR chi2({res}11{txt})     = {res}    725.14
+                                                  {txt}Prob > chi2     = {res}    0.0000
+{txt}Log likelihood = {res}-301.19646                       {txt}Pseudo R2       = {res}    0.5462
+
+{txt}{hline 13}{c TT}{hline 64}
+   treatment {c |} Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+{hline 13}{c +}{hline 64}
+         age {c |}  {res} .5574768   .0565026     9.87   0.000     .4467338    .6682198
+        {txt}age2 {c |}  {res}-.0086777   .0009358    -9.27   0.000    -.0105119   -.0068436
+   {txt}education {c |}  {res} .6299895   .1535463     4.10   0.000     .3290443    .9309347
+  {txt}education2 {c |}  {res} -.036566   .0077788    -4.70   0.000    -.0518122   -.0213198
+       {txt}black {c |}  {res} 1.877559   .1304003    14.40   0.000     1.621979    2.133139
+    {txt}hispanic {c |}  {res} .7284484   .2004914     3.63   0.000     .3354925    1.121404
+     {txt}married {c |}  {res}-.7082852   .1549138    -4.57   0.000    -1.011911   -.4046598
+        {txt}RE75 {c |}  {res}-.0000634   .0000381    -1.66   0.096    -.0001381    .0000113
+       {txt}re752 {c |}  {res} 3.94e-10   1.83e-09     0.22   0.829    -3.19e-09    3.98e-09
+        {txt}RE74 {c |}  {res}-.0001491   .0000302    -4.94   0.000    -.0002082   -.0000899
+       {txt}re742 {c |}  {res} 5.02e-09   1.30e-09     3.86   0.000     2.47e-09    7.57e-09
+       {txt}_cons {c |}  {res}-11.84257   1.133858   -10.44   0.000    -14.06489   -9.620248
+{txt}{hline 13}{c BT}{hline 64}
+Note: 124 failures and 0 successes completely determined.
+
+
+
+{res}Note: the common support option has been selected
+The region of common support is [.00216378, .95365402]
+
+
+
+Description of the estimated propensity score 
+in region of common support 
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res}  .002275       .0021638
+{txt} 5%    {res} .0028539       .0021666
+{txt}10%    {res} .0038021       .0021849       {txt}Obs         {res}      1,488
+{txt}25%    {res} .0064353       .0021939       {txt}Sum of wgt. {res}      1,488
+
+{txt}50%    {res} .0153765                      {txt}Mean          {res} .1239025
+                        {txt}Largest       Std. dev.     {res} .2203264
+{txt}75%    {res} .1055499       .9405907
+{txt}90%    {res} .4555212       .9428243       {txt}Variance      {res} .0485437
+{txt}95%    {res} .7067206       .9455919       {txt}Skewness      {res} 2.164089
+{txt}99%    {res} .9043149        .953654       {txt}Kurtosis      {res} 6.802082
+
+
+
+****************************************************** 
+Step 1: Identification of the optimal number of blocks 
+Use option detail if you want more detailed output 
+****************************************************** 
+
+
+{txt}The final number of blocks is 9
+
+This number of blocks ensures that the mean propensity score
+is not different for treated and controls in each blocks
+
+
+
+{res}********************************************************** 
+Step 2: Test of balancing property of the propensity score 
+Use option detail if you want more detailed output 
+********************************************************** 
+
+Variable hispanic is not balanced in block 1
+
+{err}The balancing property is not satisfied 
+
+Try a different specification of the propensity score 
+
+  {txt}Inferior {c |}
+  of block {c |}       treatment
+of pscore  {c |}         0          1 {c |}     Total
+{hline 11}{c +}{hline 22}{c +}{hline 10}
+         0 {c |}{res}       853          8 {txt}{c |}{res}       861 
+{txt}      .025 {c |}{res}       122          6 {txt}{c |}{res}       128 
+{txt}       .05 {c |}{res}       117          3 {txt}{c |}{res}       120 
+{txt}        .1 {c |}{res}        65         16 {txt}{c |}{res}        81 
+{txt}        .2 {c |}{res}        55         10 {txt}{c |}{res}        65 
+{txt}        .3 {c |}{res}        32         27 {txt}{c |}{res}        59 
+{txt}        .4 {c |}{res}        36         36 {txt}{c |}{res}        72 
+{txt}        .6 {c |}{res}        17         39 {txt}{c |}{res}        56 
+{txt}        .8 {c |}{res}         6         40 {txt}{c |}{res}        46 
+{txt}{hline 11}{c +}{hline 22}{c +}{hline 10}
+     Total {c |}{res}     1,303        185 {txt}{c |}{res}     1,488 
+{txt}Note: the common support option has been selected
+
+
+{res}******************************************* 
+End of the algorithm to estimate the pscore 
+******************************************* 
+{txt}
+{com}. 
+. //## PASO E4: Refinar especificación para lograr balance
+. 
+. // Crear interacciones simples (si no existen)
+. cap gen age_educ   = age*education
+{txt}
+{com}. cap gen re74_re75  = RE74*RE75
+{txt}
+{com}. 
+. // Borrar variables anteriores de pscore y blockid
+. cap drop pscore blockid
+{txt}
+{com}. 
+. // Re-estimar pscore con interacciones añadidas
+. local xvars age age2 education education2 black hispanic married RE75 re752 RE74 re742 age_educ re74_re75
+{txt}
+{com}. pscore treatment `xvars', pscore(pscore) blockid(blockid) comsup
+
+
+
+{res}**************************************************** 
+Algorithm to estimate the propensity score 
+**************************************************** 
+
+
+The treatment is treatment
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}      2,369       92.76       92.76
+{txt}          1 {c |}{res}        185        7.24      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}      2,554      100.00
+
+
+
+Estimation of the propensity score 
+
+{txt}Iteration 0:  Log likelihood = {res}-663.76796
+{txt}Iteration 1:  Log likelihood = {res}-370.34095
+{txt}Iteration 2:  Log likelihood = {res}-321.80317
+{txt}Iteration 3:  Log likelihood = {res}-304.31197
+{txt}Iteration 4:  Log likelihood = {res}-300.82099
+{txt}Iteration 5:  Log likelihood = {res}-300.62844
+{txt}Iteration 6:  Log likelihood = {res}-300.62671
+
+{txt}Probit regression                                 Number of obs   = {res}      2554
+                                                  {txt}LR chi2({res}13{txt})     = {res}    726.28
+                                                  {txt}Prob > chi2     = {res}    0.0000
+{txt}Log likelihood = {res}-300.62671                       {txt}Pseudo R2       = {res}    0.5471
+
+{txt}{hline 13}{c TT}{hline 64}
+   treatment {c |} Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+{hline 13}{c +}{hline 64}
+         age {c |}  {res} .5647733    .067475     8.37   0.000     .4325248    .6970218
+        {txt}age2 {c |}  {res}-.0086881    .000938    -9.26   0.000    -.0105266   -.0068496
+   {txt}education {c |}  {res} .6578155    .209049     3.15   0.002      .248087    1.067544
+  {txt}education2 {c |}  {res}-.0370572   .0081561    -4.54   0.000     -.053043   -.0210714
+       {txt}black {c |}  {res} 1.883748   .1308098    14.40   0.000     1.627366    2.140131
+    {txt}hispanic {c |}  {res} .7166679   .2011088     3.56   0.000     .3225019    1.110834
+     {txt}married {c |}  {res}-.7096977   .1551974    -4.57   0.000    -1.013879   -.4055163
+        {txt}RE75 {c |}  {res}-.0000627    .000038    -1.65   0.098    -.0001372    .0000117
+       {txt}re752 {c |}  {res} 2.20e-09   2.35e-09     0.94   0.349    -2.41e-09    6.81e-09
+        {txt}RE74 {c |}  {res}-.0001518   .0000302    -5.02   0.000    -.0002111   -.0000926
+       {txt}re742 {c |}  {res} 5.95e-09   1.54e-09     3.86   0.000     2.93e-09    8.97e-09
+    {txt}age_educ {c |}  {res}-.0007031   .0032905    -0.21   0.831    -.0071523    .0057461
+   {txt}re74_re75 {c |}  {res}-2.89e-09   2.57e-09    -1.13   0.260    -7.93e-09    2.14e-09
+       {txt}_cons {c |}  {res}-12.07722   1.666456    -7.25   0.000    -15.34342    -8.81103
+{txt}{hline 13}{c BT}{hline 64}
+Note: 132 failures and 0 successes completely determined.
+
+
+
+{res}Note: the common support option has been selected
+The region of common support is [.00197385, .95428976]
+
+
+
+Description of the estimated propensity score 
+in region of common support 
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} .0020635       .0019738
+{txt} 5%    {res} .0025091         .00199
+{txt}10%    {res} .0034514       .0019908       {txt}Obs         {res}      1,504
+{txt}25%    {res} .0062698       .0019908       {txt}Sum of wgt. {res}      1,504
+
+{txt}50%    {res} .0149173                      {txt}Mean          {res} .1226465
+                        {txt}Largest       Std. dev.     {res} .2196124
+{txt}75%    {res} .1011429       .9402674
+{txt}90%    {res} .4487692        .943807       {txt}Variance      {res} .0482296
+{txt}95%    {res} .7006824       .9458637       {txt}Skewness      {res} 2.180316
+{txt}99%    {res} .9044118       .9542898       {txt}Kurtosis      {res} 6.878289
+
+
+
+****************************************************** 
+Step 1: Identification of the optimal number of blocks 
+Use option detail if you want more detailed output 
+****************************************************** 
+
+
+{txt}The final number of blocks is 9
+
+This number of blocks ensures that the mean propensity score
+is not different for treated and controls in each blocks
+
+
+
+{res}********************************************************** 
+Step 2: Test of balancing property of the propensity score 
+Use option detail if you want more detailed output 
+********************************************************** 
+
+
+{txt}The balancing property is satisfied 
+
+
+This table shows the inferior bound, the number of treated
+and the number of controls for each block 
+
+  Inferior {c |}
+  of block {c |}       treatment
+of pscore  {c |}         0          1 {c |}     Total
+{hline 11}{c +}{hline 22}{c +}{hline 10}
+  .0019738 {c |}{res}       869          8 {txt}{c |}{res}       877 
+{txt}      .025 {c |}{res}       120          5 {txt}{c |}{res}       125 
+{txt}       .05 {c |}{res}       121          4 {txt}{c |}{res}       125 
+{txt}        .1 {c |}{res}        65         15 {txt}{c |}{res}        80 
+{txt}        .2 {c |}{res}        53         11 {txt}{c |}{res}        64 
+{txt}        .3 {c |}{res}        31         29 {txt}{c |}{res}        60 
+{txt}        .4 {c |}{res}        39         36 {txt}{c |}{res}        75 
+{txt}        .6 {c |}{res}        15         37 {txt}{c |}{res}        52 
+{txt}        .8 {c |}{res}         6         40 {txt}{c |}{res}        46 
+{txt}{hline 11}{c +}{hline 22}{c +}{hline 10}
+     Total {c |}{res}     1,319        185 {txt}{c |}{res}     1,504 
+{txt}Note: the common support option has been selected
+
+
+{res}******************************************* 
+End of the algorithm to estimate the pscore 
+******************************************* 
+{txt}
+{com}. 
+. //## PASO E5 corregido: Exportar Probit dividido en dos paneles lado a lado
+. 
+. // Primero guardamos el modelo completo
+. probit treatment age age2 education education2 black hispanic married ///
+>     RE75 re752 RE74 re742 age_educ re74_re75
+
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res:-663.76796}  
+Iteration 1:{space 2}Log likelihood = {res:-367.68529}  
+Iteration 2:{space 2}Log likelihood = {res:-308.32403}  
+Iteration 3:{space 2}Log likelihood = {res:-300.84656}  
+Iteration 4:{space 2}Log likelihood = {res: -300.6277}  
+Iteration 5:{space 2}Log likelihood = {res:-300.62671}  
+Iteration 6:{space 2}Log likelihood = {res:-300.62671}  
+{res}
+{txt}{col 1}Probit regression{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:2,554}
+{txt}{col 57}{lalign 13:LR chi2({res:13})}{col 70} = {res}{ralign 6:726.28}
+{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-300.62671}{txt}{col 57}{lalign 13:Pseudo R2}{col 70} = {res}{ralign 6:0.5471}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   treatment{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}age {c |}{col 14}{res}{space 2} .5647733{col 26}{space 2} .0674754{col 37}{space 1}    8.37{col 46}{space 3}0.000{col 54}{space 4}  .432524{col 67}{space 3} .6970226
+{txt}{space 8}age2 {c |}{col 14}{res}{space 2}-.0086881{col 26}{space 2}  .000938{col 37}{space 1}   -9.26{col 46}{space 3}0.000{col 54}{space 4}-.0105266{col 67}{space 3}-.0068496
+{txt}{space 3}education {c |}{col 14}{res}{space 2} .6578155{col 26}{space 2} .2090502{col 37}{space 1}    3.15{col 46}{space 3}0.002{col 54}{space 4} .2480846{col 67}{space 3} 1.067546
+{txt}{space 2}education2 {c |}{col 14}{res}{space 2}-.0370572{col 26}{space 2} .0081562{col 37}{space 1}   -4.54{col 46}{space 3}0.000{col 54}{space 4} -.053043{col 67}{space 3}-.0210714
+{txt}{space 7}black {c |}{col 14}{res}{space 2} 1.883748{col 26}{space 2} .1308113{col 37}{space 1}   14.40{col 46}{space 3}0.000{col 54}{space 4} 1.627363{col 67}{space 3} 2.140134
+{txt}{space 4}hispanic {c |}{col 14}{res}{space 2} .7166679{col 26}{space 2}   .20111{col 37}{space 1}    3.56{col 46}{space 3}0.000{col 54}{space 4} .3224996{col 67}{space 3} 1.110836
+{txt}{space 5}married {c |}{col 14}{res}{space 2}-.7096977{col 26}{space 2} .1551988{col 37}{space 1}   -4.57{col 46}{space 3}0.000{col 54}{space 4}-1.013882{col 67}{space 3}-.4055136
+{txt}{space 8}RE75 {c |}{col 14}{res}{space 2}-.0000627{col 26}{space 2}  .000038{col 37}{space 1}   -1.65{col 46}{space 3}0.098{col 54}{space 4}-.0001372{col 67}{space 3} .0000117
+{txt}{space 7}re752 {c |}{col 14}{res}{space 2} 2.20e-09{col 26}{space 2} 2.35e-09{col 37}{space 1}    0.94{col 46}{space 3}0.349{col 54}{space 4}-2.41e-09{col 67}{space 3} 6.81e-09
+{txt}{space 8}RE74 {c |}{col 14}{res}{space 2}-.0001518{col 26}{space 2} .0000302{col 37}{space 1}   -5.02{col 46}{space 3}0.000{col 54}{space 4}-.0002111{col 67}{space 3}-.0000926
+{txt}{space 7}re742 {c |}{col 14}{res}{space 2} 5.95e-09{col 26}{space 2} 1.54e-09{col 37}{space 1}    3.86{col 46}{space 3}0.000{col 54}{space 4} 2.93e-09{col 67}{space 3} 8.97e-09
+{txt}{space 4}age_educ {c |}{col 14}{res}{space 2}-.0007031{col 26}{space 2} .0032905{col 37}{space 1}   -0.21{col 46}{space 3}0.831{col 54}{space 4}-.0071523{col 67}{space 3} .0057461
+{txt}{space 3}re74_re75 {c |}{col 14}{res}{space 2}-2.89e-09{col 26}{space 2} 2.57e-09{col 37}{space 1}   -1.13{col 46}{space 3}0.260{col 54}{space 4}-7.93e-09{col 67}{space 3} 2.14e-09
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-12.07722{col 26}{space 2} 1.666464{col 37}{space 1}   -7.25{col 46}{space 3}0.000{col 54}{space 4}-15.34343{col 67}{space 3}-8.811013
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: 132 failures and 0 successes completely determined.{p_end}
+
+{com}. eststo fullmodel
+{txt}
+{com}. 
+. // Guardar dos mitades para la exportación
+. // Panel A (primeras covariables)
+. eststo panelA: probit treatment age age2 education education2 black hispanic married
+
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res:-663.76796}  
+Iteration 1:{space 2}Log likelihood = {res: -401.7233}  
+Iteration 2:{space 2}Log likelihood = {res:-354.31173}  
+Iteration 3:{space 2}Log likelihood = {res:-351.65002}  
+Iteration 4:{space 2}Log likelihood = {res:-351.62503}  
+Iteration 5:{space 2}Log likelihood = {res:-351.62503}  
+{res}
+{txt}{col 1}Probit regression{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:2,554}
+{txt}{col 57}{lalign 13:LR chi2({res:7})}{col 70} = {res}{ralign 6:624.29}
+{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-351.62503}{txt}{col 57}{lalign 13:Pseudo R2}{col 70} = {res}{ralign 6:0.4703}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   treatment{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 9}age {c |}{col 14}{res}{space 2} .4116228{col 26}{space 2} .0484147{col 37}{space 1}    8.50{col 46}{space 3}0.000{col 54}{space 4} .3167317{col 67}{space 3}  .506514
+{txt}{space 8}age2 {c |}{col 14}{res}{space 2}-.0064977{col 26}{space 2} .0007945{col 37}{space 1}   -8.18{col 46}{space 3}0.000{col 54}{space 4} -.008055{col 67}{space 3}-.0049405
+{txt}{space 3}education {c |}{col 14}{res}{space 2} .5177845{col 26}{space 2} .1427034{col 37}{space 1}    3.63{col 46}{space 3}0.000{col 54}{space 4} .2380909{col 67}{space 3} .7974781
+{txt}{space 2}education2 {c |}{col 14}{res}{space 2}-.0315712{col 26}{space 2} .0071656{col 37}{space 1}   -4.41{col 46}{space 3}0.000{col 54}{space 4}-.0456156{col 67}{space 3}-.0175268
+{txt}{space 7}black {c |}{col 14}{res}{space 2} 1.967075{col 26}{space 2} .1198921{col 37}{space 1}   16.41{col 46}{space 3}0.000{col 54}{space 4} 1.732091{col 67}{space 3}  2.20206
+{txt}{space 4}hispanic {c |}{col 14}{res}{space 2} .7226863{col 26}{space 2} .1890551{col 37}{space 1}    3.82{col 46}{space 3}0.000{col 54}{space 4} .3521451{col 67}{space 3} 1.093228
+{txt}{space 5}married {c |}{col 14}{res}{space 2}-.9506824{col 26}{space 2} .1357784{col 37}{space 1}   -7.00{col 46}{space 3}0.000{col 54}{space 4}-1.216803{col 67}{space 3}-.6845617
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-9.606634{col 26}{space 2} 1.017438{col 37}{space 1}   -9.44{col 46}{space 3}0.000{col 54}{space 4}-11.60078{col 67}{space 3}-7.612492
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: 29 failures and 0 successes completely determined.{p_end}
+
+{com}. 
+. // Panel B (resto de covariables + constante)
+. eststo panelB: probit treatment RE75 re752 RE74 re742 age_educ re74_re75
+
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res:-663.76796}  
+Iteration 1:{space 2}Log likelihood = {res:-586.15882}  
+Iteration 2:{space 2}Log likelihood = {res:-579.76678}  
+Iteration 3:{space 2}Log likelihood = {res:-579.57546}  
+Iteration 4:{space 2}Log likelihood = {res:-579.57508}  
+Iteration 5:{space 2}Log likelihood = {res:-579.57508}  
+{res}
+{txt}{col 1}Probit regression{col 57}{lalign 13:Number of obs}{col 70} = {res}{ralign 6:2,554}
+{txt}{col 57}{lalign 13:LR chi2({res:5})}{col 70} = {res}{ralign 6:168.39}
+{txt}{col 57}{lalign 13:Prob > chi2}{col 70} = {res}{ralign 6:0.0000}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-579.57508}{txt}{col 57}{lalign 13:Pseudo R2}{col 70} = {res}{ralign 6:0.1268}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}   treatment{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 8}RE75 {c |}{col 14}{res}{space 2}-.0000879{col 26}{space 2} .0000268{col 37}{space 1}   -3.28{col 46}{space 3}0.001{col 54}{space 4}-.0001404{col 67}{space 3}-.0000354
+{txt}{space 7}re752 {c |}{col 14}{res}{space 2} 2.47e-09{col 26}{space 2} 1.83e-09{col 37}{space 1}    1.35{col 46}{space 3}0.177{col 54}{space 4}-1.11e-09{col 67}{space 3} 6.05e-09
+{txt}{space 8}RE74 {c |}{col 14}{res}{space 2}-.0000907{col 26}{space 2} .0000222{col 37}{space 1}   -4.09{col 46}{space 3}0.000{col 54}{space 4}-.0001341{col 67}{space 3}-.0000473
+{txt}{space 7}re742 {c |}{col 14}{res}{space 2} 3.32e-09{col 26}{space 2} 1.12e-09{col 37}{space 1}    2.96{col 46}{space 3}0.003{col 54}{space 4} 1.12e-09{col 67}{space 3} 5.51e-09
+{txt}{space 4}age_educ {c |}{col 14}{res}{space 2} .0001795{col 26}{space 2} .0003367{col 37}{space 1}    0.53{col 46}{space 3}0.594{col 54}{space 4}-.0004805{col 67}{space 3} .0008395
+{txt}{space 3}re74_re75 {c |}{col 14}{res}{space 2}-1.30e-09{col 26}{space 2} 1.90e-09{col 37}{space 1}   -0.68{col 46}{space 3}0.495{col 54}{space 4}-5.03e-09{col 67}{space 3} 2.43e-09
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-1.022188{col 26}{space 2} .0990908{col 37}{space 1}  -10.32{col 46}{space 3}0.000{col 54}{space 4}-1.216403{col 67}{space 3}-.8279739
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. 
+. // Exportar en formato LaTeX lado a lado
+. esttab panelA panelB using "$basedir\RESULTADOS\E_PS.tex", ///
+>     se b(%9.3f) se(%9.3f) star(* 0.10 ** 0.05 *** 0.01) ///
+>     replace label nonumber noobs compress booktabs ///
+>     title("Determinantes del Tratamiento: Modelo Probit para el Propensity Score") ///
+>     mtitle("Panel A" "Panel B") collabels(none)
+{res}{txt}(output written to {browse  `"C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\RESULTADOS\E_PS.tex"'})
+
+{com}.         
+. 
+. //# PROBLEMA F) 
+. *Histogramas del Propensity Score (tratados vs. controles)
+. 
+. //## PASO F1: Histograma grupo control (naranja metálico, 20% opaco)
+. histogram pscore if treatment==0, width(0.05) frequency addlabels ///
+>     fcolor("255 59 0%30") lcolor("255 59 0") ///
+>     xtitle("Propensity Score") ytitle("Frecuencia")
+{txt}(bin={res}19{txt}, start={res}1.069e-22{txt}, width={res}.05{txt})
+{res}{txt}
+{com}. 
+. graph export "$basedir\RESULTADOS\F_HIST_CONTROL.png", replace
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\RESULTADOS\F_HIST_CONTROL.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. 
+. //## PASO F2: Histograma grupo tratado (azul pastel, 20% opaco)
+. histogram pscore if treatment==1, width(0.05) frequency addlabels ///
+>     fcolor("100 149 237%30") lcolor("100 149 237") ///
+>     xtitle("Propensity Score") ytitle("Frecuencia")
+{txt}(bin={res}20{txt}, start={res}.00197385{txt}, width={res}.05{txt})
+{res}{txt}
+{com}. 
+. graph export "$basedir\RESULTADOS\F_HIST_TREATED.png", replace
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\RESULTADOS\F_HIST_TREATED.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. 
+. //## PASO F3: Histogramas solapados en un solo gráfico
+. twoway ///
+>     (histogram pscore if treatment==0, width(0.05) fcolor("255 59 0%20") lcolor("255 59 0")) ///
+>     (histogram pscore if treatment==1, width(0.05) fcolor("100 149 237%20") lcolor("100 149 237")), ///
+>     legend(label(1 "Controles") label(2 "Tratados")) ///
+>     xtitle("Propensity Score") ytitle("Frecuencia")
+{res}{txt}
+{com}. 
+. graph export "$basedir\RESULTADOS\F_HIST_OVERLAY.png", replace
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\RESULTADOS\F_HIST_OVERLAY.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. 
+. //# PROBLEMA G) Diagnóstico fino de overlap
+. 
+. //## PASO G1: Exportar tabla de rangos de Propensity Score
+. 
+. file open fr using "$basedir\RESULTADOS\G_PS_SUMMARY.tex", write replace
+{txt}
+{com}. file write fr "\begin{c -(}tabular{c )-}{c -(}lccccc{c )-}" _n
+{txt}
+{com}. file write fr "\hline" _n
+{txt}
+{com}. file write fr "Grupo & N & Media & Desv.Est. & Mínimo & Máximo \\\\" _n
+{txt}
+{com}. file write fr "\hline" _n
+{txt}
+{com}. 
+. // Controles
+. summarize pscore if treatment==0
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}pscore {c |}{res}      2,369    .0375596    .1075071   1.07e-22   .9321345
+{txt}
+{com}. local n_c    : display %9.0f r(N)
+{res}{txt}
+{com}. local mean_c : display %9.3f r(mean)
+{res}{txt}
+{com}. local sd_c   : display %9.3f r(sd)
+{res}{txt}
+{com}. local min_c  : display %9.6f r(min)
+{res}{txt}
+{com}. local max_c  : display %9.6f r(max)
+{res}{txt}
+{com}. file write fr "Controles & `n_c' & `mean_c' & `sd_c' & `min_c' & `max_c' \\\\" _n
+{txt}
+{com}. 
+. // Tratados
+. summarize pscore if treatment==1
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 6}pscore {c |}{res}        185    .5178794    .2834682   .0019738   .9542898
+{txt}
+{com}. local n_t    : display %9.0f r(N)
+{res}{txt}
+{com}. local mean_t : display %9.3f r(mean)
+{res}{txt}
+{com}. local sd_t   : display %9.3f r(sd)
+{res}{txt}
+{com}. local min_t  : display %9.6f r(min)
+{res}{txt}
+{com}. local max_t  : display %9.6f r(max)
+{res}{txt}
+{com}. file write fr "Tratados & `n_t' & `mean_t' & `sd_t' & `min_t' & `max_t' \\\\" _n
+{txt}
+{com}. 
+. file write fr "\hline" _n
+{txt}
+{com}. file write fr "\end{c -(}tabular{c )-}" _n
+{txt}
+{com}. file close fr
+{txt}
+{com}. 
+. 
+. 
+. //## PASO G2: Graficar densidades kernel por grupo
+. twoway ///
+>     (kdensity pscore if treatment==0, lcolor("255 59 0") lwidth(medthick) ///
+>         fcolor("255 59 0%20") lpattern(solid) ///
+>         legend(label(1 "Controles"))) ///
+>     (kdensity pscore if treatment==1, lcolor("100 149 237") lwidth(medthick) ///
+>         fcolor("100 149 237%20") lpattern(solid) ///
+>         legend(label(2 "Tratados"))), ///
+>     xtitle("Propensity Score") ytitle("Densidad") ///
+>     legend(pos(12) ring(0) col(2))
+{res}{txt}
+{com}. 
+. //## PASO G3: Guardar gráfica
+. graph export "$basedir\RESULTADOS\G_KERNEL_OVERLAP.png", replace
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\RESULTADOS\G_KERNEL_OVERLAP.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. 
+. 
+. 
+. //# PROBLEMA H) 
+. *Estimación del TOT con soporte común
+. 
+. count if treatment==1 & comsup==1
+  {res}185
+{txt}
+{com}. count if treatment==0 & comsup==1
+  {res}1,319
+{txt}
+{com}. 
+. * Número de observaciones antes
+. count
+  {res}2,554
+{txt}
+{com}. 
+. //## PASO H1: Mantener solo soporte común
+. keep if comsup==1
+{txt}(1,050 observations deleted)
+
+{com}. 
+. 
+. * Número de observaciones después
+. count
+  {res}1,504
+{txt}
+{com}. 
+. * Rango de PS en tratados (T)
+. summarize pscore if treatment==1, detail
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} .0025115       .0019738
+{txt} 5%    {res} .0290624       .0025115
+{txt}10%    {res} .1153847       .0027312       {txt}Obs         {res}        185
+{txt}25%    {res} .3151937       .0039415       {txt}Sum of wgt. {res}        185
+
+{txt}50%    {res} .5062063                      {txt}Mean          {res} .5178794
+                        {txt}Largest       Std. dev.     {res} .2834682
+{txt}75%    {res} .7787062       .9402674
+{txt}90%    {res} .8936253        .943807       {txt}Variance      {res} .0803542
+{txt}95%    {res} .9279615       .9458637       {txt}Skewness      {res}-.1678546
+{txt}99%    {res} .9458637       .9542898       {txt}Kurtosis      {res} 1.841692
+{txt}
+{com}. 
+. * Rango de PS en controles (C)
+. summarize pscore if treatment==0, detail
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} .0020621         .00199
+{txt} 5%    {res} .0024389       .0019908
+{txt}10%    {res} .0031655       .0019908       {txt}Obs         {res}      1,319
+{txt}25%    {res} .0059123       .0019932       {txt}Sum of wgt. {res}      1,319
+
+{txt}50%    {res} .0113454                      {txt}Mean          {res}  .067212
+                        {txt}Largest       Std. dev.     {res}   .13704
+{txt}75%    {res} .0502366       .8681405
+{txt}90%    {res} .2354797       .8917822       {txt}Variance      {res}   .01878
+{txt}95%    {res} .3790614       .9198971       {txt}Skewness      {res} 3.181669
+{txt}99%    {res} .6727468       .9321345       {txt}Kurtosis      {res} 14.02818
+{txt}
+{com}. 
+. //## PASO H2: Estratificación manual (bloques de pscore)
+. reg RE78 treatment i.blockid, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}     1,504
+                                                {txt}F(9, 1494)        =  {res}     3.36
+                                                {txt}Prob > F          = {res}    0.0004
+                                                {txt}R-squared         = {res}    0.0140
+                                                {txt}Root MSE          =    {res}   7365
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 630.8155{col 26}{space 2} 619.6571{col 37}{space 1}    1.02{col 46}{space 3}0.309{col 54}{space 4}-584.6749{col 67}{space 3} 1846.306
+{txt}{space 12} {c |}
+{space 5}blockid {c |}
+{space 10}2  {c |}{col 14}{res}{space 2}-379.6511{col 26}{space 2} 705.5988{col 37}{space 1}   -0.54{col 46}{space 3}0.591{col 54}{space 4}-1763.721{col 67}{space 3} 1004.418
+{txt}{space 10}3  {c |}{col 14}{res}{space 2}-490.8302{col 26}{space 2} 751.2533{col 37}{space 1}   -0.65{col 46}{space 3}0.514{col 54}{space 4}-1964.453{col 67}{space 3}  982.793
+{txt}{space 10}4  {c |}{col 14}{res}{space 2}-526.2447{col 26}{space 2} 852.7421{col 37}{space 1}   -0.62{col 46}{space 3}0.537{col 54}{space 4}-2198.944{col 67}{space 3} 1146.454
+{txt}{space 10}5  {c |}{col 14}{res}{space 2}-2079.948{col 26}{space 2} 854.7572{col 37}{space 1}   -2.43{col 46}{space 3}0.015{col 54}{space 4}  -3756.6{col 67}{space 3}-403.2967
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}-3090.652{col 26}{space 2} 767.9652{col 37}{space 1}   -4.02{col 46}{space 3}0.000{col 54}{space 4}-4597.057{col 67}{space 3}-1584.248
+{txt}{space 10}7  {c |}{col 14}{res}{space 2}-2726.515{col 26}{space 2} 782.5905{col 37}{space 1}   -3.48{col 46}{space 3}0.001{col 54}{space 4}-4261.608{col 67}{space 3}-1191.422
+{txt}{space 10}8  {c |}{col 14}{res}{space 2}-1449.937{col 26}{space 2} 1179.655{col 37}{space 1}   -1.23{col 46}{space 3}0.219{col 54}{space 4}-3763.892{col 67}{space 3} 864.0184
+{txt}{space 10}9  {c |}{col 14}{res}{space 2}-2815.161{col 26}{space 2} 1537.611{col 37}{space 1}   -1.83{col 46}{space 3}0.067{col 54}{space 4}-5831.267{col 67}{space 3} 200.9442
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 7819.259{col 26}{space 2} 248.2898{col 37}{space 1}   31.49{col 46}{space 3}0.000{col 54}{space 4} 7332.226{col 67}{space 3} 8306.293
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. //## PASO H3: Estratificación automática (atts)
+. atts RE78 treatment, pscore(pscore) blockid(blockid)
+
+
+
+{col 1}{txt}ATT estimation with the Stratification method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      185{col 13}     1319{col 25} 1804.426{col 37}  740.349{col 49}    2.437
+
+{txt}{hline 57}
+
+{com}. 
+. //## PASO H4: Vecino más cercano (attnd)
+. attnd RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching the nearest neighbor of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with Nearest Neighbor Matching method 
+{col 1}(random draw version)
+{col 1}Analytical standard errors
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 38}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      185{col 13}       99{col 25} 2338.443{col 38} 1146.881{col 49}    2.039
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+nearest neighbour matches
+
+{com}. 
+. //## PASO H5: Kernel matching (attk)
+. attk RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching for matches of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with the Kernel Matching method 
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      185{col 13}     1319{col 25} 1778.280{col 37}        .{col 49}        .
+
+{txt}{hline 57}
+Note: Analytical standard errors cannot be computed. Use
+the bootstrap option to get bootstrapped standard errors.
+
+{com}. 
+. //## PASO H6: Radius matching (attr)
+. attr RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      185{col 13}     1319{col 25} -863.509{col 37}  615.620{col 49}   -1.403
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.001
+. attr RE78 treatment, pscore(pscore) radius(0.001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       75{col 13}      498{col 25}-2050.933{col 37}  885.994{col 49}   -2.315
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.0001
+. attr RE78 treatment, pscore(pscore) radius(0.0001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       29{col 13}      105{col 25}-2107.848{col 37} 1340.375{col 49}   -1.573
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.00001
+. attr RE78 treatment, pscore(pscore) radius(0.00001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       19{col 13}       24{col 25}  -81.947{col 37} 2253.668{col 49}   -0.036
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. 
+. *** EXPORTAR MANUEMENTE LOS RESULTADOS EN UNA TABLa***
+. 
+. //# PORBLEMA I)
+. 
+. * Número de observaciones antes del trimming Crump
+. count
+  {res}1,504
+{txt}
+{com}. 
+. //## PASO I1: Definir muestra Crump (0.1 < ps < 0.9)
+. keep if pscore > 0.1 & pscore < 0.9
+{txt}(1,143 observations deleted)
+
+{com}. 
+. * Número de observaciones después del trimming
+. count
+  {res}361
+{txt}
+{com}. 
+. * Resumen de PS para tratados y controles
+. summarize pscore if treatment==1, detail
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} .1153847       .1010927
+{txt} 5%    {res} .1497277       .1153847
+{txt}10%    {res} .2034803       .1184862       {txt}Obs         {res}        154
+{txt}25%    {res} .3590166       .1191677       {txt}Sum of wgt. {res}        154
+
+{txt}50%    {res} .5145679                      {txt}Mean          {res}  .533891
+                        {txt}Largest       Std. dev.     {res} .2336292
+{txt}75%    {res} .7670037       .8970662
+{txt}90%    {res} .8538439       .8970662       {txt}Variance      {res} .0545826
+{txt}95%    {res} .8810898       .8970662       {txt}Skewness      {res}-.0700242
+{txt}99%    {res} .8970662       .8974707       {txt}Kurtosis      {res} 1.783177
+{txt}
+{com}. summarize pscore if treatment==0, detail
+
+                 {txt}Estimated propensity score
+{hline 61}
+      Percentiles      Smallest
+ 1%    {res} .1013624       .1011932
+{txt} 5%    {res} .1175302       .1013179
+{txt}10%    {res} .1334646       .1013624       {txt}Obs         {res}        207
+{txt}25%    {res}   .18106       .1053995       {txt}Sum of wgt. {res}        207
+
+{txt}50%    {res} .2694719                      {txt}Mean          {res} .3228344
+                        {txt}Largest       Std. dev.     {res}  .178682
+{txt}75%    {res} .4091767       .8076876
+{txt}90%    {res}  .593271       .8499183       {txt}Variance      {res} .0319272
+{txt}95%    {res} .6808017       .8681405       {txt}Skewness      {res} 1.027646
+{txt}99%    {res} .8499183       .8917822       {txt}Kurtosis      {res} 3.456911
+{txt}
+{com}. 
+. 
+. //## PASO I2: Estratificación manual
+. reg RE78 treatment i.blockid, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}       361
+                                                {txt}F(6, 354)         =  {res}     1.44
+                                                {txt}Prob > F          = {res}    0.1990
+                                                {txt}R-squared         = {res}    0.0177
+                                                {txt}Root MSE          =    {res} 7344.3
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 974.4473{col 26}{space 2} 736.2084{col 37}{space 1}    1.32{col 46}{space 3}0.186{col 54}{space 4}-473.4448{col 67}{space 3} 2422.339
+{txt}{space 12} {c |}
+{space 5}blockid {c |}
+{space 10}5  {c |}{col 14}{res}{space 2}-1548.334{col 26}{space 2}  1146.68{col 37}{space 1}   -1.35{col 46}{space 3}0.178{col 54}{space 4}-3803.496{col 67}{space 3}  706.828
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}-2666.065{col 26}{space 2} 1057.237{col 37}{space 1}   -2.52{col 46}{space 3}0.012{col 54}{space 4} -4745.32{col 67}{space 3} -586.811
+{txt}{space 10}7  {c |}{col 14}{res}{space 2}-2300.783{col 26}{space 2} 1069.589{col 37}{space 1}   -2.15{col 46}{space 3}0.032{col 54}{space 4}-4404.331{col 67}{space 3} -197.235
+{txt}{space 10}8  {c |}{col 14}{res}{space 2}-1103.768{col 26}{space 2} 1376.677{col 37}{space 1}   -0.80{col 46}{space 3}0.423{col 54}{space 4}-3811.262{col 67}{space 3} 1603.725
+{txt}{space 10}9  {c |}{col 14}{res}{space 2}-1496.803{col 26}{space 2} 2328.526{col 37}{space 1}   -0.64{col 46}{space 3}0.521{col 54}{space 4}-6076.286{col 67}{space 3} 3082.681
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 7228.583{col 26}{space 2} 830.4402{col 37}{space 1}    8.70{col 46}{space 3}0.000{col 54}{space 4} 5595.367{col 67}{space 3}   8861.8
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. //## PASO I3: Estratificación automática (atts)
+. atts RE78 treatment, pscore(pscore) blockid(blockid)
+
+
+
+{col 1}{txt}ATT estimation with the Stratification method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25} 2271.598{col 37}  811.677{col 49}    2.799
+
+{txt}{hline 57}
+
+{com}. 
+. //## PASO I4: Vecino más cercano
+. attnd RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching the nearest neighbor of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with Nearest Neighbor Matching method 
+{col 1}(random draw version)
+{col 1}Analytical standard errors
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 38}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}       78{col 25} 2741.232{col 38} 1189.084{col 49}    2.305
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+nearest neighbour matches
+
+{com}. 
+. //## PASO I5: Kernel matching
+. attk RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching for matches of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with the Kernel Matching method 
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25} 2229.721{col 37}        .{col 49}        .
+
+{txt}{hline 57}
+Note: Analytical standard errors cannot be computed. Use
+the bootstrap option to get bootstrapped standard errors.
+
+{com}. 
+. //## PASO I6: Radius matching
+. attr RE78 treatment, pscore(pscore)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25}  884.744{col 37}  821.323{col 49}    1.077
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.001
+. attr RE78 treatment, pscore(pscore) radius(0.001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       56{col 13}       65{col 25} 1635.209{col 37} 1363.021{col 49}    1.200
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.0001
+. attr RE78 treatment, pscore(pscore) radius(0.0001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       18{col 13}       19{col 25} -389.896{col 37} 2045.241{col 49}   -0.191
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // Radius matching con r = 0.00001
+. attr RE78 treatment, pscore(pscore) radius(0.00001)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}       14{col 13}       15{col 25}  264.372{col 37} 2484.033{col 49}    0.106
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. 
+. //# PROBLEMA J) 
+. 
+. //## PASO J1: Placebo bajo soporte común clásico (comsup)
+. // Estratificación manual
+. reg RE75 treatment i.blockid if comsup==1, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}       361
+                                                {txt}F(6, 354)         =  {res}     5.72
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.1124
+                                                {txt}Root MSE          =    {res} 3217.3
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE75{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 35.61022{col 26}{space 2} 355.6266{col 37}{space 1}    0.10{col 46}{space 3}0.920{col 54}{space 4}-663.7963{col 67}{space 3} 735.0167
+{txt}{space 12} {c |}
+{space 5}blockid {c |}
+{space 10}5  {c |}{col 14}{res}{space 2}-1479.004{col 26}{space 2} 724.4319{col 37}{space 1}   -2.04{col 46}{space 3}0.042{col 54}{space 4}-2903.735{col 67}{space 3}-54.27273
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}-2638.017{col 26}{space 2} 628.0053{col 37}{space 1}   -4.20{col 46}{space 3}0.000{col 54}{space 4}-3873.107{col 67}{space 3}-1402.926
+{txt}{space 10}7  {c |}{col 14}{res}{space 2}-2475.744{col 26}{space 2} 647.1043{col 37}{space 1}   -3.83{col 46}{space 3}0.000{col 54}{space 4}-3748.396{col 67}{space 3}-1203.092
+{txt}{space 10}8  {c |}{col 14}{res}{space 2}-2905.224{col 26}{space 2} 661.0921{col 37}{space 1}   -4.39{col 46}{space 3}0.000{col 54}{space 4}-4205.386{col 67}{space 3}-1605.063
+{txt}{space 10}9  {c |}{col 14}{res}{space 2}-3305.737{col 26}{space 2} 695.7332{col 37}{space 1}   -4.75{col 46}{space 3}0.000{col 54}{space 4}-4674.027{col 67}{space 3}-1937.447
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 3779.378{col 26}{space 2}  569.582{col 37}{space 1}    6.64{col 46}{space 3}0.000{col 54}{space 4} 2659.188{col 67}{space 3} 4899.569
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. // Estratificación automática
+. atts RE75 treatment if comsup==1, pscore(pscore) blockid(blockid)
+
+
+
+{col 1}{txt}ATT estimation with the Stratification method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25}   17.603{col 37}  269.845{col 49}    0.065
+
+{txt}{hline 57}
+
+{com}. 
+. // Vecino más cercano
+. attnd RE75 treatment if comsup==1, pscore(pscore)
+
+
+{res} The program is searching the nearest neighbor of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with Nearest Neighbor Matching method 
+{col 1}(random draw version)
+{col 1}Analytical standard errors
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 38}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}       78{col 25} -165.233{col 38}  614.674{col 49}   -0.269
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+nearest neighbour matches
+
+{com}. 
+. // Kernel matching
+. attk RE75 treatment if comsup==1, pscore(pscore)
+
+
+{res} The program is searching for matches of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with the Kernel Matching method 
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25}  -66.567{col 37}        .{col 49}        .
+
+{txt}{hline 57}
+Note: Analytical standard errors cannot be computed. Use
+the bootstrap option to get bootstrapped standard errors.
+
+{com}. 
+. // Radius matching
+. attr RE75 treatment if comsup==1, pscore(pscore)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25} -641.198{col 37}  350.576{col 49}   -1.829
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. // AIPW (Augmented IPW)
+. teffects aipw (RE75 age age2 education education2 black hispanic married re752 RE74 re742) ///
+>               (treatment), atet vce(robust)
+{res}
+{txt}Iteration 0:{space 2}EE criterion ={res: 1.146e-21}  
+Iteration 1:{space 2}EE criterion ={res: 7.197e-25}  
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: augmented IPW}
+{txt:Outcome model}{col 16}:{res: linear by ML}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE75{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2}-266.7091{col 26}{space 2} 171.1077{col 37}{space 1}   -1.56{col 46}{space 3}0.119{col 54}{space 4} -602.074{col 67}{space 3} 68.65575
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2}  1644.42{col 26}{space 2} 225.7737{col 37}{space 1}    7.28{col 46}{space 3}0.000{col 54}{space 4} 1201.912{col 67}{space 3} 2086.928
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}.                           
+. keep if pscore > 0.1 & pscore < 0.9
+{txt}(0 observations deleted)
+
+{com}. 
+. // AIPW
+. teffects aipw (RE75 age age2 education education2 black hispanic married re752 RE74 re742) ///
+>               (treatment), atet vce(robust)
+{res}
+{txt}Iteration 0:{space 2}EE criterion ={res: 1.146e-21}  
+Iteration 1:{space 2}EE criterion ={res: 7.197e-25}  
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: augmented IPW}
+{txt:Outcome model}{col 16}:{res: linear by ML}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE75{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2}-266.7091{col 26}{space 2} 171.1077{col 37}{space 1}   -1.56{col 46}{space 3}0.119{col 54}{space 4} -602.074{col 67}{space 3} 68.65575
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2}  1644.42{col 26}{space 2} 225.7737{col 37}{space 1}    7.28{col 46}{space 3}0.000{col 54}{space 4} 1201.912{col 67}{space 3} 2086.928
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}. 
+. 
+. //## PASO J2: Placebo bajo trimming tipo Crump (0.1 < ps < 0.9)
+. // Estratificación manual
+. reg RE75 treatment i.blockid if pscore>0.1 & pscore<0.9, vce(robust)
+
+{txt}Linear regression                               Number of obs     = {res}       361
+                                                {txt}F(6, 354)         =  {res}     5.72
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.1124
+                                                {txt}Root MSE          =    {res} 3217.3
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE75{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 3}treatment {c |}{col 14}{res}{space 2} 35.61022{col 26}{space 2} 355.6266{col 37}{space 1}    0.10{col 46}{space 3}0.920{col 54}{space 4}-663.7963{col 67}{space 3} 735.0167
+{txt}{space 12} {c |}
+{space 5}blockid {c |}
+{space 10}5  {c |}{col 14}{res}{space 2}-1479.004{col 26}{space 2} 724.4319{col 37}{space 1}   -2.04{col 46}{space 3}0.042{col 54}{space 4}-2903.735{col 67}{space 3}-54.27273
+{txt}{space 10}6  {c |}{col 14}{res}{space 2}-2638.017{col 26}{space 2} 628.0053{col 37}{space 1}   -4.20{col 46}{space 3}0.000{col 54}{space 4}-3873.107{col 67}{space 3}-1402.926
+{txt}{space 10}7  {c |}{col 14}{res}{space 2}-2475.744{col 26}{space 2} 647.1043{col 37}{space 1}   -3.83{col 46}{space 3}0.000{col 54}{space 4}-3748.396{col 67}{space 3}-1203.092
+{txt}{space 10}8  {c |}{col 14}{res}{space 2}-2905.224{col 26}{space 2} 661.0921{col 37}{space 1}   -4.39{col 46}{space 3}0.000{col 54}{space 4}-4205.386{col 67}{space 3}-1605.063
+{txt}{space 10}9  {c |}{col 14}{res}{space 2}-3305.737{col 26}{space 2} 695.7332{col 37}{space 1}   -4.75{col 46}{space 3}0.000{col 54}{space 4}-4674.027{col 67}{space 3}-1937.447
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 3779.378{col 26}{space 2}  569.582{col 37}{space 1}    6.64{col 46}{space 3}0.000{col 54}{space 4} 2659.188{col 67}{space 3} 4899.569
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. // Estratificación automática
+. atts RE75 treatment if pscore>0.1 & pscore<0.9, pscore(pscore) blockid(blockid)
+
+
+
+{col 1}{txt}ATT estimation with the Stratification method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25}   17.603{col 37}  269.845{col 49}    0.065
+
+{txt}{hline 57}
+
+{com}. 
+. // Vecino más cercano
+. attnd RE75 treatment if pscore>0.1 & pscore<0.9, pscore(pscore)
+
+
+{res} The program is searching the nearest neighbor of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with Nearest Neighbor Matching method 
+{col 1}(random draw version)
+{col 1}Analytical standard errors
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 38}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}       78{col 25} -165.233{col 38}  614.674{col 49}   -0.269
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+nearest neighbour matches
+
+{com}. 
+. // Kernel matching
+. attk RE75 treatment if pscore>0.1 & pscore<0.9, pscore(pscore)
+
+
+{res} The program is searching for matches of each treated unit. 
+ This operation may take a while.
+
+
+
+{col 1}ATT estimation with the Kernel Matching method 
+
+{txt}{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25}  -66.567{col 37}        .{col 49}        .
+
+{txt}{hline 57}
+Note: Analytical standard errors cannot be computed. Use
+the bootstrap option to get bootstrapped standard errors.
+
+{com}. 
+. // Radius matching
+. attr RE75 treatment if pscore>0.1 & pscore<0.9, pscore(pscore)
+
+
+{res} The program is searching for matches of treated units within radius. 
+ This operation may take a while.
+
+
+
+{col 1}{txt}ATT estimation with the Radius Matching method
+{col 1}Analytical standard errors
+
+{hline 57}
+{col 1}n. treat.{col 13}n. contr.{col 25}      ATT{col 37}Std. Err.{col 49}        t
+{hline 57}
+
+{col 1}{res}      154{col 13}      207{col 25} -641.198{col 37}  350.576{col 49}   -1.829
+
+{txt}{hline 57}
+Note: the numbers of treated and controls refer to actual
+matches within radius
+
+{com}. 
+. 
+. //# PROBLEMA K) 
+. 
+. *Estimadores doblemente robustos (DR)
+. 
+. //## PASO K: Estimación bajo soporte común clásico (pscore)
+. 
+. // Mantener soporte común
+. keep if comsup==1
+{txt}(0 observations deleted)
+
+{com}. 
+. // AIPW (Augmented IPW)
+. teffects aipw (RE78 age age2 education education2 black hispanic married RE75 re752 RE74 re742) ///
+>               (treatment), atet vce(robust)
+{res}
+{txt}Iteration 0:{space 2}EE criterion ={res: 9.107e-21}  
+Iteration 1:{space 2}EE criterion ={res: 6.958e-24}  
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: augmented IPW}
+{txt:Outcome model}{col 16}:{res: linear by ML}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2} 2138.768{col 26}{space 2}  861.778{col 37}{space 1}    2.48{col 46}{space 3}0.013{col 54}{space 4} 449.7142{col 67}{space 3} 3827.822
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2} 4395.873{col 26}{space 2} 570.8945{col 37}{space 1}    7.70{col 46}{space 3}0.000{col 54}{space 4}  3276.94{col 67}{space 3} 5514.805
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}.                           
+. tabulate treatment if comsup==1
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}        207       57.34       57.34
+{txt}          1 {c |}{res}        154       42.66      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        361      100.00
+{txt}
+{com}. 
+. 
+. // IPWRA (Inverse Probability Weighted Regression Adjustment)
+. teffects ipwra (RE78 age age2 education education2 black hispanic married RE75 re752 RE74 re742) ///
+>                (treatment age age2 education education2 black hispanic married RE75 re752 RE74 re742), atet vce(robust)
+
+{res}{txt}Iteration 0:{space 2}EE criterion ={res: 4.786e-19}  (not concave)
+Iteration 1:{space 2}EE criterion ={res: 3.086e-19}  (not concave)
+Iteration 2:{space 2}EE criterion ={res: 2.545e-19}  (not concave)
+Iteration 3:{space 2}EE criterion ={res: 2.371e-19}  (not concave)
+Iteration 4:{space 2}EE criterion ={res: 2.286e-19}  (not concave)
+Iteration 5:{space 2}EE criterion ={res: 2.218e-19}  (not concave)
+Iteration 6:{space 2}EE criterion ={res: 2.147e-19}  (not concave)
+Iteration 7:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 8:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 9:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 10:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 11:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 12:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 13:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 14:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 15:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 16:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 17:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 18:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 19:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 20:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 21:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 22:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 23:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 24:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 25:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 26:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 27:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 28:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 29:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 30:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 31:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 32:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 33:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 34:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 35:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 36:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 37:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 38:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 39:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 40:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 41:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 42:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 43:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 44:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 45:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 46:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 47:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 48:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 49:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 50:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 51:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 52:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 53:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 54:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 55:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 56:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 57:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 58:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 59:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 60:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 61:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 62:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 63:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 64:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 65:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 66:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 67:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 68:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 69:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 70:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 71:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 72:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 73:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 74:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 75:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 76:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 77:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 78:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 79:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 80:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 81:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 82:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 83:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 84:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 85:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 86:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 87:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 88:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 89:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 90:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 91:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 92:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 93:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 94:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 95:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 96:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 97:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 98:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 99:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 100:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 101:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 102:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 103:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 104:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 105:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 106:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 107:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 108:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 109:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 110:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 111:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 112:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 113:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 114:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 115:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 116:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 117:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 118:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 119:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 120:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 121:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 122:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 123:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 124:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 125:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 126:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 127:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 128:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 129:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 130:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 131:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 132:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 133:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 134:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 135:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 136:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 137:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 138:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 139:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 140:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 141:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 142:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 143:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 144:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 145:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 146:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 147:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 148:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 149:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 150:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 151:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 152:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 153:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 154:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 155:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 156:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 157:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 158:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 159:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 160:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 161:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 162:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 163:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 164:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 165:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 166:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 167:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 168:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 169:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 170:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 171:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 172:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 173:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 174:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 175:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 176:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 177:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 178:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 179:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 180:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 181:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 182:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 183:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 184:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 185:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 186:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 187:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 188:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 189:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 190:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 191:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 192:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 193:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 194:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 195:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 196:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 197:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 198:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 199:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 200:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 201:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 202:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 203:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 204:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 205:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 206:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 207:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 208:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 209:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 210:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 211:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 212:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 213:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 214:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 215:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 216:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 217:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 218:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 219:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 220:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 221:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 222:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 223:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 224:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 225:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 226:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 227:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 228:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 229:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 230:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 231:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 232:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 233:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 234:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 235:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 236:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 237:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 238:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 239:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 240:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 241:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 242:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 243:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 244:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 245:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 246:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 247:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 248:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 249:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 250:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 251:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 252:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 253:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 254:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 255:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 256:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 257:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 258:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 259:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 260:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 261:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 262:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 263:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 264:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 265:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 266:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 267:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 268:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 269:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 270:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 271:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 272:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 273:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 274:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 275:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 276:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 277:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 278:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 279:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 280:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 281:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 282:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 283:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 284:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 285:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 286:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 287:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 288:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 289:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 290:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 291:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 292:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 293:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 294:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 295:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 296:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 297:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 298:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 299:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 300:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+{err}convergence not achieved
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: IPW regression adjustment}
+{txt:Outcome model}{col 16}:{res: linear}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2}  2347.41{col 26}{space 2} 800.8146{col 37}{space 1}    2.93{col 46}{space 3}0.003{col 54}{space 4} 777.8417{col 67}{space 3} 3916.977
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2} 4187.231{col 26}{space 2} 483.9314{col 37}{space 1}    8.65{col 46}{space 3}0.000{col 54}{space 4} 3238.743{col 67}{space 3} 5135.719
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}. 
+. tabulate treatment if comsup==1
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}        207       57.34       57.34
+{txt}          1 {c |}{res}        154       42.66      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        361      100.00
+{txt}
+{com}.                            
+. //## PASO K2: Estimación bajo trimming tipo Crump (0.1 < pscore < 0.9)
+. 
+. keep if pscore > 0.1 & pscore < 0.9
+{txt}(0 observations deleted)
+
+{com}. 
+. // AIPW
+. teffects aipw (RE78 age age2 education education2 black hispanic married RE75 re752 RE74 re742) ///
+>               (treatment), atet vce(robust)
+{res}
+{txt}Iteration 0:{space 2}EE criterion ={res: 9.107e-21}  
+Iteration 1:{space 2}EE criterion ={res: 6.958e-24}  
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: augmented IPW}
+{txt:Outcome model}{col 16}:{res: linear by ML}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2} 2138.768{col 26}{space 2}  861.778{col 37}{space 1}    2.48{col 46}{space 3}0.013{col 54}{space 4} 449.7142{col 67}{space 3} 3827.822
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2} 4395.873{col 26}{space 2} 570.8945{col 37}{space 1}    7.70{col 46}{space 3}0.000{col 54}{space 4}  3276.94{col 67}{space 3} 5514.805
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}.                           
+. tabulate treatment if comsup==1
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}        207       57.34       57.34
+{txt}          1 {c |}{res}        154       42.66      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        361      100.00
+{txt}
+{com}. 
+. 
+. // IPWRA
+. teffects ipwra (RE78 age age2 education education2 black hispanic married RE75 re752 RE74 re742) ///
+>                (treatment age age2 education education2 black hispanic married RE75 re752 RE74 re742), atet vce(robust)
+
+{res}{txt}Iteration 0:{space 2}EE criterion ={res: 4.786e-19}  (not concave)
+Iteration 1:{space 2}EE criterion ={res: 3.086e-19}  (not concave)
+Iteration 2:{space 2}EE criterion ={res: 2.545e-19}  (not concave)
+Iteration 3:{space 2}EE criterion ={res: 2.371e-19}  (not concave)
+Iteration 4:{space 2}EE criterion ={res: 2.286e-19}  (not concave)
+Iteration 5:{space 2}EE criterion ={res: 2.218e-19}  (not concave)
+Iteration 6:{space 2}EE criterion ={res: 2.147e-19}  (not concave)
+Iteration 7:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 8:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 9:{space 2}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 10:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 11:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 12:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 13:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 14:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 15:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 16:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 17:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 18:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 19:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 20:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 21:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 22:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 23:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 24:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 25:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 26:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 27:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 28:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 29:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 30:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 31:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 32:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 33:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 34:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 35:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 36:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 37:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 38:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 39:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 40:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 41:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 42:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 43:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 44:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 45:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 46:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 47:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 48:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 49:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 50:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 51:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 52:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 53:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 54:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 55:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 56:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 57:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 58:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 59:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 60:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 61:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 62:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 63:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 64:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 65:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 66:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 67:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 68:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 69:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 70:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 71:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 72:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 73:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 74:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 75:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 76:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 77:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 78:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 79:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 80:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 81:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 82:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 83:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 84:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 85:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 86:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 87:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 88:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 89:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 90:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 91:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 92:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 93:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 94:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 95:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 96:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 97:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 98:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 99:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 100:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 101:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 102:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 103:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 104:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 105:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 106:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 107:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 108:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 109:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 110:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 111:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 112:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 113:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 114:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 115:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 116:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 117:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 118:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 119:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 120:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 121:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 122:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 123:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 124:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 125:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 126:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 127:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 128:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 129:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 130:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 131:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 132:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 133:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 134:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 135:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 136:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 137:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 138:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 139:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 140:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 141:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 142:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 143:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 144:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 145:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 146:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 147:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 148:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 149:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 150:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 151:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 152:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 153:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 154:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 155:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 156:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 157:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 158:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 159:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 160:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 161:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 162:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 163:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 164:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 165:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 166:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 167:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 168:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 169:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 170:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 171:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 172:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 173:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 174:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 175:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 176:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 177:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 178:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 179:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 180:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 181:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 182:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 183:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 184:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 185:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 186:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 187:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 188:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 189:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 190:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 191:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 192:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 193:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 194:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 195:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 196:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 197:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 198:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 199:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 200:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 201:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 202:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 203:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 204:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 205:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 206:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 207:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 208:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 209:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 210:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 211:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 212:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 213:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 214:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 215:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 216:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 217:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 218:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 219:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 220:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 221:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 222:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 223:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 224:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 225:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 226:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 227:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 228:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 229:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 230:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 231:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 232:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 233:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 234:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 235:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 236:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 237:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 238:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 239:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 240:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 241:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 242:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 243:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 244:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 245:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 246:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 247:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 248:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 249:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 250:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 251:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 252:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 253:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 254:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 255:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 256:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 257:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 258:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 259:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 260:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 261:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 262:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 263:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 264:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 265:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 266:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 267:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 268:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 269:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 270:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 271:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 272:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 273:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 274:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 275:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 276:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 277:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 278:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 279:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 280:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 281:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 282:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 283:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 284:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 285:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 286:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 287:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 288:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 289:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 290:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 291:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 292:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 293:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 294:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 295:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 296:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 297:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 298:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 299:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+Iteration 300:{space 1}EE criterion ={res: 2.125e-19}  (not concave)
+{err}convergence not achieved
+{txt}{p 4 4 2}The Gauss-Newton stopping criterion has been met but missing standard errors indicate some of the parameters are not identified.{p_end}
+{res}
+{txt}Treatment-effects estimation{col 49}Number of obs {col 67}= {res}       361
+{txt:Estimator}{col 16}:{res: IPW regression adjustment}
+{txt:Outcome model}{col 16}:{res: linear}
+{txt:Treatment model}{col 16}:{res: logit}
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}        RE78{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ATET         {txt}{c |}
+{space 3}treatment {c |}
+{space 3}(1 vs 0)  {c |}{col 14}{res}{space 2}  2347.41{col 26}{space 2} 800.8146{col 37}{space 1}    2.93{col 46}{space 3}0.003{col 54}{space 4} 777.8417{col 67}{space 3} 3916.977
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}POmean       {txt}{c |}
+{space 3}treatment {c |}
+{space 10}0  {c |}{col 14}{res}{space 2} 4187.231{col 26}{space 2} 483.9314{col 37}{space 1}    8.65{col 46}{space 3}0.000{col 54}{space 4} 3238.743{col 67}{space 3} 5135.719
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+Warning: Convergence not achieved.
+
+{com}.                            
+.                 tabulate treatment if comsup==1   
+
+  {txt}treatment {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}        207       57.34       57.34
+{txt}          1 {c |}{res}        154       42.66      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        361      100.00
+{txt}
+{com}.                          
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\danif\Colmex maestria\TERCER SEMESTRE\MICROECONOMETRIA EPS\TAREAS\TAREA 3\Tarea3_FuentesGarcia.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res} 2 Oct 2025, 16:27:08
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
