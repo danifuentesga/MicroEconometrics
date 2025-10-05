@@ -1,0 +1,1044 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+   3 Experimentos II\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+   3 Experimentos II\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{3 Experimentos II} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Sesgo y precisión}}
+\addcontentsline{toc}{section}{Sesgo y precisión}
+
+\begin{itemize}
+    \item La \textbf{precisión} aumenta con el \textbf{tamaño de muestra}: más observaciones generan estimaciones menos dispersas.
+    \item El \textbf{sesgo} se reduce con la \textbf{aleatorización}: asegura que las estimaciones estén centradas en la verdad.
+    \item La calidad de un experimento se mide por la combinación de \textbf{bajo sesgo} y \textbf{alta precisión}.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image1}
+\caption{\footnotesize Relación entre precisión (arriba-abajo) y sesgo (izquierda-derecha).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La precisión es como disparar muchas veces al mismo lugar; el sesgo es qué tan cerca estás del \textbf{centro real}.
+    \item Un buen experimento es como un arquero que lanza flechas todas juntas y justo en el blanco: \textbf{consistente y correcto}.
+\end{itemize}
+
+\section*{\noindent\textbf{Evaluamos el efecto de traer tutores a las escuelas}}
+\addcontentsline{toc}{section}{Evaluamos el efecto de traer tutores a las escuelas}
+
+\begin{itemize}
+    \item Después de la prueba, se comparan \textbf{grupo control} y \textbf{grupo tratamiento}.
+    \item La media del tratamiento resulta ser \textbf{6 puntos porcentuales más alta} que la media del grupo de control.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\textwidth]{image2}
+\caption{\footnotesize Distribución de puntajes: comparación entre media del grupo de control y del tratamiento.}
+\end{figure}
+
+\begin{itemize}
+    \item Pregunta central: ¿es este impacto \textbf{estadísticamente significativo}?  
+    ¿Sí, no, o no es posible determinarlo?
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Ver una media más alta no basta: necesitamos saber si la diferencia es \textbf{real} o solo fruto del azar.
+    \item Es como lanzar una moneda muchas veces: un resultado con más “caras” puede parecer un patrón, pero solo la estadística nos dice si lo es en serio.
+\end{itemize}
+
+\section*{\noindent\textbf{Diferencia entre las medias muestrales}}
+\addcontentsline{toc}{section}{Diferencia entre las medias muestrales}
+
+\begin{itemize}
+    \item La diferencia entre la media del \textbf{grupo tratamiento} y la del \textbf{grupo control} se interpreta como el \textbf{efecto estimado}.
+    \item En este caso, la diferencia corresponde a aproximadamente \textbf{6 puntos}.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image3}
+\caption{\footnotesize Comparación gráfica de medias muestrales: el efecto estimado es la distancia entre ambas líneas.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La estimación es simplemente la \textbf{distancia} entre la media de los tratados y la de los controles.
+    \item Es como comparar el promedio de altura entre dos equipos: la diferencia directa refleja el \textbf{efecto medio}.
+\end{itemize}
+
+\section*{\noindent\textbf{¿Qué pasaría si corriéramos un segundo experimento?}}
+\addcontentsline{toc}{section}{¿Qué pasaría si corriéramos un segundo experimento?}
+
+\begin{itemize}
+    \item Si se repite el experimento con una nueva muestra, las \textbf{medias muestrales} de tratamiento y control pueden cambiar.
+    \item El \textbf{efecto estimado} en este segundo experimento no será exactamente igual al del primero.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image4}
+\caption{\footnotesize Un segundo experimento puede producir medias y efectos estimados diferentes debido al azar muestral.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Cada experimento es como volver a \textbf{lanzar los dados}: los resultados pueden variar un poco aunque la verdad subyacente sea la misma.
+    \item Esto refleja la \textbf{variabilidad muestral}: distintos grupos de estudiantes darán estimaciones ligeramente distintas.
+\end{itemize}
+
+\section*{\noindent\textbf{Múltiples experimentos: una distribución de las estimaciones}}
+\addcontentsline{toc}{section}{Múltiples experimentos: una distribución de las estimaciones}
+
+\begin{itemize}
+    \item Si repitiéramos el experimento muchas veces, cada muestra daría un \textbf{efecto estimado} ligeramente distinto.
+    \item Estos efectos se agrupan en una \textbf{distribución muestral}, que refleja la variabilidad inherente al azar.
+    \item La forma de esta distribución permite evaluar la \textbf{precisión} de la estimación y construir intervalos de confianza.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image5}
+\caption{\footnotesize Distribución de los efectos estimados en múltiples repeticiones del experimento.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como lanzar muchas veces un dado cargado: cada tirada cambia, pero la mayoría de los resultados se concentran cerca del valor real.
+    \item Esta distribución nos dice qué tan \textbf{confiables} son los promedios que obtenemos y cuánto fluctúan por azar.
+\end{itemize}
+
+\section*{\noindent\textbf{Distribución de las estimaciones si el verdadero efecto = $\beta$}}
+\addcontentsline{toc}{section}{Distribución de las estimaciones si el verdadero efecto = $\beta$}
+
+\begin{itemize}
+    \item Los \textbf{efectos estimados} se concentran alrededor del verdadero parámetro $\beta$.
+    \item Bajo ciertos supuestos, esta distribución sigue una forma \textbf{normal}, gracias al \textbf{Teorema Central del Límite}.
+    \item Por eso, aunque cada experimento da un resultado distinto, en promedio los estimadores se agrupan cerca del valor real.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image6}
+\caption{\footnotesize Distribución normal de los estimadores alrededor del efecto verdadero $\beta$.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como lanzar una moneda muchas veces: la proporción de caras varía, pero se concentra alrededor de 0.5.
+    \item Aquí, los estimadores fluctúan por azar, pero en promedio apuntan al \textbf{valor verdadero}.
+\end{itemize}
+
+\section*{\noindent\textbf{Distribución de las estimaciones si el verdadero efecto = 0}}
+\addcontentsline{toc}{section}{Distribución de las estimaciones si el verdadero efecto = 0}
+
+\begin{itemize}
+    \item Cuando el \textbf{efecto verdadero es nulo}, los estimadores se concentran alrededor de 0.
+    \item La dispersión de los resultados entre experimentos refleja el \textbf{error estándar}.
+    \item En promedio, el estimador no está sesgado: su media coincide con el verdadero valor (0).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image7}
+\caption{\footnotesize Distribución normal de los estimadores alrededor de $0$ cuando el efecto verdadero es nulo.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Como lanzar un dado balanceado: los resultados varían, pero en promedio no se inclinan hacia ningún lado.
+    \item Aquí, cada experimento da un estimado distinto, pero el \textbf{promedio global es cero}.
+\end{itemize}
+
+\section*{\noindent\textbf{Dos distribuciones bajo dos hipótesis distintas}}
+\addcontentsline{toc}{section}{Dos distribuciones bajo dos hipótesis distintas}
+
+\begin{itemize}
+    \item La \textbf{hipótesis nula} ($H_0$): el efecto verdadero es 0.  
+    \item La \textbf{hipótesis alternativa} ($H_\beta$): el efecto verdadero es distinto de 0 (por ejemplo, $\beta > 0$).  
+    \item Cada curva muestra la \textbf{distribución de los estimadores} si una u otra hipótesis fuera cierta.  
+    \item La superposición indica que un mismo valor estimado puede ser consistente con ambas hipótesis.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image8}
+\caption{\footnotesize Distribuciones de los estimadores bajo $H_0$ (efecto nulo) y bajo $H_\beta$ (efecto positivo).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Como dos “mundos posibles”: en uno el efecto es 0, en el otro es positivo.  
+    \item Observar un estimado nos hace preguntarnos: ¿es más probable que provenga del mundo $H_0$ o del mundo $H_\beta$?
+\end{itemize}
+
+\section*{\noindent\textbf{Si corremos un solo experimento}}
+\addcontentsline{toc}{section}{Si corremos un solo experimento}
+
+\begin{itemize}
+    \item Al correr un solo experimento obtenemos una estimación puntual $\hat{\beta}$.  
+    \item La pregunta es: \textbf{¿cómo sabemos si este valor es estadísticamente significativo?}  
+    \item Para responder, comparamos $\hat{\beta}$ con la distribución de los estimadores bajo $H_0$.  
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image9}
+\caption{\footnotesize Una estimación puntual $\hat{\beta}$ a partir de un único experimento.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Una sola flecha al blanco no nos dice si acertamos por suerte o por efecto real.  
+    \item Necesitamos comparar $\hat{\beta}$ con lo que esperaríamos si el efecto verdadero fuera cero ($H_0$).
+\end{itemize}
+
+\section*{\noindent\textbf{¿Nuestra estimación provino de $H_\beta$ o $H_0$?}}
+\addcontentsline{toc}{section}{¿Nuestra estimación provino de $H_\beta$ o $H_0$?}
+
+\begin{itemize}
+    \item Una misma estimación $\hat{\beta}$ puede ser consistente tanto con $H_0$ como con $H_\beta$, pero con distinta probabilidad.  
+    \item El punto $P1$ muestra la densidad bajo $H_0$; el punto $P2$, bajo $H_\beta$.  
+    \item La pregunta central es: \textbf{¿qué hipótesis hace más probable la observación?}  
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image10}
+\caption{\footnotesize Comparación de probabilidades: densidad de la estimación bajo $H_0$ (P1) y bajo $H_\beta$ (P2).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como observar una ficha en la mesa: ¿salió de la bolsa roja ($H_0$) o de la bolsa azul ($H_\beta$)?  
+    \item No necesitamos certeza absoluta: lo clave es evaluar si podemos \textbf{descartar razonablemente} que provino de $H_0$.  
+\end{itemize}
+
+
+\section*{\noindent\textbf{Nivel de significancia del 5\%}}
+\addcontentsline{toc}{section}{Nivel de significancia del 5\%}
+
+\begin{itemize}
+    \item Fijamos un umbral: $\alpha = 0.05$.  
+    \item Definimos dos \textbf{valores críticos} que delimitan la región donde no podemos rechazar $H_0$.  
+    \item Cualquier estimación que caiga entre estas dos líneas críticas se interpreta como \textbf{no estadísticamente diferente de 0}.  
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{image11}
+\caption{\footnotesize Regla de decisión con $\alpha = 0.05$: los valores entre las líneas críticas no permiten rechazar $H_0$.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como un margen de tolerancia: si la evidencia cae en esa “zona gris”, no podemos decir con confianza que el efecto es distinto de cero.  
+    \item Solo los valores fuera de esa franja se consideran suficientemente extremos para concluir que $H_0$ es improbable.  
+\end{itemize}
+
+\section*{\noindent\textbf{Valor crítico}}
+\addcontentsline{toc}{section}{Valor crítico}
+
+\begin{itemize}
+    \item \textbf{Definición:} El valor crítico es el tamaño del efecto estimado que corresponde exactamente con el nivel de significancia $\alpha$.  
+    \item Sirve como punto de referencia para decidir si un resultado es suficientemente extremo como para rechazar $H_0$.  
+    \item Si estamos probando:  
+    \begin{itemize}
+        \item El efecto es mayor que 0.  
+        \item Y queremos significancia al nivel del 95\%.  
+        \item Entonces, el \textbf{valor crítico} es la estimación donde exactamente 5\% del área bajo la curva se encuentra a la derecha.  
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como fijar una “meta mínima”: solo los resultados más grandes que este umbral se consideran evidencia suficiente contra $H_0$.  
+    \item Visualmente, el valor crítico es la frontera entre la región de aceptación y la de rechazo de $H_0$.  
+\end{itemize}
+
+\section*{\noindent\textbf{¿Es $\beta$ significativamente diferente de 0, al 5\% de significancia?}}
+\addcontentsline{toc}{section}{¿Es $\beta$ significativamente diferente de 0, al 5\% de significancia?}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image12}
+\end{figure}
+
+\begin{itemize}
+    \item La estimación $\hat{\beta}$ se compara con los valores críticos (líneas naranjas).  
+    \item Si $\hat{\beta}$ cae fuera del intervalo delimitado por los valores críticos, rechazamos $H_0$.  
+    \item Si cae dentro, no podemos rechazar $H_0$ al 5\% de significancia.  
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Los valores críticos son los “umbrales” de evidencia: solo los resultados suficientemente extremos permiten concluir que el efecto es distinto de 0.  
+    \item Aquí la pregunta clave es: \textit{¿dónde cae nuestra estimación relativa a esos umbrales?}  
+\end{itemize}
+
+\section*{\noindent\textbf{Prueba de hipótesis}}
+\addcontentsline{toc}{section}{Prueba de hipótesis}
+
+\begin{itemize}
+    \item En derecho penal, la mayoría de las instituciones siguen la regla de: \textbf{"inocente hasta que se demuestre lo contrario"}.
+    \item La presunción es que el acusado es inocente y la carga está en el fiscal para demostrar la culpabilidad.
+    \begin{itemize}
+        \item El jurado o juez inicia con la \textbf{hipótesis nula} de que el acusado es inocente.
+        \item El fiscal sostiene la hipótesis alternativa: que el acusado es culpable.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La hipótesis nula funciona como la "base": se mantiene hasta que haya suficiente evidencia en contra.  
+    \item Igual que en un juicio, solo rechazamos $H_0$ (inocente) si la evidencia es muy fuerte a favor de $H_1$ (culpable).  
+\end{itemize}
+
+\hrule
+
+\section*{\noindent\textbf{Prueba de hipótesis (evaluación de programas)}}
+\addcontentsline{toc}{section}{Prueba de hipótesis (evaluación de programas)}
+
+\begin{itemize}
+    \item En evaluación de programas, en lugar de la "presunción de inocencia", la regla es: \textbf{"presunción de cero efecto"}.
+    \item La \textbf{hipótesis nula} ($H_0$) es que el programa no tuvo impacto.
+    \item La carga de la prueba es demostrar que sí hubo un impacto.
+    \item \textbf{Excepción:} en programas con componentes múltiples, $H_0$ puede ser que un componente no cambie el efecto respecto a otro.  
+    \\ Ejemplo: un programa de \textit{dinero en efectivo + capacitación} podría tener como $H_0$ que su efecto es igual al de un programa con \textit{solo capacitación}.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item $H_0$ funciona como la “posición base” (no hay impacto).
+    \item Solo si la evidencia es suficientemente fuerte rechazamos $H_0$ y concluimos que el programa sí cambió algo.  
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Si es muy improbable (menos del 5\% de probabilidad) que la diferencia entre grupo control y tratamiento se deba exclusivamente a la casualidad:
+    \begin{itemize}
+        \item Rechazamos la hipótesis nula. 
+        \item Es decir, concluimos que el programa tiene un impacto \textbf{estadísticamente significativo}.
+    \end{itemize}
+    
+    \item Importante: \textbf{estadísticamente significativo} $\neq$ \textbf{más probable}.
+    
+    \item Puede ocurrir que sea más probable que el programa funcione a que no lo haga, pero aún así no se considere \textbf{estadísticamente significativo}.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La significancia estadística es una regla formal: no basta con que algo “parezca más probable”. 
+    \item Sirve para reducir errores y exigir evidencia fuerte antes de rechazar la hipótesis nula.
+\end{itemize}
+
+\section*{\noindent\textbf{¿Qué es el nivel de significancia?}}
+\addcontentsline{toc}{section}{¿Qué es el nivel de significancia?}
+
+\begin{itemize}
+    \item \textbf{Error Tipo I}: rechazar la hipótesis nula a pesar de que es verdadera.
+    \item \textbf{Nivel de significancia}: probabilidad de rechazar la hipótesis nula cuando en realidad es verdadera.
+    \item Tradicionalmente se fija en \textbf{5\%}.
+    \item Esto implica aceptar un 5\% de probabilidad de cometer un Error Tipo I.
+    \item Es decir, el 5\% del tiempo diremos que un programa tuvo impacto, aunque en realidad no lo tuvo.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El nivel de significancia es como el \textit{umbral de confianza} que ponemos antes de afirmar que algo funciona.
+    \item Aceptamos que, a veces, podemos equivocarnos —pero solo en una proporción pequeña (5\%).
+\end{itemize}
+
+\section*{\noindent\textbf{¿Qué es poder estadístico?}}
+\addcontentsline{toc}{section}{¿Qué es poder estadístico?}
+
+\begin{itemize}
+    \item \textbf{Error Tipo II}: no rechazar la hipótesis nula (concluir que no hay diferencia entre control y tratados) cuando en realidad es falsa.
+    \item \textbf{Poder}: probabilidad de detectar un efecto real (rechazar $H_0$ cuando $H_0$ es falsa).
+    \item Tradicionalmente, se busca un \textbf{80\%} de poder estadístico (otros apuntan a \textbf{90\%}).
+    \item Un nivel bajo de poder significa que podríamos no encontrar un efecto significativo, aun cuando sí existe.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El poder estadístico mide la \textit{capacidad del experimento para no perderse un efecto real}.
+    \item Como un radar: si el radar es débil (bajo poder), puede que no detecte un avión aunque esté allí.
+\end{itemize}
+
+\section*{\noindent\textbf{Cuatro resultados de las pruebas de hipótesis}}
+\addcontentsline{toc}{section}{Cuatro resultados de las pruebas de hipótesis}
+
+\begin{itemize}
+    \item Cuando el tratamiento es \textbf{efectivo ($H_0$ falsa)}:
+    \begin{itemize}
+        \item Si la prueba es \textbf{significativa (rechaza $H_0$)}: obtenemos un resultado correcto con probabilidad $1-\kappa$ (\textbf{poder}).
+        \item Si la prueba es \textbf{no significativa (no se rechaza $H_0$)}: incurrimos en un \textbf{Error Tipo II} con probabilidad $\kappa$.
+    \end{itemize}
+    \item Cuando el tratamiento \textbf{no es efectivo ($H_0$ verdadera)}:
+    \begin{itemize}
+        \item Si la prueba es \textbf{significativa (rechaza $H_0$)}: incurrimos en un \textbf{Error Tipo I} con probabilidad $\alpha$.
+        \item Si la prueba es \textbf{no significativa (no se rechaza $H_0$)}: obtenemos un resultado correcto con probabilidad $1-\alpha$.
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image13}
+    \caption{\footnotesize Resumen de los posibles resultados de una prueba de hipótesis.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Piensa en un detector de humo: a veces suena aunque no haya fuego (\textbf{Error Tipo I}), o no suena aunque sí haya fuego (\textbf{Error Tipo II}).
+    \item El poder estadístico refleja qué tan bueno es el detector para sonar cuando realmente hay fuego (detectar un efecto real).
+\end{itemize}
+
+\section*{\noindent\textbf{¿Cuántas veces se rechazaría la hipótesis nula, si es que $H_\beta$ es cierta?}}
+\addcontentsline{toc}{section}{¿Cuántas veces se rechazaría la hipótesis nula, si es que $H_\beta$ es cierta?}
+
+\begin{itemize}
+    \item El área sombreada representa el \textbf{poder estadístico}: la fracción de veces que encontramos que $H_\beta$ es distinto de 0 cuando en verdad el efecto es $\beta$.
+    \item El poder es, por tanto, la \textbf{probabilidad de rechazar $H_0$ cuando esta es falsa}.
+    \item La línea amarilla marca el \textbf{valor crítico} a partir del cual concluimos que el efecto es significativo.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image14}
+    \caption{\footnotesize El área bajo $H_\beta$ más allá del valor crítico indica el poder estadístico.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como un examen de antidoping: el poder mide cuántas veces detectamos correctamente a alguien que sí consumió (efecto real).
+    \item Un poder alto significa que rara vez dejamos pasar por “negativo” a alguien que en verdad era positivo.
+\end{itemize}
+
+
+\section*{\noindent\textbf{¿Cuáles son los determinantes del poder estadístico?}}
+\addcontentsline{toc}{section}{¿Cuáles son los determinantes del poder estadístico?}
+
+\begin{itemize}
+    \item Los \textbf{determinantes del poder} son los factores que modifican la proporción de hipótesis de investigación que quedan en la zona sombreada, es decir, la parte a la derecha (o izquierda) de la curva de $H_0$.
+    \item Comprender estos determinantes es clave para \textbf{diseñar experimentos más potentes} y con mayor capacidad de detectar efectos reales.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El poder depende de qué tan fácil es distinguir la señal del ruido: más muestra, menor ruido y más chances de ver el efecto.
+    \item Es como usar una cámara: con mayor resolución (poder estadístico), captas detalles que con una cámara borrosa pasarían desapercibidos.
+\end{itemize}
+
+
+\section*{\noindent\textbf{Poder estadístico: principales determinantes}}
+\addcontentsline{toc}{section}{Poder estadístico: principales determinantes}
+
+\begin{itemize}
+    \item Mayor \textbf{superposición de las curvas} implica menor poder estadístico.
+    \item Los factores que determinan el grado de superposición entre $H_0$ y $H_\beta$ son:
+    \begin{enumerate}
+        \item \textbf{Tamaño del efecto}: efectos más grandes son más fáciles de detectar.
+        \item \textbf{Tamaño de la muestra}: muestras mayores reducen la incertidumbre.
+        \item \textbf{Varianza}: menor dispersión de los datos aumenta el poder.
+        \item \textbf{Proporción de la muestra en T vs. C}: la asignación balanceada maximiza eficiencia.
+        \item \textbf{Clustering (clusterización)}: aumenta la correlación interna y reduce poder.
+    \end{enumerate}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image15}
+    \caption{\footnotesize Factores que determinan el solapamiento de las distribuciones y, por tanto, el poder.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Más datos y menos ruido hacen que la señal se vea más clara: como subir el volumen de una canción en medio del tráfico.
+    \item Si las curvas se separan más (efecto grande, muestra grande), es mucho más difícil confundir $H_0$ con $H_\beta$.
+\end{itemize}
+
+\section*{\noindent\textbf{Tamaño del efecto = 1 $\times$ error estándar}}
+\addcontentsline{toc}{section}{Tamaño del efecto = 1 $\times$ error estándar}
+
+\begin{itemize}
+    \item El \textbf{tamaño del efecto} puede medirse en múltiplos del \textbf{error estándar}.
+    \item Si el efecto verdadero es igual a 1 error estándar, las distribuciones de $H_0$ y $H_\beta$ se \textbf{solapan bastante}.
+    \item Esto implica que distinguir entre hipótesis se vuelve más difícil, reduciendo el poder.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image16}
+    \caption{\footnotesize Cuando el efecto es de 1 error estándar, la superposición entre $H_0$ y $H_\beta$ es significativa.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Imagínalo como dos grupos de personas con alturas distintas, pero que difieren en solo \textbf{unos centímetros}: cuesta más diferenciarlos.
+    \item Cuanto más pequeño sea el efecto en relación al ruido (error estándar), más se confunden las distribuciones y menor el poder.
+\end{itemize}
+
+\section*{\noindent\textbf{Tamaño del efecto = 1 $\times$ error estándar}}
+\addcontentsline{toc}{section}{Tamaño del efecto = 1 $\times$ error estándar}
+
+\begin{itemize}
+    \item Si el efecto verdadero equivale a \textbf{un error estándar}, la zona sombreada bajo $H_\beta$ muestra la fracción de casos donde se rechaza $H_0$.
+    \item El \textbf{poder estadístico} es relativamente bajo, porque gran parte de las distribuciones de $H_0$ y $H_\beta$ siguen solapadas.
+    \item Esto refleja que con un efecto pequeño, el test solo detecta diferencias en una porción limitada de escenarios.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image17}
+    \caption{\footnotesize El área verde representa la probabilidad de rechazar $H_0$ cuando el verdadero efecto es $H_\beta$.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como tratar de escuchar una canción suave en medio de mucho \textbf{ruido}: a veces la distingues, pero muchas veces no.
+    \item Un efecto pequeño en relación al error estándar significa que el experimento tiene \textbf{bajo poder}.
+\end{itemize}
+
+\section*{\noindent\textbf{Poder igual a 26\% si el verdadero impacto es 1 $\times$ error estándar}}
+\addcontentsline{toc}{section}{Poder igual a 26\% si el verdadero impacto es 1 $\times$ error estándar}
+
+\begin{itemize}
+    \item Con un \textbf{efecto verdadero de 1 error estándar}, el poder estadístico resulta ser apenas \textbf{26\%}.
+    \item Esto implica que en el \textbf{74\% de los casos}, no se rechazaría la hipótesis nula aunque el efecto exista.
+    \item La figura muestra el área sombreada bajo $H_\beta$, correspondiente a la probabilidad de detectar el efecto real.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image18}
+    \caption{\footnotesize Con un efecto de 1 error estándar, la hipótesis nula solo se rechaza en el 26\% de los experimentos.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como lanzar una moneda cargada pero muy poco: la mayoría de las veces sigue pareciendo una moneda justa.
+    \item Un poder de 26\% significa que tu \textbf{experimento está mal calibrado}: la mayor parte del tiempo no detecta un efecto que sí existe.
+\end{itemize}
+
+\section*{\noindent\textbf{Tamaño del efecto = 3 $\times$ error estándar. Poder = 91\%}}
+\addcontentsline{toc}{section}{Tamaño del efecto = 3 $\times$ error estándar. Poder = 91\%}
+
+\begin{itemize}
+    \item Con un \textbf{efecto de 3 errores estándar}, las distribuciones de $H_0$ y $H_\beta$ están claramente \textbf{separadas}.
+    \item El \textbf{poder estadístico} alcanza el \textbf{91\%}, lo que significa que casi siempre se detecta el efecto verdadero.
+    \item A mayor \textbf{tamaño del efecto}, menor solapamiento entre distribuciones y, por tanto, mayor precisión en el test.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image19}
+    \caption{\footnotesize Un efecto tres veces mayor que el error estándar produce un poder muy alto (91\%).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como comparar a una persona adulta con un niño: la diferencia es tan clara que casi nunca te confundes.
+    \item Con un \textbf{efecto grande}, el experimento funciona de manera mucho más confiable y detecta el impacto verdadero casi siempre.
+\end{itemize}
+
+\section*{\noindent\textbf{Tamaño del efecto y adopción (take-up)}}
+\addcontentsline{toc}{section}{Tamaño del efecto y adopción (take-up)}
+
+\begin{itemize}
+    \item Supongamos que el impacto esperado en los participantes es de \textbf{3 errores estándar}.
+    \item Pero si solo un \textbf{tercio de los individuos} adopta o participa, el efecto observado se reduce a \textbf{1/3 del tamaño}.
+    \item Esto implica que el poder estadístico vuelve a caer drásticamente, en este caso a \textbf{26\%}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image20}
+    \caption{\footnotesize Con adopción parcial (33\%), el efecto efectivo se reduce y el poder baja nuevamente al 26\%.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como tener un remedio muy potente, pero que solo toma una parte de los pacientes: el \textbf{efecto promedio se diluye}.
+    \item Aun si el impacto individual es grande, la baja participación hace que el experimento \textbf{pierda fuerza}.
+\end{itemize}
+
+\section*{\noindent\textbf{Al incrementar el tamaño de la muestra...}}
+\addcontentsline{toc}{section}{Al incrementar el tamaño de la muestra...}
+
+\begin{itemize}
+    \item (a) \textbf{Disminuye el sesgo}
+    \item (b) \textbf{Incrementa precisión}
+    \item (c) Ambas
+    \item (d) Ninguna
+    \item (e) No sé
+\end{itemize}
+
+\noindent Al incrementar el tamaño de la muestra...
+\begin{itemize}
+    \item (a) Las curvas se separan
+    \item (b) Las curvas se acercan
+    \item (c) Las curvas se ensanchan
+    \item (d) \textbf{Las curvas se estrechan}
+    \item (e) No sé
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image21}
+    \caption{\footnotesize Un mayor tamaño de muestra estrecha las curvas, aumentando la precisión y el poder (ej. 91\%).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Más observaciones = menos ruido: las distribuciones se \textbf{estrechan} porque reducimos la variabilidad.
+    \item Es como medir la temperatura varias veces: al aumentar las mediciones, el promedio se vuelve \textbf{más preciso}.
+\end{itemize}
+
+\section*{\noindent\textbf{Tamaño de la muestra}}
+\addcontentsline{toc}{section}{Tamaño de la muestra}
+
+\begin{itemize}
+    \item Con un \textbf{tamaño de efecto = 1 error estándar} y una muestra de \textbf{4000}, el poder es de apenas \textbf{64\%}.
+    \item Al aumentar la muestra a \textbf{9000}, el poder crece hasta \textbf{91\%}.
+    \item Esto muestra que una mayor muestra estrecha las distribuciones y mejora la probabilidad de rechazar $H_0$ cuando corresponde.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image22}
+    \caption{\footnotesize A mayor tamaño de muestra, las distribuciones se estrechan y el poder estadístico aumenta (64\% $\to$ 91\%).}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Con pocas observaciones, el “ruido” hace difícil distinguir si hay un efecto.  
+    \item Una muestra grande es como tener una foto en alta resolución: todo se ve con mayor \textbf{claridad y precisión}.
+\end{itemize}
+
+\section*{\noindent\textbf{¿Cómo un incremento en la varianza de la población afecta las curvas de distribución de las estimaciones?}}
+\addcontentsline{toc}{section}{¿Cómo un incremento en la varianza de la población afecta las curvas de distribución de las estimaciones?}
+
+\begin{itemize}
+    \item (a) Las curvas se separan
+    \item (b) Las curvas se acercan
+    \item (c) \textbf{Las curvas se ensanchan}
+    \item (d) Las curvas se estrechan
+    \item (e) No sé
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Mayor \textbf{varianza} significa más dispersión: las distribuciones se hacen más anchas y con colas más largas.
+    \item Es como medir con una regla torcida: el promedio puede estar bien, pero los datos quedan mucho más \textbf{esparcidos}.
+\end{itemize}
+
+\section*{\noindent\textbf{Varianza}}
+\addcontentsline{toc}{section}{Varianza}
+
+\begin{itemize}
+    \item \textbf{Estimaciones más agrupadas} $\rightarrow$ mayor poder estadístico.
+    \item \textbf{Muestra con poca varianza}: distribuciones estrechas, fácil distinguir $H_0$ de $H_\beta$.
+    \item \textbf{Muestra con mucha varianza}: distribuciones más dispersas, mayor solapamiento y menor capacidad de detección.
+    \item \textbf{Estimaciones más dispersas} $\rightarrow$ menor poder.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image23}
+    \caption{\footnotesize Comparación entre baja varianza (arriba) y alta varianza (abajo): más dispersión implica menor poder estadístico.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Con \textbf{poca varianza}, es como ver dos colores bien definidos: la diferencia salta a la vista.  
+    \item Con \textbf{mucha varianza}, los colores se mezclan y cuesta saber cuál es cuál: el test pierde fuerza.
+\end{itemize}
+
+\section*{\noindent\textbf{Varianza y poder: intuición}}
+\addcontentsline{toc}{section}{Varianza y poder: intuición}
+
+\begin{itemize}
+    \item Un programa busca aumentar la altura de los niños.
+    \item Existe una gran cantidad de variación en la altura de la población.
+    \item Al final del período, los niños en el grupo de tratamiento son más altos que en el grupo de control.
+    \item ¿Será porque comenzamos con niños más altos o porque el programa funcionó?
+    \item Necesitamos una muestra grande para poder averiguar esto.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image24}
+    \caption{\footnotesize Ejemplo intuitivo: variabilidad inicial puede confundir el efecto real del tratamiento.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Con mucha varianza, es difícil separar el efecto del programa de las diferencias iniciales.  
+    \item Una \textbf{muestra grande} ayuda a “promediar” la variación y revelar si el tratamiento realmente funcionó.  
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Si todos los miembros de la población subyacente son similares en estatura al inicio del programa, sería fácil averiguar el efecto.
+    \begin{itemize}
+        \item Necesitaríamos una muestra más pequeña (o, con el mismo tamaño de muestra, tendríamos un mayor poder estadístico).
+    \end{itemize}
+    \item Sería más fácil concluir que las variaciones observadas entre el grupo tratado y el de control son resultado del programa. 
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{image25}
+    \caption{\footnotesize Menor varianza inicial implica más claridad en la detección del efecto.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Si la población es homogénea, el “ruido” es bajo y se necesita menos muestra para identificar el impacto.  
+    \item Menor varianza = más fácil distinguir efecto verdadero del programa.  
+\end{itemize}
+
+\section*{\noindent\textbf{Proporción de la muestra en T vs. C}}
+\addcontentsline{toc}{section}{Proporción de la muestra en T vs. C}
+
+\begin{itemize}
+    \item División de la muestra: 50\% C, 50\% T. Poder = 91\%.
+    \item La igualdad en la proporción da distribuciones con la misma “anchura”.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image26}
+    \caption{\footnotesize Poder estadístico con división equilibrada de la muestra entre control y tratamiento.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Una división balanceada entre tratamiento y control maximiza la precisión de la comparación.  
+    \item Si la muestra está desbalanceada, aumenta la varianza y disminuye el poder.  
+\end{itemize}
+
+\section*{\noindent\textbf{¿Qué pasa si la división de la muestra no es del 50:50?}}
+\addcontentsline{toc}{section}{¿Qué pasa si la división de la muestra no es del 50:50?}
+
+\begin{itemize}
+    \item Por ejemplo, si es de 25\% C y 75\% T, el poder baja a 83\%.
+    \item Distribuciones desiguales no son eficientes $\rightarrow$ menor poder.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image27}
+    \caption{\footnotesize Poder estadístico disminuye cuando la división no es balanceada entre grupos.}
+\end{figure}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Un grupo pequeño (ej. 25\% en control) aporta menos información para la comparación.  
+    \item Esto aumenta la varianza y reduce la probabilidad de detectar un efecto real.  
+\end{itemize}
+
+\section*{\noindent\textbf{¿Qué tanto es muy desequilibrado?}}
+\addcontentsline{toc}{section}{¿Qué tanto es muy desequilibrado?}
+
+\noindent Bloom (2006): 
+\textit{"Debido a que la precisión se erosiona lentamente hasta que el grado de desequilibrio se vuelve extremo 
+(o más o menos $p \leq 0.2$ o $p \geq 0.8$), hay suficiente margen de maniobra para el uso de una asignación desequilibrada".} 
+
+\begin{itemize}
+    \item Cuestiones políticas pueden dictar un grupo pequeño de control.  
+    \item Los costos pueden dictar un grupo pequeño de tratamiento.  
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image28}
+    \caption{\footnotesize Relación entre proporción asignada y varianza del estimador.}
+\end{figure}
+
+\begin{itemize}
+    \item Sin embargo, dejando atrás estas consideraciones, para un tamaño de muestra dado, el poder se maximiza cuando la mitad de la muestra es asignada al tratamiento.  
+\end{itemize}
+
+\section*{\noindent\textbf{Ecuación de poder. Efecto Mínimo Detectable}}
+\addcontentsline{toc}{section}{Ecuación de poder. Efecto Mínimo Detectable}
+
+\[
+EMD \;=\; \underbrace{t_{(1-\kappa)}}_{\text{Poder}} 
+\;+\; \underbrace{t_{\alpha}}_{\text{Nivel de significancia}}
+\;\times\; 
+\sqrt{\frac{1}{P(1-P)}} \times \sqrt{\frac{\sigma^2}{N}}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{image29}
+    \caption{\footnotesize Representación gráfica del Efecto Mínimo Detectable (EMD).}
+\end{figure}
+
+\begin{itemize}
+    \item El \textbf{EMD} es el tamaño de efecto más pequeño que puede ser detectado con un nivel de confianza y poder dados.  
+    \item Depende de la \textbf{varianza} ($\sigma^2$), el \textbf{tamaño de la muestra} ($N$) y la \textbf{proporción de asignación} ($P$).  
+    \item Valores más altos de $N$ o menor varianza reducen el EMD, permitiendo detectar efectos más pequeños.  
+\end{itemize}
+
+\section*{\noindent\textbf{Diseño agrupado. Definición}}
+\addcontentsline{toc}{section}{Diseño agrupado. Definición}
+
+\textbf{En muestreo:}
+\begin{itemize}
+    \item Cuando grupos de individuos (por ejemplo, escuelas, comunidades, etc.) son seleccionados al azar de la población, antes de seleccionar individuos para observación.
+\end{itemize}
+
+\textbf{En evaluación aleatoria:}
+\begin{itemize}
+    \item Cuando grupos de individuos son asignados al azar a diferentes grupos de tratamiento.
+\end{itemize}
+
+\hrule
+
+Queremos saber qué tan cerradas serán las próximas elecciones nacionales
+
+\begin{itemize}
+    \item \textbf{Método 1:} Seleccionar aleatoriamente 50 personas de toda la población
+    \item \textbf{Método 2:} Seleccionar al azar 5 familias y pedir a 10 miembros de cada familia su opinión
+\end{itemize}
+
+\section*{\noindent\textbf{Baja correlación dentro de la agrupación o clúster (ICC, $\rho$)}}
+\addcontentsline{toc}{section}{Baja correlación dentro de la agrupación o clúster (ICC, $\rho$)}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image30}
+    \caption*{\footnotesize Intra-cluster correlation (ICC): mide qué tan parecidos son los individuos dentro de un mismo clúster. 
+    \\[3pt] 
+    Si la correlación $\rho$ es baja, cada observación aporta más información independiente.}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Cuando $\rho$ es cercano a 0, los individuos dentro del clúster se comportan como observaciones casi independientes.
+    \item \textbf{Intuición:} Un grupo de personas con opiniones muy diversas equivale a tener más información útil, aunque estén en el mismo clúster.
+\end{itemize}
+
+\section*{\noindent\textbf{Alta correlación dentro de la agrupación o clúster ($\rho$)}}
+\addcontentsline{toc}{section}{Alta correlación dentro de la agrupación o clúster ($\rho$)}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image31}
+    \caption*{\footnotesize Si la correlación intra-clúster $\rho$ es alta, los individuos dentro del mismo grupo se parecen demasiado. 
+    \\[3pt] Esto reduce la información efectiva, ya que cada observación adicional aporta poco valor nuevo.}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Con $\rho$ alto, los individuos de un clúster se comportan casi igual, como si fueran una sola observación.
+    \item \textbf{Intuición:} Es como encuestar a una familia donde todos responden lo mismo: aunque tengas muchas respuestas, la información es redundante.
+\end{itemize}
+
+\section*{\noindent\textbf{¿Cómo $\rho$ (ICC) influye en el poder estadístico?}}
+\addcontentsline{toc}{section}{¿Cómo $\rho$ (ICC) influye en el poder estadístico?}
+
+\begin{itemize}
+    \item Para un tamaño de muestra determinado $N$, tenemos \textbf{menos poder} cuando randomizamos a nivel clúster (a menos que $ICC = 0$).
+    \item Lo clave para determinar el poder es el \textbf{número de clústeres}, no el número de personas dentro de cada clúster.
+    \item Fórmula de poder con diseño agrupado:
+\end{itemize}
+
+\[
+\frac{EMD}{\sqrt{1 + \rho (m-1)}} 
+= \left( t_{(1-\kappa)} + t_{\alpha} \right) 
+\times \sqrt{\frac{1}{P(1-P)}} \times \sqrt{\frac{\sigma^2}{N}}
+\]
+
+\begin{itemize}
+    \item $m$: Tamaño promedio del clúster
+    \item $\rho$: Correlación intra–clúster (ICC)
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Un $\rho$ alto inflará el denominador y reducirá el poder, ya que cada observación adicional dentro del clúster aporta información redundante.
+    \item \textbf{Intuición:} Es como entrevistar a muchos hermanos de la misma familia: si todos responden parecido, no se gana información adicional útil.
+\end{itemize}
+
+\section*{\noindent\textbf{Calcular poder con Stata}}
+\addcontentsline{toc}{section}{Calcular poder con Stata}
+
+\begin{itemize}
+    \item Stata tiene un nuevo comando de \texttt{power}, donde señalas el tamaño de la muestra y te muestra el poder. 
+    \item \textbf{Limitación:} no permite el diseño agrupado.
+    \item La mayoría todavía utiliza \texttt{sampsi}, \texttt{ sampclus} (add-ons) o \texttt{clustersampsi}.
+    \begin{itemize}
+        \item Por defecto calcula un poder del 90\% y 5\% de significancia con asignación equitativa.
+    \end{itemize}
+    \item Ejemplo: para detectar un aumento en las puntuaciones promedio de las pruebas de 43\% a 45\% con un poder de 80\%:
+\end{itemize}
+
+\[
+\texttt{sampsi 0.43 0.45, power(0.8) sd(0.05)}
+\]
+
+\begin{itemize}
+    \item \textbf{Explicación:} El comando estima automáticamente el tamaño de muestra requerido para alcanzar el poder deseado dado un efecto esperado.
+    \item \textbf{Intuición:} Es como preguntarle a Stata: “¿Con cuántos alumnos necesito trabajar para estar 80\% seguro de detectar una mejora de 43\% a 45\% en los puntajes?”.
+\end{itemize}
+
+
+
+
+
+
+
+
+\end{document}
