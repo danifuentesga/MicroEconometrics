@@ -1,0 +1,784 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometris for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+ 5  Regression with Controls II\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometris for Evaluation}
+  }
+  \fancyhead[R]{%
+   5 Regression with Controls II\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{5 Regression with Controls II} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Controls good and bad}}
+\addcontentsline{toc}{section}{Controls good and bad}
+
+\doublespacing
+Including additional control variables in a regression can often strengthen the \textit{causal interpretation} of the coefficients. By adjusting for relevant background characteristics, we can better isolate the effect of the main explanatory variable.
+
+However, \textbf{not all controls are helpful}. Some variables, if added, can introduce bias rather than reduce it.
+
+Specifically, \textbf{bad controls} are those that may themselves be influenced by the treatment. If you control for a variable that is affected by the treatment, you might accidentally adjust away some of the effect you are trying to measure.
+
+By contrast, \textbf{good controls} are factors that are determined \textit{prior} to the treatment. These are often fixed or pre-existing characteristics that help explain variation in outcomes without being affected by the treatment itself.
+
+\textbf{Intuition:} Suppose you want to estimate the effect of attending college on income. A \textit{good control} might be high school GPA—something determined before college. A \textit{bad control} would be current job satisfaction—something that could already reflect the income effect you're trying to study. Including variables that occur after the treatment can distort your estimates by removing part of the effect you're aiming to capture.
+
+\section*{\noindent\textbf{An example}}
+\addcontentsline{toc}{section}{An example}
+
+\begin{itemize}
+  \item Imagine we randomly assign individuals a college degree, where $C_i \in \{0, 1\}$.
+  
+  \item Our goal is to estimate the \textit{causal effect} of a college education on income $Y_i$—that is, the causal conditional expectation function (CEF).
+  
+  \item Suppose individuals can work in two types of jobs: white-collar ($W_i = 1$) or blue-collar ($W_i = 0$).
+  
+  \item So, which regression specification should we use?
+  \begin{itemize}
+    \item A \textbf{natural approach}: find $\beta$ that satisfies the moment condition $E[C_i(Y_i - \alpha - \beta C_i)] = 0$
+    
+    \item An \textbf{alternative approach}: find $\beta$ that satisfies $E[C_i(Y_i - \alpha - \beta C_i - \gamma W_i)] = 0$.\\
+    Is this better?
+  \end{itemize}
+\end{itemize}
+
+\textbf{Intuition:} If college degrees are randomly assigned, then estimating the effect of college on earnings should be straightforward. The first approach uses only college assignment to estimate the effect. The second approach adds occupation as a control—\textit{but this may be problematic if occupation is influenced by education}. Including such a variable could distort the causal estimate, as you're controlling for something on the causal path from education to earnings.
+
+\singlespacing
+\subsection*{\noindent\textbf{Example: Estimating the Causal Effect of College}}
+\addcontentsline{toc}{subsection}{Example: Estimating the Causal Effect of College}
+
+\begin{align}
+Y_i &= C_i Y_{1i} + (1 - C_i) Y_{0i} && \text{\textbf{Definition of observed outcome}}
+\end{align}
+
+\begin{align}
+\mathbb{E}[Y_i \mid C_i = 1] &= \mathbb{E}[C_i Y_{1i} + (1 - C_i) Y_{0i} \mid C_i = 1] \\
+                             &= \mathbb{E}[1 \cdot Y_{1i} + 0 \cdot Y_{0i} \mid C_i = 1] \\
+                             &= \mathbb{E}[Y_{1i} \mid C_i = 1]
+\end{align}
+
+\begin{align}
+\mathbb{E}[Y_i \mid C_i = 0] &= \mathbb{E}[C_i Y_{1i} + (1 - C_i) Y_{0i} \mid C_i = 0] \\
+                             &= \mathbb{E}[0 \cdot Y_{1i} + 1 \cdot Y_{0i} \mid C_i = 0] \\
+                             &= \mathbb{E}[Y_{0i} \mid C_i = 0]
+\end{align}
+
+\begin{align}
+\mathbb{E}[Y_i \mid C_i = 1] - \mathbb{E}[Y_i \mid C_i = 0] 
+&= \mathbb{E}[Y_{1i} \mid C_i = 1] - \mathbb{E}[Y_{0i} \mid C_i = 0] && \text{\textbf{Difference in means}}
+\end{align}
+
+\begin{align}
+C_i \perp (Y_{1i}, Y_{0i}) &\Rightarrow \mathbb{E}[Y_{0i} \mid C_i = 1] = \mathbb{E}[Y_{0i} \mid C_i = 0] = \mathbb{E}[Y_{0i}] \\
+                           &\Rightarrow \mathbb{E}[Y_{1i} \mid C_i = 1] - \mathbb{E}[Y_{0i} \mid C_i = 0] = \mathbb{E}[Y_{1i} - Y_{0i}]
+\end{align}
+
+\begin{align}
+\beta &= \mathbb{E}[Y_{1i} - Y_{0i}] \quad \blacksquare && \text{\textbf{Average Treatment Effect (ATE)}}
+\end{align}
+
+\doublespacing
+The difference in expected outcomes between those who went to college and those who did not,  
+$\mathbb{E}[Y_i \mid C_i = 1] - \mathbb{E}[Y_i \mid C_i = 0]$, identifies the causal effect when $C_i$ is randomly assigned.  
+Under mean independence, this difference equals the \textit{average treatment effect} $\mathbb{E}[Y_{1i} - Y_{0i}]$.
+
+\textbf{Intuition:}  
+Since college assignment $C_i$ is \textbf{random}, it’s as if nature ran an experiment: some people got a college degree, others didn’t, but not based on anything else about them. That means we can \textbf{directly compare their average earnings}, and the difference will reflect the true effect of college. The observed difference in outcomes isn’t confounded by other variables—it’s just the average gain from going to college. That’s why the regression captures the causal effect.
+
+\subsection*{\noindent\textbf{Example: The Bad Control Problem}}
+\addcontentsline{toc}{subsection}{Example: The Bad Control Problem}
+
+\begin{itemize}
+  \item Let $(W_{1i}, W_{0i})$ denote potential occupations.
+  
+  \item We observe:
+  \[
+  W_i = C_i W_{1i} + (1 - C_i) W_{0i}
+  \]
+
+  \item \textbf{Bad control:} Conditioning on $W_i$ does \textit{not} lead to a valid causal interpretation of the effect of $C_i$ on $Y_i$.
+
+  \item To understand why, consider the conditional difference in average earnings between college and non-college individuals among those in white-collar jobs:
+  \[
+  \mathbb{E}[Y_i \mid W_i = 1, C_i = 1] - \mathbb{E}[Y_i \mid W_i = 1, C_i = 0]
+  \]
+
+  \item Substitute observed outcomes:
+  \[
+  = \mathbb{E}[Y_{1i} \mid W_{1i} = 1, C_i = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1, C_i = 0]
+  \]
+
+  \item Assume joint independence between $(Y_{1i}, W_{1i}, Y_{0i}, W_{0i})$ and $C_i$. Then:
+  \[
+  = \mathbb{E}[Y_{1i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1]
+  \]
+
+  \item This expression \textit{does not} identify the causal effect of $C_i$ on $Y_i$.
+\end{itemize}
+
+\textbf{Intuition:}  
+The problem with conditioning on $W_i$ is that it's a \textit{post-treatment variable}—college can affect occupation. By comparing earnings only within white-collar jobs, we are selecting on a variable influenced by college, which introduces selection bias. It’s like only looking at the “successful” people in both groups and comparing them—this distorts the true effect of college. That’s why $W_i$ is a \textbf{bad control}.
+
+\subsection*{\noindent\textbf{Example: The Bad Control Problem II}}
+\addcontentsline{toc}{subsection}{Example: The Bad Control Problem II}
+
+\begin{itemize}
+  \item Consider:
+  \[
+  \mathbb{E}[Y_{1i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1]
+  \]
+
+  \item Add and subtract $\mathbb{E}[Y_{0i} \mid W_{1i} = 1]$:
+  \begin{align}
+  &= \mathbb{E}[Y_{1i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{1i} = 1] \\
+  &\quad + \mathbb{E}[Y_{0i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1]
+  \end{align}
+
+  \item Group terms:
+  \begin{align}
+  &= \mathbb{E}[Y_{1i} - Y_{0i} \mid W_{1i} = 1] + \left( \mathbb{E}[Y_{0i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1] \right)
+  \end{align}
+
+  \item First term: \textbf{causal effect on treated}  
+  Second term: \textbf{selection bias}
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Important sign intuition:}
+\begin{itemize}
+  \item If
+  \[
+  \mathbb{E}[Y_{0i} \mid W_{1i} = 1] < \mathbb{E}[Y_{0i} \mid W_{0i} = 1]
+  \]
+  then selection bias is negative.
+
+  \item \textit{Why?} Any college graduate can likely access a white-collar job, so those with low $Y_{0i}$ are still present: $\mathbb{E}[Y_{0i} \mid W_{1i} = 1] \approx \mathbb{E}[Y_{0i}]$.
+
+  \item But only higher-$Y_{0i}$ individuals manage to get white-collar jobs without a college degree, so:  
+  \[
+  \mathbb{E}[Y_{0i} \mid W_{0i} = 1] > \mathbb{E}[Y_{0i}]
+  \]
+
+  \item Therefore:  
+  \[
+  \mathbb{E}[Y_{0i} \mid W_{1i} = 1] - \mathbb{E}[Y_{0i} \mid W_{0i} = 1] < 0
+  \]
+\end{itemize}
+
+\textbf{Intuition:}  
+This is an \textit{apples-to-oranges} comparison. Among white-collar workers, those with degrees include everyone—strong and weak performers. But those without degrees who make it into white-collar jobs are unusually high-ability. Comparing these two groups mixes in this ability difference, introducing \textbf{selection bias}. That’s why the second term pulls down the total difference, making it look like college has less of an effect—or even a negative one.
+
+\subsection*{\noindent\textbf{Example: Bad Control, i.e., Proxy Control}}
+\addcontentsline{toc}{subsection}{Example: Bad Control, i.e., Proxy Control}
+
+\textbf{Proxy control.} A variable that helps control for omitted variables, but is itself influenced by the treatment. This means it cannot be used to estimate a clean causal effect.
+
+Suppose we estimate the following regression:
+\begin{equation}
+Y_i = \alpha + \rho s_i + \gamma a_i + \varepsilon_i
+\end{equation}
+
+\begin{itemize}
+  \item $a_i$ is an IQ score observed in eighth grade, which reflects innate ability before any major schooling decisions.
+  
+  \item Since $a_i$ is measured prior to $s_i$ (e.g., years of schooling), it is \textbf{not affected} by the treatment.
+  
+  \item By assumption:
+  \[
+  \mathbb{E}[s_i \varepsilon_i] = \mathbb{E}[a_i \varepsilon_i] = 0
+  \]
+  This implies no correlation between either regressor and the error term.
+  
+  \item Therefore, $a_i$ qualifies as a \textbf{good control}.
+\end{itemize}
+
+\textbf{Intuition:}  
+A good control is something known \textit{before} the treatment happens. Since IQ is measured before schooling, it can explain variation in outcomes without being influenced by schooling itself. This makes it a useful way to adjust for differences in ability, without introducing bias. But if you used a variable \textit{affected} by education—like current job performance—that would be a bad (or proxy) control, because it already reflects some of education's effect.
+
+\subsection*{\noindent\textbf{Example: Bad Control, i.e., Proxy Control II}}
+\addcontentsline{toc}{subsection}{Example: Bad Control, i.e., Proxy Control II}
+
+\begin{itemize}
+  \item Equation (1) is the causal model of interest, but unfortunately, data on $a_i$ (early ability) are \textbf{unavailable}.
+
+  \item Suppose we have an alternative ability measure taken \textit{after} schooling is completed. Denote this variable by $a_{li}$:
+  \begin{equation}
+  a_{li} = \pi_0 + \pi_1 s_i + \pi_2 a_i
+  \end{equation}
+
+  \item Here, $a_{li}$ represents \textbf{late-measured ability}, which is influenced by both schooling ($s_i$) and innate ability ($a_i$).
+  
+  \item Since $a_i$ is unobserved, we regress $y_i$ on $s_i$ and $a_{li}$ in an attempt to control for ability.
+\end{itemize}
+
+\textbf{Intuition:}  
+Because $a_{li}$ is measured \textit{after} schooling, it reflects not just innate ability, but also the effect of schooling. By including $a_{li}$ in the regression, you are controlling for a variable that already contains part of the effect of $s_i$—\textbf{you are "soaking up" some of the treatment effect}. This leads to biased estimates of $\rho$ in the regression. In this case, $a_{li}$ acts as a \textit{proxy control}—intended to adjust for unobserved ability, but contaminated by the treatment itself.
+
+\subsection*{\noindent\textbf{Example: Bad Control, i.e., Proxy Control III}}
+\addcontentsline{toc}{subsection}{Example: Bad Control, i.e., Proxy Control III}
+
+\begin{itemize}
+  \item Start from the original regression:
+  \[
+  Y_i = \alpha + \rho s_i + \gamma a_i + \varepsilon_i \tag{1}
+  \]
+
+  \item And the proxy relationship:
+  \[
+  a_{li} = \pi_0 + \pi_1 s_i + \pi_2 a_i \tag{2}
+  \]
+
+  \item Solve equation (2) for $a_i$:
+  \[
+  a_i = \frac{a_{li} - \pi_0 - \pi_1 s_i}{\pi_2}
+  \]
+
+  \item Substitute into (1):
+  \begin{align}
+  Y_i &= \alpha + \rho s_i + \gamma \left( \frac{a_{li} - \pi_0 - \pi_1 s_i}{\pi_2} \right) + \varepsilon_i \\
+      &= \alpha + \rho s_i + \frac{\gamma}{\pi_2} a_{li} - \frac{\gamma \pi_0}{\pi_2} - \frac{\gamma \pi_1}{\pi_2} s_i + \varepsilon_i
+  \end{align}
+
+  \item Group terms:
+  \[
+  Y_i = \left( \alpha - \frac{\gamma \pi_0}{\pi_2} \right) + \left( \rho - \frac{\gamma \pi_1}{\pi_2} \right) s_i + \frac{\gamma}{\pi_2} a_{li} + \varepsilon_i \tag{3}
+  \]
+
+  \item Note that if $\gamma > 0$, $\pi_1 > 0$, and $\pi_2 > 0$, then:
+  \[
+  \left( \rho - \frac{\gamma \pi_1}{\pi_2} \right) < \rho
+  \]
+  So the estimated coefficient on $s_i$ is biased downward.
+
+  \item In the extreme case where $\pi_1 = 0$, then:
+  \[
+  \left( \rho - \frac{\gamma \pi_1}{\pi_2} \right) = \rho
+  \]
+  and there is no bias.
+  
+  \item \textbf{Important:} The OVB formula tells us that if we omit $a_i$, the regression:
+  \[
+  Y_i = \alpha + \tilde{\rho} s_i + \tilde{\varepsilon}_i
+  \]
+  will yield:
+  \[
+  \tilde{\rho} = \rho + \gamma \delta_{as}
+  \]
+  where $\delta_{as}$ is the coefficient from the regression:
+  \[
+  a_i = \delta_{as} s_i + \nu_i
+  \]
+
+  \item If $\delta_{as} > 0$, then this omits a positively correlated variable and overstates the coefficient.
+
+  \item In contrast, regression (3) biases it downward.
+
+  \item So together:
+  \[
+  \rho + \gamma \delta_{as} \quad \text{(overstate)} \quad > \quad \text{true } \rho \quad > \quad \left( \rho - \frac{\gamma \pi_1}{\pi_2} \right) \quad \text{(understate)}
+  \]
+  This makes regression (3) useful for \textbf{bounding} the true effect.
+\end{itemize}
+
+\textbf{Intuition:}  
+We want to control for ability ($a_i$), but we don’t observe it. Instead, we use a later measure ($a_{li}$), which is partly caused by education. Substituting $a_i$ with $a_{li}$ introduces bias because $a_{li}$ already "absorbs" some of the effect of schooling. As a result, the coefficient on $s_i$ shrinks. On the other hand, if we omit ability entirely, the estimate of $\rho$ grows due to positive correlation between $s_i$ and $a_i$. So we can think of the true effect as being somewhere in between. That’s the power of bounding with a bad control.
+
+\section*{\noindent\textbf{Variables to Control For}}
+\addcontentsline{toc}{section}{Variables to Control For}
+
+\begin{itemize}
+  \item When estimating the effect of a treatment $d$ on an outcome variable $y$ using observational data, the treated group ($d = 1$) and control group ($d = 0$) may differ in observed characteristics $x$.
+
+  \item To adjust for these differences, we \textbf{control for} $x$: that is, we compare treated and untreated individuals who share the same value of $x$.
+
+  \item But \textit{which} variables should we control for?
+
+  \begin{itemize}
+    \item \textbf{General guidance:} We should control for \textit{pre-treatment covariates}—variables that influence the outcome $y_j$ but are not themselves affected by the treatment $d$.
+  \end{itemize}
+\end{itemize}
+
+\textbf{Intuition:}  
+To estimate a causal effect, we want to isolate variation in the outcome that is due only to the treatment—not other differences between groups. If treated and control units differ in important characteristics, comparing them directly will conflate these differences with the effect of $d$. Controlling for variables $x$ that were determined \textit{before} the treatment helps ensure we’re comparing like with like. But we must avoid controlling for anything that’s affected by the treatment, as that would distort the very effect we’re trying to measure.
+
+\subsection*{\noindent\textbf{Variables to Control For: Must Cases}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Must Cases}
+
+Consider a causal chain where each arrow represents a direct causal or influencing relationship:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.35\textwidth]{cap1.png} % ← Rename to your actual filename
+  \caption*{\textit{must (i)}: $x$ influences both $d$ and $y$}
+\end{figure}
+
+\begin{itemize}
+  \item Here, $x$ is a \textbf{pre-treatment variable} that influences both the treatment $d$ and the outcome $y$.
+  \item In this case, $x$ \textbf{must} be controlled for. Why? Because it may differ across the treated ($d = 1$) and control ($d = 0$) groups.
+  \item When this happens, $x$ is called a \textit{confounder}.
+\end{itemize}
+
+\textbf{Intuition:}  
+If $x$ affects both who gets treated and what outcomes they have, failing to control for $x$ would misattribute its effect to $d$. For example, if smarter students ($x$) are more likely to go to college ($d$) and also earn more ($y$), then college appears more effective than it really is. Controlling for $x$ levels the playing field, so we can isolate the impact of $d$ alone.
+
+\subsection*{\noindent\textbf{Variables to Control For: Must Cases II}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Must Cases II}
+
+\textbf{Case (i)}: 
+
+\begin{itemize}
+  \item A specific model for this case is:
+\end{itemize}
+
+\begin{equation}
+d_i = 1[\alpha_1 + \alpha_x X_i + \epsilon_i > 0], \qquad 
+y_i = \beta_1 + \beta_d d_i + \beta_x X_i + u_i, \qquad 
+u_i \perp\!\!\!\perp \epsilon_i \mid X_i
+\end{equation}
+
+\begin{itemize}
+  \item Suppose $\beta_d = 0$ (i.e., \textbf{no effect} of $d$ on $y$).
+  \item Then:
+\end{itemize}
+
+\begin{align}
+\mathbb{E}(y \mid x, d = 1) &= \mathbb{E}(y \mid x, d = 0) \\
+                            &= \beta_1 + \beta_x x
+\end{align}
+
+\begin{itemize}
+  \item But as long as $\alpha_x \ne 0$, the distribution of $X_i$ depends on $d_i$.
+  \item So, taking expectation over $x$ in both cases:
+\end{itemize}
+
+\begin{align}
+\mathbb{E}(y \mid d = 1) &= \mathbb{E}[\beta_1 + \beta_x X_i \mid d = 1] \\
+                         &= \beta_1 + \beta_x \mathbb{E}(X_i \mid d = 1) \\
+\mathbb{E}(y \mid d = 0) &= \beta_1 + \beta_x \mathbb{E}(X_i \mid d = 0)
+\end{align}
+
+\noindent
+Therefore:
+\begin{equation}
+\mathbb{E}(y \mid d = 1) \ne \mathbb{E}(y \mid d = 0) \quad \text{unless} \quad \mathbb{E}(X_i \mid d = 1) = \mathbb{E}(X_i \mid d = 0)
+\end{equation}
+
+\begin{itemize}
+  \item \textbf{Interpretation:} Even when $\beta_d = 0$, imbalance in $X_i$ across treatment groups creates differences in $\mathbb{E}(y \mid d)$.
+  \item If the arrow $x \rightarrow y$ is removed (i.e., $\beta_x = 0$), then:
+\end{itemize}
+
+\begin{align}
+y_i &= \beta_1 + \beta_d d_i + u_i \\
+\Rightarrow \mathbb{E}(y \mid x, d) &= \beta_1 + \beta_d d
+\end{align}
+
+\begin{itemize}
+  \item In that case, we have the clean path $x \rightarrow d \rightarrow y$, and imbalance in $x$ no longer confounds the estimate of $\beta_d$.
+\end{itemize}
+
+\textbf{Intuition:}  
+This case illustrates why failing to control for $x$ creates bias even when the treatment has \textit{no true effect}. If $x$ influences selection into $d$ and also affects $y$, then observed differences in $y$ between groups may come entirely from $x$ — not $d$. That’s why we must adjust for $x$ when it influences both treatment and outcome.
+
+\subsection*{\noindent\textbf{Variables to Control For: Must Cases III}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Must Cases III}
+
+\textbf{Case (ii)}:  
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.35\textwidth]{cap2.png} % ← Replace with actual uploaded filename
+  \caption*{\textit{must (ii)}: $x_{pre}$ affects $d$ and $y$, $x_{post}$ affected by $d$}
+\end{figure}
+
+\begin{itemize}
+  \item $x_{pre}$ should be controlled for because it is a \textbf{pre-treatment confounder}.
+  \item However, $x_{post}$ should \textbf{not} be controlled for, because it is affected by the treatment $d$.
+\end{itemize}
+
+\textbf{Intuition:}  
+Think of $x_{pre}$ as something like IQ measured \textit{before} schooling — it helps determine both whether someone goes to college ($d$) and how much they earn ($y$). It is fair game to control for it.  
+On the other hand, $x_{post}$ might be something like confidence or skills acquired \textit{after} schooling — and it is partly caused by $d$. If you control for $x_{post}$, you're "soaking up" part of the treatment's effect, which biases the estimate of $d$. So we must avoid controlling for post-treatment variables.
+
+\subsection*{\noindent\textbf{Variables to Control For: No-no Cases}}
+\addcontentsline{toc}{subsection}{Variables to Control For: No-no Cases}
+
+\textbf{Case (i)}:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.28\textwidth]{cap3.png} % Replace with your filename
+  \caption*{\textit{no-no (i)}: $d \rightarrow y \rightarrow w$}
+\end{figure}
+
+\begin{itemize}
+  \item $w$ is a \textbf{post-response variable}. Controlling for $w$ can block part (or even all) of the effect that $d$ has on $y$.
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Case (ii)}:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\textwidth]{cap4.png} % Replace with your filename
+  \caption*{\textit{no-no (ii)}: $d \rightarrow e_1 \rightarrow y$, and $e_2 \rightarrow e_1$}
+\end{figure}
+
+\begin{itemize}
+  \item $d$ affects $y$ through multiple channels. If we control for $e_i$ (a post-treatment mediator), we weaken or distort the estimated impact of $d$.
+\end{itemize}
+
+\textbf{Intuition:}  
+Imagine $d$ is a training program, $y$ is productivity, and $w$ is a performance bonus. If you control for $w$ — which is based on productivity — you’re essentially conditioning on the outcome or its consequence. This removes real variation caused by $d$. Similarly, if $d$ improves productivity partly through boosting motivation $e_1$, and we control for motivation, we understate the full effect of the training. In short: \textit{never control for things that happen after the treatment and are part of its effect}.
+
+\subsection*{\noindent\textbf{Variables to Control For: Yes–No Cases}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Yes–No Cases}
+
+\textbf{Case (i)}:
+
+\begin{itemize}
+  \item Consider a causal chain related to the previous “no-no (ii)” situation:
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{cap5.png} % replace with your actual filename
+  \caption*{\textit{yes–no (i)}: $d \rightarrow w \rightarrow y$}
+\end{figure}
+
+\begin{itemize}
+  \item If we want the effect of $d$ on $y$ \textit{excluding} what operates through $w$, then controlling for $w$ is appropriate.
+  \item But if we're interested in the \textit{total effect} of $d$ on $y$, then $w$ should not be controlled for.
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Case (ii)}:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.25\textwidth]{cap6.png} % replace with your actual filename
+  \caption*{\textit{yes–no (ii)}: $d \rightarrow y$, $d \rightarrow w \rightarrow y$}
+\end{figure}
+
+\begin{itemize}
+  \item Controlling for $w$ here will only capture the \textbf{direct effect} of $d$ on $y$.
+\end{itemize}
+
+\textbf{Intuition:}  
+Sometimes we want to ask: “What would the effect of $d$ be on $y$ if we could hold some mediator $w$ fixed?” That’s a direct effect, and controlling for $w$ answers it. But if we want to measure the \textit{total impact} of $d$ — including effects that flow through $w$ — then controlling for $w$ blocks part of that path. It’s not about right or wrong — it’s about whether you want the total or direct effect.
+
+\subsection*{\noindent\textbf{Variables to Control For: Yes–No Cases II}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Yes–No Cases II}
+
+\textbf{Example.} Program affects both graduation and earnings.  
+Specific model for Case (ii):
+
+\begin{align}
+w_i &= \alpha_1 + \alpha_d d_i + \epsilon_i \\
+y_i &= \underbrace{\beta_1 + \beta_d d_i}_{\text{Effect of } d} + \underbrace{\beta_w w_i}_{\text{Effect of } w} + u_i \\
+    &= \text{\small Structural form (SF) for } y
+\end{align}
+
+\begin{itemize}
+    \item Assume $(d, w) \perp u_i$, and define $\epsilon_i \equiv w_i - \mathbb{E}[w_i \mid d_i]$
+\end{itemize}
+
+\vspace{1em}
+\textbf{Substitute the $w$ equation into the SF for $y_i$:}
+
+\begin{align}
+y_i &= \beta_1 + \beta_d d_i + \beta_w(\alpha_1 + \alpha_d d_i + \epsilon_i) + u_i \\
+    &= \beta_1 + \beta_d d_i + \beta_w \alpha_1 + \beta_w \alpha_d d_i + \beta_w \epsilon_i + u_i \\
+    &= (\beta_1 + \beta_w \alpha_1) + (\beta_d + \beta_w \alpha_d) d_i + \beta_w \epsilon_i + u_i \\
+    &= \underbrace{(\beta_1 + \beta_w \alpha_1)}_{\text{Intercept}} + \underbrace{(\beta_d + \beta_w \alpha_d)}_{\text{Total effect}} d_i + \underbrace{\beta_w \epsilon_i + u_i}_{\text{Error term}} \\
+    &= \text{\small Reduced form (RF) for } y
+\end{align}
+
+\vspace{1em}
+\textbf{Therefore, total effect of $d$ on $y$:}
+\begin{align}
+\mathbb{E}[y \mid d = 1] - \mathbb{E}[y \mid d = 0] = \beta_d + \beta_w \alpha_d
+\end{align}
+
+\textit{Interpretation:}  
+The total effect of $d$ on $y$ consists of:
+\begin{itemize}
+    \item A direct effect: $\beta_d$
+    \item An indirect effect that passes through $w$: $\beta_w \alpha_d$
+\end{itemize}
+
+Controlling for $w$ in the regression isolates only the direct effect $\beta_d$.  
+If we want the full impact of $d$ on $y$ — including the mechanism through $w$ — we should not control for $w$.
+
+\subsection*{\noindent\textbf{Variables to Control For: Yes–No Cases III}}
+\addcontentsline{toc}{subsection}{Variables to Control For: Yes–No Cases III}
+
+\begin{itemize}
+    \item \textbf{Direct effect:}
+    \begin{align}
+        \mathbb{E}(y \mid d = 1, w) - \mathbb{E}(y \mid d = 0, w) &= \beta_d \qquad \text{(from the SF for $y$)}
+    \end{align}
+    
+    \item \textbf{Indirect effect:}
+    \begin{align}
+        &\left\{ \mathbb{E}(w \mid d = 1) - \mathbb{E}(w \mid d = 0) \right\} 
+        \times 
+        \left\{ \mathbb{E}(y \mid d, w = 1) - \mathbb{E}(y \mid d, w = 0) \right\} \\
+        &= \alpha_d \cdot \beta_w
+    \end{align}
+\end{itemize}
+
+\textit{Interpretation:}  
+The direct effect $\beta_d$ isolates the impact of $d$ on $y$ holding $w$ fixed.  
+The indirect effect captures the change in $y$ that operates through how $d$ shifts $w$ (via $\alpha_d$), and how $w$ affects $y$ (via $\beta_w$).
+
+\begin{align}
+\text{Total effect} = \beta_d + \underbrace{\alpha_d \cdot \beta_w}_{\text{indirect}}
+\end{align}
+
+\section*{What is identified when $x$ is controlled for?}
+\addcontentsline{toc}{section}{What is identified when $x$ is controlled for?}
+
+\begin{itemize}
+  \item To show that:
+\end{itemize}
+
+\textbf{(i)} \quad $y_0 \perp d \mid x \quad \Rightarrow \quad \mathbb{E}(y_1 - y_0 \mid d = 1, x)$ \quad \textit{(effect on the treated)}
+
+\textbf{(ii)} \quad $y_1 \perp d \mid x \quad \Rightarrow \quad \mathbb{E}(y_1 - y_0 \mid d = 0, x)$ \quad \textit{(effect on the untreated)}
+
+\textbf{(iii)} \quad $y_0 \perp d \mid x$ and $y_1 \perp d \mid x \quad \Rightarrow \quad \mathbb{E}(y_1 - y_0 \mid x)$ \quad \textit{(effect on the population)}
+
+\vspace{1em}
+
+\textbf{For (i), observe:}
+
+\begin{align*}
+\mathbb{E}(y \mid d = 1, x) - \mathbb{E}(y \mid d = 0, x)
+&= \mathbb{E}(y_1 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 0, x) \\
+&= \mathbb{E}(y_1 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 1, x) \\
+&\quad + \left[ \mathbb{E}(y_0 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 0, x) \right] \\
+&= \mathbb{E}(y_1 - y_0 \mid d = 1, x) + \underbrace{\left[ \mathbb{E}(y_0 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 0, x) \right]}_{\text{$y_0$ comparison group bias}}
+\end{align*}
+
+\vspace{0.5em}
+
+\textbf{where}
+
+\[
+\text{$y_0$ comparison group bias} \equiv \mathbb{E}(y_0 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 0, x)
+\]
+
+\textit{Interpretation:} If $y_0 \perp d \mid x$, then the comparison group bias is zero, and the difference in outcomes equals the average treatment effect on the treated.
+
+\section*{What is identified when $x$ is controlled for? II}
+\addcontentsline{toc}{section}{What is identified when $x$ is controlled for? II}
+
+We now analyze the conditional mean difference:
+
+\[
+\mathbb{E}(y \mid d = 1, x) - \mathbb{E}(y \mid d = 0, x)
+\]
+
+Recall the fundamental identity for observed outcome \( y \):
+
+\[
+y = d y_1 + (1 - d) y_0
+\]
+
+Thus, we can write:
+
+\[
+\mathbb{E}(y \mid d = 1, x) = \mathbb{E}(d y_1 + (1 - d) y_0 \mid d = 1, x) = \mathbb{E}(y_1 \mid d = 1, x)
+\]
+
+\[
+\mathbb{E}(y \mid d = 0, x) = \mathbb{E}(d y_1 + (1 - d) y_0 \mid d = 0, x) = \mathbb{E}(y_0 \mid d = 0, x)
+\]
+
+Now consider the decomposition of the original expression:
+
+\[
+\mathbb{E}(y \mid d = 1, x) - \mathbb{E}(y \mid d = 0, x)
+= \mathbb{E}(y_1 \mid d = 1, x) - \mathbb{E}(y_0 \mid d = 0, x)
+\]
+
+Add and subtract \( \mathbb{E}(y_1 \mid d = 0, x) \) inside the expression:
+
+\[
+= \underbrace{\left[ \mathbb{E}(y_1 \mid d = 1, x) - \mathbb{E}(y_1 \mid d = 0, x) \right]}_{\textit{Comparison group bias on } y_1}
++ \underbrace{\left[ \mathbb{E}(y_1 \mid d = 0, x) - \mathbb{E}(y_0 \mid d = 0, x) \right]}_{\textit{Average treatment effect on untreated}}
+\]
+
+Therefore:
+
+\[
+\mathbb{E}(y \mid d = 1, x) - \mathbb{E}(y \mid d = 0, x)
+= \text{bias} + \text{effect on untreated}
+\]
+
+\textbf{Interpretation:}
+\begin{itemize}
+    \item The first term represents a selection bias: the treated individuals differ from untreated even in their potential outcomes \( y_1 \).
+    \item The second term is the causal effect of treatment on the untreated group.
+    \item If \( y_1 \perp d \mid x \), then the bias term disappears, and the conditional difference identifies the treatment effect on the untreated.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
