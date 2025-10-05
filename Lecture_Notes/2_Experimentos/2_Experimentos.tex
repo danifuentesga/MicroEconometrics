@@ -1,0 +1,841 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+   2 Experimentos\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+   2 Experimentos\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{2 Experimentos} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Experimentos Aleatorios}}
+\addcontentsline{toc}{section}{Experimentos Aleatorios}
+
+\begin{itemize}
+    \item Un \textbf{experimento aleatorio controlado} toma como referencia los estudios médicos: comparación entre \textbf{fármaco} y \textbf{placebo}.
+    \item En ciencias sociales, los \textbf{experimentos aleatorios} enfrentan un reto central: la \textbf{ausencia de contrafactual}, ya que una misma persona no puede ser observada con y sin \textbf{tratamiento} al mismo tiempo.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como probar una \textbf{receta}: necesitas un grupo que la deguste y otro que no, para saber si realmente funciona.
+    \item El gran lío en sociales es que no puedes tener el \textbf{mismo individuo} en dos realidades distintas a la vez, como si existiera un “doble”.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Métodos}}
+\addcontentsline{toc}{subsection}{Métodos}
+
+\begin{itemize}
+    \item Gran \textbf{avance en economía}: se identifican distintas formas de \textbf{insertar aleatoriedad} en la implementación de programas.
+    \item Es posible agregar \textbf{componentes aleatorios} sin impedir ni complicar el \textbf{funcionamiento normal} de las políticas existentes.
+    \begin{itemize}
+        \item Este hallazgo fue el \textbf{detonante} del auge de este tipo de estudios empíricos en los últimos \textbf{años}.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como hacer un \textbf{experimento de cocina}: puedes variar un ingrediente sin arruinar el platillo principal.
+    \item Estos trucos prácticos explican por qué en los últimos tiempos hubo una verdadera \textbf{explosión} de investigaciones basadas en aleatoriedad.
+\end{itemize}
+
+\section*{\noindent\textbf{Métodos para aplicar tratamientos aleatorios}}
+\addcontentsline{toc}{section}{Métodos para aplicar tratamientos aleatorios}
+
+\begin{itemize}
+    \item \textbf{Sobresuscripción}
+    \begin{itemize}
+        \item Cuando los \textbf{recursos son escasos} o la capacidad de implementación resulta menor que la \textbf{demanda}.
+        \item Se eligen beneficiarios al azar (\textbf{lotería}) dentro del conjunto de elegibles.
+    \end{itemize}
+
+    \item \textbf{Asignación aleatoria cronológica o por etapas}
+    \begin{itemize}
+        \item Útil cuando no es viable que algunos grupos o individuos se \textbf{queden sin apoyo}.
+        \item \textbf{Ventaja}: fomenta cooperación del grupo de control y puede reducir la \textbf{deserción}.
+        \item \textbf{Desventaja}: complicado medir \textbf{efectos de largo plazo}, ya que el grupo de control puede ajustar su \textbf{conducta} al esperar recibir el programa en el futuro.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La \textbf{sobresuscripción} es como rifar boletos cuando hay más gente que asientos: pura suerte decide quién entra.
+    \item La asignación por \textbf{etapas} se parece a una fila de espera: todos pasan, pero en distinto momento, lo que cambia cómo se comportan los que esperan.
+\end{itemize}
+\hrule
+
+\begin{itemize}
+    \item \textbf{Asignación aleatoria dentro de un mismo grupo}
+    \begin{itemize}
+        \item Cuando un \textbf{grupo} (ej. escuela) rechaza colaborar si se excluye del programa.
+        \item El programa se implementa en todas las escuelas, dividiendo en distintos \textbf{subgrupos} internos.
+        \item \textbf{Problema}: posible contaminación del grupo control si los recursos se \textbf{redistribuyen} dentro de la escuela.
+    \end{itemize}
+
+    \item \textbf{Diseños de fomento}
+    \begin{itemize}
+        \item Sirven para medir el efecto de un programa que está \textbf{disponible} para todos, pero cuya adopción no es universal.
+        \item En vez de aleatorizar la \textbf{recepción del tratamiento}, se asigna al azar un \textbf{incentivo} que motive a participar. Ejemplo: entregar materiales gratuitos para preparar el \textbf{GRE}.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La asignación dentro de un \textbf{grupo} es como repartir becas solo a algunos salones dentro de la misma escuela: difícil evitar que se mezclen los efectos.
+    \item Los diseños de \textbf{fomento} se parecen a dar un empujoncito: no obligas, pero ofreces algo extra que anima a entrar al programa.
+\end{itemize}
+
+\section*{\noindent\textbf{Experimentos Naturales}}
+\addcontentsline{toc}{section}{Experimentos Naturales}
+
+\begin{itemize}
+    \item A diferencia de los \textbf{experimentos controlados}, cuando \textbf{factores externos} al investigador generan una asignación que luce aleatoria, se habla de \textbf{experimentos naturales}.
+    \item Ejemplos típicos: \textbf{reformas legales}, fechas de inicio de políticas, \textbf{variaciones naturales} como el mes de nacimiento, \textbf{desastres naturales}, entre otros.
+    \item La condición clave es que esas \textbf{causas externas} sean \textbf{exógenas} al efecto causal que se desea identificar.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como si la vida armara un \textbf{experimento} por sí sola: un cambio de ley o un desastre reparte “al azar” quién se ve afectado.
+    \item Lo esencial es que ese reparto no dependa de las \textbf{decisiones de las personas}, sino de algo externo que hace de “sorteo natural”.
+\end{itemize}
+
+\section*{\noindent\textbf{El problema de selección}}
+\addcontentsline{toc}{section}{El problema de selección}
+
+\begin{itemize}
+    \item Ejemplo del \textbf{problema de selección}: ¿realmente los \textbf{hospitales} hacen que las personas estén más \textbf{saludables}?
+    \item Basado en la encuesta \textbf{National Health Interview Survey (NHIS)} 2005.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\textbf{Grupo} & \textbf{Tamaño Muestra} & \textbf{Media Estado Salud} & \textbf{Error Est.} \\
+Hospital & 7,774 & 3.21 & 0.014 \\
+No hospital & 90,049 & 3.93 & 0.003 \\
+\end{tabular}
+\end{table}
+
+\footnotesize
+Estado de salud medido de 1 (mala salud) a 5 (excelente salud). \\
+Diferencia de medias: 0.72; estadístico t: 58.9
+\normalsize
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El simple promedio sugiere que quienes no van al \textbf{hospital} reportan mejor \textbf{salud}, pero esto refleja un sesgo: quienes están más enfermos son justamente los que terminan en hospitales.
+    \item Es como decir que los \textbf{mecánicos} dañan los autos porque los que están en el taller siempre se ven peor: olvidamos que ya estaban mal antes de entrar.
+\end{itemize}
+
+\section*{\noindent\textbf{Notación}}
+\addcontentsline{toc}{section}{Notación}
+
+\begin{itemize}
+    \item El \textbf{tratamiento hospitalario} se define como una variable binaria: $D_i \in \{0,1\}$.
+    \item El \textbf{resultado de interés} (estado de salud) se denota por $Y_i$.
+    \item Pregunta central: ¿se ve \textbf{afectado} $Y_i$ por recibir atención hospitalaria?
+    \item Cada individuo tiene dos \textbf{resultados potenciales}:  
+    \[
+    Resultado\ potencial =
+    \begin{cases}
+    Y_{1i}, & \text{si } D_i = 1 \\
+    Y_{0i}, & \text{si } D_i = 0
+    \end{cases}
+    \]
+    \item $Y_{0i}$ es el estado de salud de la persona si no hubiera acudido al \textbf{hospital} (sin importar lo que ocurrió en realidad).
+    \item $Y_{1i}$ es el estado de salud del individuo si efectivamente va al \textbf{hospital}.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La idea es pensar en dos \textbf{mundos paralelos}: uno donde la persona va al hospital y otro donde no va.
+    \item El gran reto es que en la vida real solo vemos \textbf{un mundo a la vez}, nunca ambos resultados para la misma persona.
+\end{itemize}
+\hrule
+
+\begin{itemize}
+    \item El \textbf{efecto causal} del tratamiento hospitalario se define como: $Y_{1i} - Y_{0i}$.
+    \item El resultado observado $Y_i$ se puede expresar en términos de resultados potenciales:  
+    \[
+    Y_i = Y_{0i} + (Y_{1i} - Y_{0i}) D_i
+    \]
+    \item Para cada persona, no es posible observar simultáneamente $Y_{1i}$ y $Y_{0i}$.
+    \item El \textbf{efecto promedio} de la hospitalización comparando promedios de salud entre hospitalizados y no hospitalizados mide lo siguiente:
+    \[
+    E[Y_i|D_i=1] - E[Y_i|D_i=0]
+    \]
+    \item Este puede descomponerse en:
+    \[
+    \underbrace{E[Y_{1i}|D_i=1] - E[Y_{0i}|D_i=1]}_{\text{Efecto promedio de tratamiento en tratados}} 
+    + 
+    \underbrace{E[Y_{0i}|D_i=1] - E[Y_{0i}|D_i=0]}_{\text{Sesgo de selección}}
+    \]
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La comparación simple de hospitalizados vs. no hospitalizados mezcla dos cosas: el \textbf{efecto real del hospital} y el \textbf{sesgo de quién termina en él}.
+    \item Es como comparar autos en taller con los que siguen en la calle: los del taller lucen peores, pero no es por el mecánico, sino porque ya estaban \textbf{descompuestos}.
+\end{itemize}
+
+\section*{\noindent\textbf{La Asignación Aleatoria Resuelve el Problema de Selección}}
+\addcontentsline{toc}{section}{La Asignación Aleatoria Resuelve el Problema de Selección}
+
+\begin{itemize}
+    \item La \textbf{asignación aleatoria} de $D_i$ garantiza que el tratamiento $D_i$ sea \textbf{independiente} de los resultados potenciales $Y_i$.
+    \item El sesgo de selección anterior era:  
+    \[
+    E[Y_{0i}|D_i=1] - E[Y_{0i}|D_i=0]
+    \]
+    \item Si $D_i$ es \textbf{independiente} de $Y_i$, entonces podemos reemplazar $E[Y_{0i}|D_i=1]$ por $E[Y_{0i}|D_i=0]$.
+    \item Por lo tanto, el \textbf{término de sesgo de selección} desaparece cuando hay asignación aleatoria.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La aleatorización es como lanzar una \textbf{moneda}: asegura que los grupos sean comparables porque no depende de sus características previas.
+    \item Así, ya no confundimos el \textbf{efecto real} del tratamiento con quién terminó recibiéndolo.
+\end{itemize}
+
+
+\section*{\noindent\textbf{Ejemplo de experimento aleatorio grande: Tennessee Proyecto STAR}}
+\addcontentsline{toc}{section}{Ejemplo de experimento aleatorio grande: Tennessee Proyecto STAR}
+
+\begin{itemize}
+    \item \textbf{Krueger (1999)} reexamina mediante técnicas econométricas un experimento aleatorio sobre el impacto del \textbf{tamaño de la clase} en el desempeño estudiantil.
+    \item El estudio se conoce como \textbf{Tennessee Student/Teacher Achievement Ratio (STAR)} y se llevó a cabo en la \textbf{década de 1980}.
+    \item En total, \textbf{11,600 alumnos} y sus maestros fueron asignados aleatoriamente a uno de tres grupos:
+    \begin{enumerate}
+        \item Clases \textbf{pequeñas} (13–17 alumnos).
+        \item Clases \textbf{regulares} (22–25 alumnos).
+        \item Clases \textbf{regulares} (22–25 alumnos) con un \textbf{asistente} de tiempo completo para el profesor.
+    \end{enumerate}
+    \item Tras la asignación, el diseño establecía que los estudiantes permanecieran en el mismo tipo de clase por \textbf{cuatro años}.
+    \item La aleatorización se implementó al interior de las \textbf{escuelas}.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Este proyecto fue como un gran \textbf{laboratorio escolar}: miles de alumnos distribuidos por sorteo en clases de distinto tamaño.
+    \item Al mantenerlos en ese esquema varios años, se pudo observar el efecto real del \textbf{tamaño de grupo} sobre el aprendizaje, sin confundirlo con otras causas.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Comparación de medias. Grupo tratamiento y control}}
+\addcontentsline{toc}{subsection}{Comparación de medias. Grupo tratamiento y control}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\textbf{Variable} & \textbf{Small} & \textbf{Regular} & \textbf{Regular/Aide} & \textbf{Joint P-Value} \\
+\hline
+Free lunch$^c$ & 0.47 & 0.48 & 0.50 & 0.09 \\
+White/Asian & 0.68 & 0.67 & 0.66 & 0.26 \\
+Age in 1985 & 5.44 & 5.43 & 5.42 & 0.32 \\
+Attrition rate$^d$ & 0.49 & 0.52 & 0.53 & 0.02 \\
+Class size in kindergarten & 15.1 & 22.4 & 22.8 & 0.00 \\
+Percentile score in kindergarten & 54.7 & 49.9 & 50.0 & 0.00 \\
+\end{tabular}
+\end{table}
+
+\footnotesize
+Fuente: Estudiantes que ingresaron al STAR en kindergarten.  
+$^c$ Participación en programa de almuerzo gratuito.  
+$^d$ Tasa de deserción.  
+\normalsize
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La tabla muestra que los grupos eran bastante \textbf{similares} en características básicas, lo cual valida la aleatorización.
+    \item Las diferencias claras solo aparecen en el \textbf{tamaño de clase} y en el \textbf{rendimiento inicial}, que son justamente las variables del tratamiento.
+\end{itemize}
+
+
+\section*{\noindent\textbf{Análisis de Regresión de Experimentos}}
+\addcontentsline{toc}{section}{Análisis de Regresión de Experimentos}
+
+\begin{itemize}
+    \item Con la \textbf{asignación aleatoria} podemos comparar directamente los resultados promedio de tratamiento y control para obtener el \textbf{efecto causal}.
+    \item También es posible trabajar con los datos mediante un \textbf{análisis de regresión}.
+    \item Supongamos un tratamiento constante: $Y_{1i} - Y_{0i} = \rho$.  
+    Reescribiendo:  
+    \[
+    Y_i = Y_{0i} + (Y_{1i} - Y_{0i})D_i
+    \]
+    se obtiene:
+    \[
+    Y_i = \underbrace{E(Y_{0i})}_{\alpha} + \rho D_i + \underbrace{\big(Y_{0i} - E(Y_{0i})\big)}_{\eta_i}
+    \]
+    \item Aquí, $\eta_i$ representa la parte aleatoria de $Y_{0i}$.
+    \item Estimamos esta regresión para identificar el \textbf{efecto causal} del tratamiento.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La regresión hace lo mismo que la \textbf{comparación de medias}, pero escrita en forma de ecuación con un intercepto, un coeficiente de tratamiento y un error.
+    \item Es como pasar de una \textbf{regla de tres} a una fórmula: cambia la presentación, pero mide la misma idea de cuánto cambia $Y$ por el tratamiento.
+\end{itemize}
+\hrule
+
+\begin{itemize}
+    \item La \textbf{expectativa condicional} de la ecuación (1) con tratamiento activo o no es:  
+    \[
+    E[Y_i|D_i=1] = \alpha + \rho + E[\eta_i|D_i=1]
+    \]  
+    \[
+    E[Y_i|D_i=0] = \alpha + E[\eta_i|D_i=0]
+    \]
+    \item Así, la diferencia se expresa como:  
+    \[
+    E[Y_i|D_i=1] - E[Y_i|D_i=0] 
+    = \underbrace{\rho}_{\text{Tratamiento}} 
+    + \underbrace{\big(E[\eta_i|D_i=1] - E[\eta_i|D_i=0]\big)}_{\text{Sesgo de selección}}
+    \]
+    \item En el experimento \textbf{STAR}, $D_i$ (estar en clase pequeña) se asigna aleatoriamente, por lo que el término de \textbf{sesgo de selección} desaparece.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La fórmula muestra que la diferencia entre grupos se compone de dos partes: el \textbf{efecto real} y el \textbf{sesgo}.
+    \item Con la aleatorización, la segunda parte se anula, dejando solo el \textbf{impacto puro} del tratamiento.
+\end{itemize}
+
+\section*{\noindent\textbf{¿Por qué incluir controles adicionales?}}
+\addcontentsline{toc}{section}{¿Por qué incluir controles adicionales?}
+
+\begin{itemize}
+    \item En lugar de estimar la ecuación (1), se puede plantear:  
+    \[
+    Y_i = \alpha + \rho D_i + X_i' \gamma + \eta_i
+    \]
+    \item \textbf{1. Ajustar la aleatoriedad condicional.}  
+    A veces la asignación aleatoria depende de ciertos observables (ej. nivel de la escuela). Incluirlos corrige esta situación.
+    \item \textbf{2. Aumentar la precisión.}  
+    Aunque $X_i$ no esté correlacionado con $D_i$, puede explicar parte de $Y_i$. Al añadir controles, se reduce la varianza del error y se mejora la estimación de $\beta$.
+    \item \textbf{3. Controlar aleatoriedad imperfecta.}  
+    Si el tratamiento no se asigna de forma aleatoria, omitir controles genera sesgo en $\beta$. Incluirlos permite captar esas diferencias.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Los controles funcionan como \textbf{lentes correctivos}: ayudan a enfocar mejor el efecto que nos interesa.
+    \item Además hacen que la medida sea más \textbf{precisa}, y en caso de que la “moneda no fuera tan justa”, permiten corregir sesgos.
+\end{itemize}
+
+\section*{\noindent\textbf{Krueger (1999)}}
+\addcontentsline{toc}{section}{Krueger (1999)}
+
+\begin{itemize}
+    \item Krueger estima el siguiente modelo econométrico:
+    \[
+    Y_{ics} = \beta_0 + \beta_1 SMALL_{cs} + \beta_2 Reg/A_{cs} + \beta_3 X_{ics} + \alpha_s + \epsilon_{ics}
+    \]
+    \item $Y_{ics}$: \textbf{percentil} de desempeño del estudiante.
+    \item $SMALL_{cs}$: indicador si el estudiante fue asignado a una \textbf{clase pequeña}.
+    \item $Reg/A_{cs}$: indicador si el estudiante fue asignado a una \textbf{clase regular con asistente}.
+    \item $X_{ics}$: conjunto de \textbf{controles individuales}.
+    \item $\alpha_s$: \textbf{efectos fijos por escuela}, dado que la asignación aleatoria se realizó dentro de cada institución.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Este modelo es básicamente una \textbf{regresión de desempeño escolar}, donde las variables clave son los tipos de clase.
+    \item Al incluir \textbf{controles} y efectos fijos, se aíslan las diferencias que no dependen del tamaño de clase, logrando una estimación más limpia.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Estimaciones experimentales del efecto del tamaño de clase en los resultados de exámenes}}
+\addcontentsline{toc}{subsection}{Estimaciones experimentales del efecto del tamaño de clase en los resultados de exámenes}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\textbf{Explanatory variable} & (1) & (2) & (3) & (4) \\
+\hline
+Small class & 4.82 & 5.37 & 5.26 & 5.37 \\
+ & (2.19) & (1.96) & (1.91) & (1.91) \\
+Regular/aide class & 2.23 & 2.29 & 2.31 & 2.41 \\
+ & (2.33) & (1.81) & (1.69) & (1.67) \\
+White/Asian (1=yes) & -- & 6.31 & 5.84 & 5.07 \\
+ & -- & (2.15) & (1.98) & (1.98) \\
+Girl (1=yes) & -- & 4.48 & 4.39 & 4.36 \\
+ & -- & (.83) & (.84) & (.84) \\
+Free lunch (1=yes) & -- & -11.63 & -11.87 & -11.90 \\
+ & -- & (1.36) & (1.34) & (1.34) \\
+White teacher & -- & -- & -.77 & -.77 \\
+ & -- & -- & (.77) & (.77) \\
+Teacher experience & -- & -- & .25 & .26 \\
+ & -- & -- & (.16) & (.16) \\
+Master's degree & -- & -- & -- & -.10 \\
+ & -- & -- & -- & (.65) \\
+\hline
+School fixed effects & No & Yes & Yes & Yes \\
+$R^2$ & .01 & .26 & .31 & .31 \\
+\end{tabular}
+\end{table}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El coeficiente de \textbf{clase pequeña} es positivo y significativo: estar en un grupo reducido mejora el rendimiento en los exámenes.
+    \item Al añadir \textbf{controles} y efectos fijos, los resultados se mantienen, mostrando que el efecto es robusto y no se debe a otras características.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Estimaciones experimentales del efecto del tamaño de clase en los resultados de exámenes (First grade)}}
+\addcontentsline{toc}{subsection}{Estimaciones experimentales del efecto del tamaño de clase en los resultados de exámenes (First grade)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\textbf{Explanatory variable} & (1) & (2) & (3) & (4) \\
+\hline
+Small class & 8.57 & 8.43 & 7.91 & 7.40 \\
+ & (1.97) & (1.21) & (1.17) & (1.18) \\
+Regular/aide class & 3.44 & 2.22 & 2.09 & 1.88 \\
+ & (2.05) & (1.00) & (.98) & (.98) \\
+White/Asian (1=yes) & -- & 6.90 & 6.97 & 6.97 \\
+ & -- & (.69) & (.67) & (.67) \\
+Girl (1=yes) & -- & 5.87 & 5.89 & 5.85 \\
+ & -- & (.56) & (.56) & (.56) \\
+Free lunch (1=yes) & -- & -13.87 & -13.81 & -13.80 \\
+ & -- & (.86) & (.85) & (.85) \\
+White teacher & -- & -- & -.18 & -.18 \\
+ & -- & -- & (.71) & (.71) \\
+Male teacher & -- & -- & -.53 & -.53 \\
+ & -- & -- & (1.61) & (1.61) \\
+Teacher experience & -- & -- & .20 & .20 \\
+ & -- & -- & (.11) & (.11) \\
+Master's degree & -- & -- & -- & .13 \\
+ & -- & -- & -- & (.67) \\
+\hline
+School fixed effects & No & Yes & Yes & Yes \\
+$R^2$ & .02 & .24 & .30 & .30 \\
+\end{tabular}
+\end{table}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item En primer grado, el impacto de estar en una \textbf{clase pequeña} es todavía más fuerte: los puntajes suben de manera notable.
+    \item Los \textbf{controles} (sexo, etnia, almuerzo gratuito, experiencia del maestro) no eliminan el efecto, lo que confirma que la diferencia se debe al \textbf{tamaño de clase}.
+\end{itemize}
+
+\section*{\noindent\textbf{Potenciales problemas en los experimentos aleatorios: Atrición}}
+\addcontentsline{toc}{section}{Potenciales problemas en los experimentos aleatorios: Atrición}
+
+\subsection*{\noindent\textbf{Atrición}}
+\addcontentsline{toc}{subsection}{Atrición}
+
+\begin{itemize}
+    \item Si la \textbf{fuga} (attrition) ocurre al azar y afecta de igual modo a tratamiento y control, las estimaciones permanecen \textbf{insesgadas}.
+    \item El problema surge si la \textbf{fuga no es aleatoria}: por ejemplo, alumnos con alto desempeño de clases grandes podrían inscribirse en escuelas privadas, generando un nuevo \textbf{sesgo de selección}.
+    \item Krueger enfrenta esta preocupación imputando los \textbf{puntajes de exámenes} (basados en pruebas anteriores) a los niños que abandonaron la muestra, y luego reestima el modelo incluyendo estos datos imputados.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La fuga es como cuando jugadores abandonan un torneo: si se van al azar no pasa nada, pero si desertan solo los \textbf{mejores}, los resultados se distorsionan.
+    \item La imputación funciona como “rellenar huecos” con una \textbf{estimación razonable} para evitar que el sesgo arruine el experimento.
+\end{itemize}
+
+\section*{\noindent\textbf{Robustez. Resultados de la regresión imputando calificaciones}}
+\addcontentsline{toc}{section}{Robustez. Resultados de la regresión imputando calificaciones}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+ & \multicolumn{2}{c}{\textbf{Actual test data}} & \multicolumn{2}{c}{\textbf{Actual and imputed test data}} \\
+\textbf{Grade} & \textbf{Coef. small class dum.} & \textbf{Sample size} & \textbf{Coef. small class dum.} & \textbf{Sample size} \\
+\hline
+K & 5.32 (0.76) & 5900 & 5.32 (0.76) & 5900 \\
+1 & 6.95 (0.74) & 6632 & 6.30 (0.68) & 8328 \\
+2 & 5.79 (0.76) & 6282 & 5.64 (0.65) & 9773 \\
+3 & 5.58 (0.79) & 6339 & 4.49 (0.63) & 10919 \\
+\end{tabular}
+\end{table}
+
+\footnotesize
+La fuga no aleatoria no sesga los resultados.  
+\normalsize
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Al incluir los puntajes imputados, los efectos de las clases pequeñas se mantienen, lo que indica que los resultados son \textbf{robustos}.
+    \item En otras palabras, incluso si algunos alumnos \textbf{abandonan}, las conclusiones no cambian: el beneficio de clases pequeñas sigue siendo claro.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Incumplimiento}}
+\addcontentsline{toc}{subsection}{Incumplimiento}
+
+\begin{itemize}
+    \item Algunos estudiantes \textbf{cambiaron de clase} después de la asignación aleatoria. Ejemplo: transiciones entre los grados 1 y 2.
+    \item Si los alumnos hubieran permanecido siempre en su \textbf{grupo inicial}, todos los elementos fuera de la diagonal serían \textbf{cero}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+ & \textbf{Small} & \textbf{Regular} & \textbf{Reg/aide} & \textbf{All} \\
+\hline
+\textbf{First grade Small} & 1435 & 23 & 24 & 1482 \\
+\textbf{Regular} & 152 & 1498 & 202 & 1852 \\
+\textbf{Aide} & 40 & 115 & 1560 & 1715 \\
+\textbf{All} & 1627 & 1636 & 1786 & 5049 \\
+\end{tabular}
+\end{table}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El incumplimiento aparece cuando algunos estudiantes \textbf{cambian de grupo}, rompiendo la pureza de la aleatorización inicial.
+    \item Es como si en un \textbf{experimento de dieta} algunos participantes decidieran cambiar de plan en medio del estudio: complica la interpretación de los resultados.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Incumplimiento (II)}}
+\addcontentsline{toc}{subsection}{Incumplimiento (II)}
+
+\begin{itemize}
+    \item Algunos participantes se movieron entre los \textbf{grupos de tratamiento y control}.
+    \item En muchos experimentos, la participación es \textbf{voluntaria}, incluso si la asignación inicial fue aleatoria (aunque no fue el caso en \textbf{Krueger (1999)}).
+    \item Una solución es usar la \textbf{asignación inicial} (clases pequeñas o regulares) como \textbf{instrumento} para la asignación real.
+    \item Krueger presenta resultados de forma reducida donde la \textbf{asignación inicial} funciona como variable explicativa.
+    \item En preescolar, los resultados de \textbf{MCO} y de \textbf{variables instrumentales} (reduced form) son semejantes, pues los estudiantes permanecieron en su clase original al menos un año.  
+    \item Desde primer grado en adelante, los estimadores MCO (columnas 1–4) y la forma reducida (columnas 5–8) comienzan a diferir.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El incumplimiento es como cuando los jugadores cambian de equipo después de hacer el sorteo: ya no puedes confiar solo en el resultado observado.
+    \item Usar la \textbf{asignación inicial como instrumento} es como registrar quién iba a estar en cada equipo desde el inicio: eso ayuda a identificar el efecto real.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccccc}
+ & \multicolumn{4}{c}{\textbf{OLS: actual class size}} & \multicolumn{4}{c}{\textbf{Reduced form: initial class size}} \\
+\textbf{Explanatory variable} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\
+\hline
+Small class & 5.93 & 6.33 & 5.83 & 5.79 & 5.31 & 5.52 & 5.27 & 5.26 \\
+ & (1.97) & (1.29) & (1.23) & (1.17) & (1.10) & (1.10) & (1.10) & (1.10) \\
+Regular/aide class & 1.97 & 1.88 & 1.64 & 1.49 & 1.40 & 1.61 & 1.37 & 1.36 \\
+ & (2.05) & (1.10) & (1.07) & (1.06) & (.81) & (.81) & (.81) & (.81) \\
+White/Asian (1=yes) & -- & 6.35 & 6.38 & 6.37 & -- & 6.29 & 6.32 & 6.31 \\
+ & -- & (.63) & (.63) & (.63) & -- & (.63) & (.63) & (.63) \\
+Girl (1=yes) & -- & 3.63 & 3.63 & 3.60 & -- & 3.67 & 3.67 & 3.67 \\
+ & -- & (.60) & (.60) & (.60) & -- & (.60) & (.60) & (.60) \\
+Free lunch (1=yes) & -- & -13.61 & -13.78 & -13.75 & -- & -13.75 & -13.75 & -13.73 \\
+ & -- & (.72) & (.72) & (.72) & -- & (.73) & (.73) & (.73) \\
+White teacher & -- & -- & -.75 & -.74 & -- & -- & -.73 & -.73 \\
+ & -- & -- & (.72) & (.72) & -- & -- & (.73) & (.73) \\
+Male teacher & -- & -- & .28 & .28 & -- & -- & .27 & .27 \\
+ & -- & -- & (1.45) & (1.45) & -- & -- & (1.47) & (1.47) \\
+Teacher experience & -- & -- & -- & -.08 & -- & -- & -- & -.08 \\
+ & -- & -- & -- & (.42) & -- & -- & -- & (.42) \\
+Master's degree & -- & -- & -- & 1.03 & -- & -- & -- & 1.06 \\
+ & -- & -- & -- & (1.06) & -- & -- & -- & (1.06) \\
+\hline
+School fixed effects & No & Yes & Yes & Yes & No & Yes & Yes & Yes \\
+$R^2$ & .01 & .22 & .28 & .28 & .01 & .21 & .28 & .28 \\
+\end{tabular}
+\end{table}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item La comparación entre OLS y \textbf{forma reducida} muestra que los efectos de clases pequeñas siguen siendo positivos, pero ligeramente menores al usar la asignación inicial como instrumento.
+    \item Esto refleja que el \textbf{incumplimiento} atenúa los efectos medidos, y que el uso de IV ayuda a recuperar una estimación más confiable del impacto real.
+\end{itemize}
+
+\section*{\noindent\textbf{Otros Problemas en los experimentos aleatorios}}
+\addcontentsline{toc}{section}{Otros Problemas en los experimentos aleatorios}
+
+\subsection*{\noindent\textbf{Costos}}
+\addcontentsline{toc}{subsection}{Costos}
+
+\begin{itemize}
+    \item \textbf{1) Costos}
+    \begin{itemize}
+        \item \textbf{Costos financieros}: los experimentos pueden ser muy caros y difíciles de aplicar correctamente en economía.
+        \item \textbf{Problemas éticos}: no siempre es posible realizar todos los experimentos deseados, ya que se podrían modificar variables sociales y económicas de forma sustancial, o bien sería injusto negar un \textbf{tratamiento valioso} a un grupo de control.
+    \end{itemize}
+
+    \subsection*{\noindent\textbf{Validez Interna}}
+\addcontentsline{toc}{subsection}{Validez Interna}
+
+    \item \textbf{2) Amenazas a la validez interna}  
+    (las inferencias estadísticas sobre los efectos causales son válidas solo para la población estudiada).
+    \begin{itemize}
+        \item \textbf{Incumplimiento (non-compliance)}.
+        \item \textbf{Fuga (attrition)}.
+    \end{itemize}
+
+\subsection*{\noindent\textbf{Validez Externa}}
+\addcontentsline{toc}{subsection}{Validez Externa}
+
+    \item \textbf{3) Amenazas a la validez externa}  
+    (la posibilidad de generalizar los resultados a otras poblaciones o escenarios distintos al estudiado).
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Hacer un experimento en economía es como organizar un \textbf{gran ensayo clínico}: caro, complicado y a veces éticamente cuestionable.
+    \item Además, incluso si sale perfecto, los resultados pueden servir solo para ese \textbf{grupo específico} y no necesariamente para todo el mundo.
+\end{itemize}
+
+
+\subsection*{\noindent\textbf{Duración Limitada}}
+\addcontentsline{toc}{subsection}{Duración Limitada}
+
+\begin{itemize}
+    \item \textbf{4) Duración limitada.}  
+    Los experimentos suelen ser de carácter \textbf{temporal}. Las personas pueden reaccionar de manera distinta ante un programa \textbf{corto} que frente a uno \textbf{permanente}.
+    \end{itemize}
+
+\subsection*{\noindent\textbf{Efectos heterogéneos}}
+\addcontentsline{toc}{subsection}{Efectos heterogéneos}
+
+    \begin{itemize}
+    \item \textbf{5) Efectos heterogéneos.}  
+    A menudo se realizan en un área \textbf{geográfica específica}, lo que dificulta extrapolar los resultados del experimento a la \textbf{población total}.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como probar un \textbf{nuevo medicamento} solo durante unos meses: el efecto puede ser distinto si se usa de por vida.
+    \item También es como evaluar un programa en un \textbf{pueblo pequeño} y asumir que funcionará igual en todo un país: el contexto puede cambiar mucho.
+\end{itemize}
+
+\section*{\noindent\textbf{Problemas en los experimentos aleatorios: Validez externa (efectos heterogéneos)}}
+\addcontentsline{toc}{section}{Problemas en los experimentos aleatorios: Validez externa (efectos heterogéneos)}
+
+\begin{itemize}
+    \item Puede presentarse cuando los \textbf{efectos del tratamiento son heterogéneos}.  
+    La muestra experimental puede no representar perfectamente a la \textbf{población de interés} debido a la aleatorización. 
+    \item Los participantes en el experimento pueden mostrar \textbf{efectos diferentes} frente al promedio poblacional.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\textwidth]{image1}
+\caption{\footnotesize Distribución de efectos del tratamiento en la población.}
+\end{figure}
+
+\begin{flushleft}
+\footnotesize
+$\rho_i = Y_{1i} - Y_{0i}$ : efecto del tratamiento para el individuo $i$. \\
+$\rho^*$ : efecto promedio del tratamiento. \\
+$\rho^+$ : umbral a partir del cual las personas participan en el experimento. \\
+$\rho^{TT}$ : efecto medido en los tratados dentro del experimento. \\
+$\rho^{TU}$ : efecto en los no tratados (no observable porque no participan). \\
+\normalsize
+\end{flushleft}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Es como probar un programa con quienes más interesados están: el efecto en ellos puede ser mayor que en la población general.
+    \item Así, los resultados de la muestra pueden \textbf{sobreestimar} o \textbf{subestimar} lo que ocurriría si el programa se aplicara a todos.
+\end{itemize}
+
+\section*{\noindent\textbf{Problemas en los experimentos aleatorios: Efectos de Hawthorne y John Henry}}
+\addcontentsline{toc}{section}{Problemas en los experimentos aleatorios: Efectos de Hawthorne y John Henry}
+
+\begin{itemize}
+    \item \textbf{Tratamiento y control} pueden modificar su comportamiento al saber que son observados.
+    \item Ejemplo: experimento STAR en \textbf{Krueger (1999)}.
+    \begin{itemize}
+        \item \textbf{Efecto Hawthorne}: los maestros de clases pequeñas pueden ser más efectivos solo porque participan en un \textbf{experimento}, y no necesariamente por el tamaño reducido de la clase.
+        \item \textbf{Efecto John Henry}: los maestros de clases regulares, al sentirse en desventaja, pueden realizar un esfuerzo extra para compensar, generando un sesgo en la comparación.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item El efecto Hawthorne es como cuando alguien trabaja más duro solo porque sabe que lo están \textbf{mirando}.
+    \item El efecto John Henry es como el “espíritu de competencia”: quienes reciben menos recursos hacen un \textbf{esfuerzo mayor} para no quedarse atrás.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item \textbf{3) Efectos de Hawthorne y John Henry (continuación)}  
+    \begin{itemize}
+        \item \textbf{Krueger (1999)} muestra que en el experimento STAR no aparecen estos efectos.  
+        El impacto del tamaño de clase en el grupo de control es \textbf{similar} al de los grupos tratados.
+    \end{itemize}
+    \item \textbf{4) Efectos de equilibrio general}  
+    \begin{itemize}
+        \item Los experimentos a pequeña escala no generan \textbf{efectos de equilibrio general}.  
+        \item Estos efectos pueden ser \textbf{cruciales} cuando el programa se aplica a toda la población.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item En STAR, la competencia entre maestros no alteró los resultados: el efecto vino realmente del \textbf{tamaño de clase}.
+    \item Pero en el mundo real, aplicar un programa a gran escala puede cambiar precios, incentivos o comportamientos, generando \textbf{nuevos efectos} que un experimento chico no detecta.
+\end{itemize}
+
+
+\section*{\noindent\textbf{Conclusiones}}
+\addcontentsline{toc}{section}{Conclusiones}
+
+\begin{itemize}
+    \item Un \textbf{artículo empírico} no debe limitarse a contar una historia interesante: tiene que ser convincente desde un punto de vista \textbf{lógico}.  
+    \begin{itemize}
+        \item Ejemplo: demostrar que asistir a \textbf{clases pequeñas} eleva el desempeño en pruebas estandarizadas.
+    \end{itemize}
+    \item También debe ser sólido desde un punto de vista \textbf{técnico}, garantizando \textbf{validez interna}.
+    \item La norma en economía aplicada es no contar con \textbf{datos perfectos}.
+    \item Por ello, resulta fundamental \textbf{reconocer los problemas existentes} y enfrentarlos de la mejor manera posible.
+\end{itemize}
+
+\textbf{Intuición:}
+\begin{itemize}
+    \item Un buen paper empírico es como una \textbf{historia bien contada}: debe ser clara y lógica, pero también tener fundamentos técnicos que la sostengan.
+    \item Como nunca habrá datos “limpios”, lo clave es \textbf{mostrar las limitaciones} y explicar qué hiciste para dar la mejor respuesta posible.
+\end{itemize}
+
+
+
+
+
+
+\end{document}
