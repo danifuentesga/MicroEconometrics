@@ -1,0 +1,838 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+  6 Matching\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+   6 Matching\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{6 Matching} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Today’s Agenda}}
+\addcontentsline{toc}{section}{Today’s Agenda}
+
+\begin{itemize}
+    \item \textbf{Matching}. We search for \textit{causal effects} by comparing \textbf{treated} and \textbf{control groups} inside subgroups where almost everything \ldots or most factors \ldots or the \textit{key elements} \ldots stay fixed
+    \item \textbf{Similarities} between \textit{regression} approaches and \textbf{matching}
+    \item \textbf{Example} of matching from \textit{Angrist (1998)}
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item Matching is a way to \textit{imitate experiments} by checking “similar” groups
+    \item It works by \textbf{holding constant} the most \textit{relevant characteristics}
+    \item Today’s focus: learn the method and see a \textbf{practical example}
+\end{itemize}
+
+\section*{\noindent\textbf{Background: Volunteers of America!}}
+\addcontentsline{toc}{section}{Background: Volunteers of America!}
+
+\begin{itemize}
+    \item The \textbf{army} is the largest single employer of \textit{young men and women} in the United States
+    \item Between \textbf{1989 and 1992}, the enlistments of men and women with \textit{no prior service} in the military dropped by \textbf{27\%}
+    \item Recruitments of \textbf{white men} declined by \textbf{25\%}, while enlistments of \textbf{black men}—the group most affected by the \textit{military cutback}—fell by \textbf{47\%} (\textit{Angrist, 1993a})
+    \item The main channel behind these decreases was a \textbf{raise in cutoff scores} on applicant tests and \textit{changes in entry rules}
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item The military is a \textbf{big employer}, so changes hit many people
+    \item During cuts, enlistments fell, especially among \textit{black recruits}
+    \item Rules got tougher: \textbf{higher test thresholds} and stricter entry norms
+\end{itemize}
+
+\begin{itemize}
+    \item What were the \textbf{consequences} of military service for the \textbf{recruits}?
+    \item By answering this, we learn whether the \textbf{military cuts} were a \textbf{lost economic opportunity} (as many believed at that time)
+    \item The problem of \textbf{selection bias} makes comparisons between \textbf{veterans} and \textbf{non-veterans} misleading (\textbf{Seltzer and Jablon, 1974})
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item The key question: did service \textbf{help or hurt} recruits?
+    \item Cuts may mean \textbf{missed chances} for economic gains
+    \item We must beware of \textbf{biased comparisons} between groups
+\end{itemize}
+
+\section*{\noindent\textbf{Angrist (1998). Matching Strategy}}
+\addcontentsline{toc}{section}{Angrist (1998). Matching Strategy}
+
+\begin{enumerate}
+    \item Compare \textbf{veterans} and \textbf{non-veterans} who applied (only half of the \textbf{qualified candidates} serve in the army)
+    \item Control for the \textbf{characteristics} that the military uses to \textbf{select} soldiers
+\end{enumerate}
+
+\begin{itemize}
+    \item The \textbf{matching estimator} is an average of \textbf{contrasts} or comparisons across cells defined by \textbf{covariates}
+    \item Focusing on the \textbf{treatment effect} on the treated (TOT):  
+    \[
+    E[Y_{1i} - Y_{0i} \mid D_i = 1]
+    \]
+    \item This shows the gap between the \textbf{average observed earnings} of soldiers, \(E[Y_{1i}\mid D_i=1]\), and the \textbf{counterfactual average} had they not served, \(E[Y_{0i}\mid D_i=1]\)
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item We compare \textbf{similar applicants} to isolate service effects
+    \item Matching builds a \textbf{fair comparison} by holding traits constant
+    \item The goal is to measure the \textbf{earnings gap} caused by service
+\end{itemize}
+
+\begin{itemize}
+    \item The \textbf{income gap} by veteran status is a \textbf{biased estimator} of the TOT, unless \(D_i\) is independent of \(Y_{0i}\):
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_i \mid D_i=1] - \mathbb{E}[Y_i \mid D_i=0] 
+   &\quad \text{\textbf{\shortstack{Diff. \\ means}}} \\[6pt]
+= \mathbb{E}[Y_{1i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=0] 
+   &\quad \text{\textbf{\shortstack{Def. of \\ $Y_i$}}} \\[6pt]
+= \big(\mathbb{E}[Y_{1i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=1]\big) 
+  + \big(\mathbb{E}[Y_{0i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=0]\big) 
+   &\quad \text{\textbf{\shortstack{Add \& subtract \\ $\mathbb{E}[Y_{0i}\mid D_i=1]$}}} \\[6pt]
+= \mathbb{E}[Y_{1i} - Y_{0i} \mid D_i=1] 
+  + \big(\mathbb{E}[Y_{0i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=0]\big) 
+   &\quad \text{\textbf{\shortstack{Group \\ terms}}} \\[6pt]
+= \underbrace{\mathbb{E}[Y_{1i} - Y_{0i} \mid D_i=1]}_{\textbf{TOT}} 
+  + \underbrace{\big(\mathbb{E}[Y_{0i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=0]\big)}_{\textbf{Selection Bias}} 
+   &\quad \text{\textbf{\shortstack{Identify \\ components}}}
+\end{align}
+
+
+\textbf{Intuition}
+\begin{itemize}
+    \item The raw gap mixes \textbf{treatment effect} and \textbf{bias}
+    \item \textbf{TOT}: what veterans gain from service
+    \item \textbf{Bias}: pre-existing differences in \(\;Y_0\) across groups
+\end{itemize}
+
+\section*{\noindent\textbf{Conditional Independence Assumption (CIA)}}
+\addcontentsline{toc}{section}{Conditional Independence Assumption (CIA)}
+
+\begin{itemize}
+    \item Conditional on observed \(\;X_i\), the treatment is as good as randomly assigned:  
+    \[
+    \{Y_{0i}, Y_{1i}\} \perp D_i \mid X_i
+    \]
+    \item Given CIA, causal effects can be built by iterating expectations over \(X_i\):
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\delta_{TOT} 
+   &= \mathbb{E}[Y_{1i} - Y_{0i} \mid D_i = 1] 
+   & \text{\textbf{\shortstack{Def. \\ TOT}}} \\[6pt]
+&= \mathbb{E}[Y_{1i} \mid D_i=1] - \mathbb{E}[Y_{0i} \mid D_i=1] 
+   & \text{\textbf{\shortstack{Linearity \\ of $\mathbb{E}$}}} \\[6pt]
+&= \mathbb{E}\big[ \mathbb{E}[Y_{1i}\mid X_i, D_i=1] \mid D_i=1 \big] 
+ - \mathbb{E}\big[ \mathbb{E}[Y_{0i}\mid X_i, D_i=1] \mid D_i=1 \big] 
+   & \text{\textbf{\shortstack{Iterated \\ Exp.}}} \\[6pt]
+&= \mathbb{E}\Big[ \, 
+   \mathbb{E}[Y_{1i}\mid X_i, D_i=1] - \mathbb{E}[Y_{0i}\mid X_i, D_i=1] 
+   \; \Big| \; D_i=1 \Big] 
+   & \text{\textbf{\shortstack{Group \\ terms}}} \\[6pt]
+&= \int \Big( \mathbb{E}[Y_{1i}\mid X_i, D_i=1] - \mathbb{E}[Y_{0i}\mid X_i, D_i=1] \Big) 
+   dF(X_i \mid D_i=1) 
+   & \quad \text{\textbf{\shortstack{Integral form: \\ average over \\ distribution of $X_i$}}}
+\end{align}
+
+\begin{align}
+\mathbb{E}[Y_{0i}\mid X_i, D_i=1] 
+   & \quad \text{\textbf{Counterfactual term}} \\[6pt]
+&\overset{CIA}{=} \mathbb{E}[Y_{0i}\mid X_i, D_i=0] 
+   & \text{\textbf{\shortstack{Use \\ CIA}}}
+\end{align}
+
+\begin{align}
+\delta_{TOT} 
+   &= \mathbb{E}\Big[ \mathbb{E}[Y_{1i}\mid X_i, D_i=1] - \mathbb{E}[Y_{0i}\mid X_i, D_i=0] 
+      \;\Big|\; D_i=1 \Big] 
+   & \text{\textbf{\shortstack{Replace \\ $Y_0$ term}}} \\[6pt]
+&= \mathbb{E}[\delta_{X_i} \mid D_i=1] 
+   & \text{\textbf{\shortstack{Define \\ $\delta_{X_i}$}}}
+\end{align}
+
+
+\begin{itemize}
+    \item where \(\delta_{X_i} = \mathbb{E}[Y_{1i}\mid X_i, D_i=1] - \mathbb{E}[Y_{0i}\mid X_i, D_i=0]\)  
+    is the (random) \textbf{X-specific causal effect}.
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item CIA says: once we \textbf{control for \(X_i\)}, treatment is \textbf{“as if random”}
+    \item TOT is built by \textbf{averaging treatment effects} across \(X_i\)
+    \item Counterfactuals are replaced by \textbf{non-treated with same \(X_i\)}
+\end{itemize}
+
+\section*{\noindent\textbf{Angrist (1998)}}
+\addcontentsline{toc}{section}{Angrist (1998)}
+
+\begin{itemize}
+    \item Angrist (1998) builds the \textbf{sample analog} of the right-hand side of eq. (1) for \textbf{discrete covariates}:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_{1i} - Y_{0i} \mid D_i = 1] 
+   &= \sum_x \delta_x \, P(X_i = x \mid D_i=1) 
+   & \text{\textbf{\shortstack{Discrete \\ version}}} \\[6pt]
+\delta_x 
+   &= \mathbb{E}[Y_{1i} \mid X_i = x, D_i=1] - \mathbb{E}[Y_{0i} \mid X_i = x, D_i=0] 
+   & \text{\textbf{\shortstack{Cell-specific \\ effect}}}
+\end{align}
+
+\begin{itemize}
+    \item Here \(P(X_i = x \mid D_i = 1)\) is the \textbf{distribution of \(X_i\)} among veterans
+    \item The estimator is obtained by replacing \(\delta_x\) with the \textbf{mean earnings difference} between veterans and non-veterans in each cell \(x\), and weighting by the \textbf{empirical distribution} \(P(X_i = x \mid D_i=1)\)
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item With discrete \(X\), the integral turns into a \textbf{sum over cells}
+    \item Each \(\delta_x\) captures the \textbf{local treatment effect} for covariate profile \(x\)
+    \item The final TOT is a \textbf{weighted average} of these cell effects
+\end{itemize}
+
+\section*{\noindent\textbf{Angrist (1998). Results}}
+\addcontentsline{toc}{section}{Angrist (1998). Results}
+
+\begin{itemize}
+    \item \textbf{White veterans} earn more than non-veterans, but this effect becomes \textbf{negative} once covariates are matched
+    \item \textbf{Non-white veterans} earn much more than non-veterans, but covariate controls \textbf{shrink the gap} considerably
+\end{itemize}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item At first glance, veterans seem to earn \textbf{more}, but once we compare \textbf{similar people}, the advantage often \textbf{disappears or reverses}
+    \item Think of it like comparing two runners: one starts with a head start. After correcting for that, the real performance looks different
+    \item For non-white veterans, the raw difference looks huge, but careful matching shows it’s \textbf{partly explained by background factors}
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Applicant Population and Sample}
+\begin{tabular}{lccccccc}
+\hline
+ & 1976 & 1977 & 1978 & 1979 & 1980 & 1981 & 1982 \\
+\hline
+\multicolumn{8}{l}{\textbf{A. Population$^a$}} \\
+White & 393.5 & 286.9 & 235.9 & 253.1 & 348.6 & 387.3 & 309.8 \\
+Percent veteran$^b$ & 53 & 52 & 54 & 55 & 53 & 49 & 52 \\
+Nonwhite & 128.6 & 114.8 & 103.6 & 119.5 & 134.3 & 149.3 & 112.5 \\
+Percent veteran & 44 & 46 & 50 & 46 & 41 & 36 & 43 \\
+\hline
+\multicolumn{8}{l}{\textbf{B. Sample$^c$}} \\
+White & 49.2 & 46.5 & 40.0 & 39.4 & 52.9 & 57.9 & 47.3 \\
+Percent veteran & 56 & 53 & 55 & 57 & 54 & 50 & 53 \\
+Nonwhite & 50.9 & 48.1 & 44.6 & 51.9 & 57.0 & 63.7 & 48.7 \\
+Percent veteran & 40 & 38 & 44 & 48 & 47 & 38 & 45 \\
+\hline
+\end{tabular}
+
+\begin{flushleft}
+\footnotesize 
+$^a$ As in Angrist (1993a, Table 4), excluding applicants with less than 9th grade education at application. Numbers in thousands. \\
+$^b$ Veterans are applicants identified as entrants to the military within two years following application. \\
+$^c$ Approximately 90\% of the sample is self-weighting, conditional on race. \\
+\end{flushleft}
+\end{table}
+
+\doublespacing
+\textbf{Explanation} \\
+Table 1 reports the size of the applicant pool and the sample used in the analysis, 
+split by \textbf{race} and \textbf{year of application} (1976--1982). 
+Panel A shows the total number of applicants (in thousands) and the share who are 
+\textbf{veterans}. Panel B shows the selected sample of applicants who actually 
+enlisted, again by race and year, with corresponding veteran shares. 
+\singlespacing
+\textbf{Intuition}
+\begin{itemize}
+    \item White applicants are the majority, but the share of \textbf{veterans} is similar across races
+    \item The \textbf{sample} is much smaller than the population, since not all applicants enlist
+    \item Think of it like a \textbf{funnel}: many apply (Panel A), fewer serve (Panel B). 
+    This shows why careful sampling matters in the analysis
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{image1}
+\caption*{\footnotesize 
+Earnings profiles by veteran status and application year for men who applied 1979--82, 
+with AFQT scores in categories III and IV. The plot shows actual earnings: 
++ \$3{,}000 for 1982 applicants, + \$6{,}000 for 1981 applicants, 
++ \$6{,}000 for 1980 applicants, and + \$9{,}000 for 1979 applicants.}
+\end{figure}
+
+\doublespacing
+\textbf{Explanation} \\
+The figure plots \textbf{earnings profiles} over time for veterans and nonveterans, 
+by year of application (1979--1982). Each curve shows the actual FICA earnings for men 
+with AFQT scores in categories III and IV. Veterans consistently earn more than 
+nonveterans in the early years, with the earnings advantage varying by application cohort.
+
+\singlespacing
+\textbf{Intuition}
+\begin{itemize}
+    \item The \textbf{gap} between the solid (veterans) and dashed (nonveterans) lines 
+    shows how much extra veterans earned
+    \item Earlier cohorts (like 1979) had the \textbf{largest boost}, while later ones (1982) saw smaller gains
+    \item Think of it like different \textbf{graduating classes}: those who entered earlier 
+    cashed in more, while later classes faced lower returns
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Alternative Estimates of the Effects of Military Service}
+\scriptsize
+\begin{tabular}{lcccccccc}
+\hline
+ & \multicolumn{4}{c}{\textbf{Whites}} & \multicolumn{4}{c}{\textbf{Nonwhites}} \\
+\cline{2-5} \cline{6-9}
+Year & Mean 
+     & \shortstack{Diff. \\ in Means} 
+     & \shortstack{Controlled \\ Contrast} 
+     & \shortstack{Regression \\ Est.} 
+     & Mean 
+     & \shortstack{Diff. \\ in Means} 
+     & \shortstack{Controlled \\ Contrast} 
+     & \shortstack{Regression \\ Est.} \\
+\hline
+74 & 182.7  & -26.1 & -14.0 & -13.0 & 157.2  & -4.9 & -2.0 & -3.9 \\
+75 & 237.9  & -41.4 & -14.2 & -12.0 & 216.9  & -6.6 & -17.1 & -15.2 \\
+76 & 473.4  & -47.9 & -14.8 & -12.7 & 413.6  & -14.5 & -33.3 & -30.2 \\
+77 & 1012.9 & -7.1  & -8.6  & -9.4  & 820.9  & -13.0 & -56.0 & -51.3 \\
+78 & 2147.1 & 40.3  & -23.5 & -22.4 & 1677.9 & 58.1 & -53.6 & -42.5 \\
+79 & 3560.7 & 188.0 & -8.4  & -11.2 & 2797.0 & 340.3 & 119.1 & 122.3 \\
+80 & 4790.0 & 572.9 & 178.0 & 175.9 & 3932.2 & 1154.3 & 741.6 & 738.5 \\
+81 & 6226.0 & 855.5 & 249.5 & 249.9 & 5218.8 & 1920.0 & 1299.9 & 1318.5 \\
+82 & 7200.6 & 1508.5 & 783.3 & 782.4 & 6150.2 & 2917.1 & 2186.0 & 2210.1 \\
+83 & 7957.3 & 1305.3 & 584.4 & 532.5 & 6852.1 & 2834.9 & 2320.0 & 2260.0 \\
+84 & 9874.2 & 1593.5 & 888.6 & 805.1 & 8377.2 & 2902.7 & 1330.6 & 1289.2 \\
+85 & 10972.7 & 2097.2 & 1281.3 & 1258.9 & 9306.8 & 3555.5 & 1942.3 & 1939.2 \\
+86 & 12004.5 & 543.7 & -557.3 & -491.7 & 10106.2 & 1381.3 & 720.9 & 872.3 \\
+87 & 13045.7 & 654.3 & -598.0 & -464.3 & 10833.0 & 2050.1 & 751.0 & 925.4 \\
+88 & 14006.4 & 593.0 & -440.8 & -333.5 & 11506.7 & 2158.2 & 858.0 & 924.3 \\
+89 & 14117.5 & -61.0 & -71.2 & -62.9 & 11751.4 & 843.2 & 189.6 & 267.9 \\
+90 & 14886.1 & -139.8 & -166.2 & -139.6 & 11904.3 & 2483.6 & 624.9 & 1064.0 \\
+91 & 14407.9 & 1559.6 & 29.8 & 16.2 & 11518.7 & 2758.8 & 1062.1 & 1277.9 \\
+\hline
+\end{tabular}
+\end{table}
+
+\doublespacing
+\textbf{Explanation} \\
+Table 2 reports alternative estimates of the effect of \textbf{military service} on 
+earnings, shown separately for \textbf{whites} and \textbf{nonwhites}, by year of application.  
+Each panel shows four measures: the \textbf{mean earnings}, the simple 
+\textbf{difference in means} between veterans and nonveterans, a 
+\textbf{controlled contrast} adjusting for covariates, and a 
+\textbf{regression estimate}. Standard errors are reported in parentheses in the original source.
+
+\singlespacing
+\textbf{Intuition}
+\begin{itemize}
+    \item Raw comparisons (diff. in means) often exaggerate or mislead; once we 
+    \textbf{control for covariates}, the effects change noticeably
+    \item For whites, the estimated benefit is sometimes small or even 
+    \textbf{negative}, while for nonwhites the veteran premium is usually 
+    \textbf{larger and more positive}
+    \item Think of it like comparing test scores: if we just compare averages, 
+    one group looks much better — but once we compare students with the 
+    \textbf{same background}, the real difference is smaller (and sometimes flips sign)
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{image2}
+\caption*{\footnotesize 
+Controlled contrasts by application year and calendar year for 
+(a) whites and (b) nonwhites.}
+\end{figure}
+
+\doublespacing
+\textbf{Explanation} \\
+Figure 3 shows the \textbf{controlled contrasts} in earnings by year of application and 
+calendar year, separately for \textbf{whites} (panel a) and \textbf{nonwhites} (panel b).  
+Each line corresponds to a different application cohort (1979--1982).  
+The vertical axis measures the earnings gap between veterans and nonveterans after 
+controlling for covariates.  
+
+\singlespacing
+\textbf{Intuition}
+\begin{itemize}
+    \item The veteran \textbf{premium} rises sharply in the early 1980s and then 
+    gradually declines for both groups
+    \item For whites, the boost is smaller and sometimes disappears; for nonwhites, 
+    the peak is \textbf{larger and more sustained}
+    \item Think of it like \textbf{waves of opportunity}: earlier cohorts (1979--1980) 
+    rode a higher wave, while later ones (1982) caught a smaller one
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Uncontrolled, Matching, and Regression Estimates of the Effects of Voluntary Military Service on Earnings}
+\scriptsize
+\begin{tabular}{lccccc}
+\hline
+Race & \shortstack{Average \\ earnings \\ 1988--1991 \\ (1)} 
+     & \shortstack{Diff. in means \\ by veteran status \\ (2)} 
+     & \shortstack{Matching \\ estimates \\ (3)} 
+     & \shortstack{Regression \\ estimates \\ (4)} 
+     & \shortstack{Regression \\ minus matching \\ (5)} \\
+\hline
+Whites    & 14537 & 1233.4  & -197.2  & -88.8   & 108.4 \\
+          & (60.3) & (60.3) & (70.5)  & (62.5)  & (28.5) \\
+Nonwhites & 11664 & 2449.1  & 839.7   & 1074.4  & 234.7 \\
+          & (47.4) & (47.4) & (62.7)  & (50.7)  & (32.5) \\
+\hline
+\end{tabular}
+
+\begin{flushleft}
+\footnotesize 
+Notes: Adapted from Angrist (1998, Tables II and V). Standard errors in parentheses.  
+Estimates cover 1988--1991 Social Security-taxable earnings of men who applied to enter the armed forces between 1979 and 1982.  
+Controls include year of birth, education at application, and AFQT score.  
+Sample sizes: 128,968 whites and 175,262 nonwhites.  
+\end{flushleft}
+\end{table}
+
+\doublespacing
+\textbf{Explanation} \\
+Table 3 summarizes the estimated effects of \textbf{voluntary military service} 
+on 1988--1991 earnings. Column (1) shows the average earnings for whites and nonwhites.  
+Column (2) presents the \textbf{raw differences in means} between veterans and nonveterans.  
+Columns (3) and (4) report \textbf{matching} and \textbf{regression} estimates, 
+which adjust for birth year, education, and AFQT scores.  
+Column (5) shows the difference between regression and matching estimates.  
+Standard errors are in parentheses.  
+
+\singlespacing
+\textbf{Intuition}
+\begin{itemize}
+    \item Raw differences suggest veterans earn \textbf{more}, especially among nonwhites
+    \item Once we \textbf{control for background factors}, the advantage for whites 
+    \textbf{disappears}, but remains \textbf{positive and large} for nonwhites
+    \item Think of it like comparing two classrooms: if we just take the average grades, 
+    veterans seem ahead. But once we compare students with the \textbf{same prior preparation}, 
+    the gap mostly closes for whites, while nonwhites still keep a real boost
+\end{itemize}
+
+\section*{\noindent\textbf{Regression vs. Matching}}
+\addcontentsline{toc}{section}{Regression vs. Matching}
+
+\begin{itemize}
+    \item Angrist (1998) reports estimates of \(\delta_R\) in the regression:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+Y_i &= \sum_x d_{ix}\beta_x + \delta_R D_i + \varepsilon_i 
+   & \text{\textbf{\shortstack{Model with \\ covariates}}}
+\end{align}
+
+\begin{itemize}
+    \item where \(d_{ix}\) indicates \(X_i = x\), \(\beta_x\) is the regression effect for cell \(X_i=x\),  
+    and \(\delta_R\) is the treatment effect from regression.
+\end{itemize}
+
+\begin{itemize}
+    \item Simplifying, the OLS estimator is:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\delta_R &= \frac{\text{Cov}(Y_i, \tilde{D}_i)}{\text{Var}(\tilde{D}_i)} 
+   & \text{\textbf{\shortstack{OLS \\ formula}}} \\[6pt]
+\tilde{D}_i &= D_i - \mathbb{E}[D_i \mid X_i] 
+   & \text{\textbf{\shortstack{Residualized \\ treatment}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\text{Cov}(Y_i, \tilde{D}_i) 
+   &= \mathbb{E}[(Y_i - \mathbb{E}[Y_i]) (D_i - \mathbb{E}[D_i \mid X_i])] 
+   & \text{\textbf{\shortstack{Def. of \\ Cov}}} \\[6pt]
+   &= \mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i]) Y_i] 
+   & \text{\textbf{\shortstack{Cross-term \\ simplification}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta_R 
+   &= \frac{\mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])Y_i]}{\mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2]} 
+   & \text{\textbf{\shortstack{Plug into \\ OLS ratio}}} \\[6pt]
+   &= \frac{\mathbb{E}\{(D_i - \mathbb{E}[D_i \mid X_i]) \cdot \mathbb{E}[Y_i \mid D_i, X_i]\}}{\mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2]} 
+   & \text{\textbf{\shortstack{Use law of \\ iterated exp.}}}
+\end{align}
+
+\begin{itemize}
+    \item Interpretation:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\delta_R 
+   &= \frac{\text{Weighted average of conditional treatment effects}}{\text{Variance of residualized $D_i$}} 
+   & \text{\textbf{\shortstack{Interpretation \\ of estimator}}}
+\end{align}
+
+\textbf{Intuition}
+\begin{itemize}
+    \item Regression with controls is like comparing veterans and nonveterans 
+    \textbf{after “residualizing” treatment} on covariates
+    \item Matching does the same idea more directly: build \textbf{pairs of similar units} and compare
+    \item Example: Suppose age predicts enlistment. Regression subtracts the “age effect” before comparing earnings; matching compares \textbf{same-age individuals} directly
+\end{itemize}
+
+\section*{\noindent\textbf{Regression vs. Matching II}}
+\addcontentsline{toc}{section}{Regression vs. Matching II}
+
+\begin{itemize}
+    \item Start from the conditional expectation of $Y_i$ given $D_i$ and $X_i$:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_i \mid D_i, X_i] 
+   &= \mathbb{E}[Y_i \mid D_i=0, X_i] + \delta_{X} D_i 
+   & \text{\textbf{\shortstack{Treatment \\ effect by $X$}}}
+\end{align}
+
+\begin{itemize}
+    \item Substitute this into the numerator of $\delta_R$:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) Y_i \} 
+   &= \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) \cdot \mathbb{E}[Y_i \mid D_i, X_i] \} 
+   & \text{\textbf{\shortstack{Replace $Y_i$ \\ with cond. exp.}}} \\[6pt]
+&= \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) [\mathbb{E}[Y_i \mid D_i=0, X_i] + \delta_X D_i] \} 
+   & \text{\textbf{\shortstack{Expand using \\ formula above}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+&= \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) \cdot \mathbb{E}[Y_i \mid D_i=0, X_i] \} 
+   + \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) \cdot \delta_X D_i \} 
+   & \text{\textbf{Distribute terms}} \\[6pt]
+&= 0 + \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) D_i \delta_X \} 
+   & \text{\textbf{\shortstack{Uncorrelated with \\ baseline term}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+&= \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i]) D_i \delta_X \} 
+   & \text{\textbf{Keep treatment part}} \\[6pt]
+&= \mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i])^2 \delta_X \} 
+   & \text{\textbf{\shortstack{Because factor $D_i$ \\ multiplies residual}}}
+\end{align}
+
+\begin{itemize}
+    \item Therefore:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\delta_R 
+   &= \frac{\mathbb{E}\{ (D_i - \mathbb{E}[D_i \mid X_i])^2 \delta_X \}}{\mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2]} 
+   & \text{\textbf{\shortstack{Plug into \\ OLS ratio}}}
+\end{align}
+
+\begin{itemize}
+    \item Iterate expectations over $X$:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\delta_R 
+   &= \frac{\mathbb{E}\big[ \mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2 \mid X_i] \cdot \delta_X \big]}{\mathbb{E}\big[\mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2 \mid X_i]\big]} 
+   & \text{\textbf{\shortstack{Law of Iterated \\ Expectations}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta_R 
+   &= \frac{\mathbb{E}[ \sigma_D^2(X_i) \cdot \delta_X ]}{\mathbb{E}[\sigma_D^2(X_i)]} 
+   & \text{\textbf{\shortstack{Define \\ conditional variance}}}
+\end{align}
+
+where \(\sigma_D^2(X_i) = \mathbb{E}[(D_i - \mathbb{E}[D_i \mid X_i])^2 \mid X_i]\).
+
+\textbf{Intuition}
+\begin{itemize}
+    \item Regression puts more weight on cells where $D_i$ has higher \textbf{variance within $X_i$} (more treated and untreated units to compare)
+    \item Matching weights all cells more evenly, regression emphasizes those with \textbf{better overlap}
+    \item Example: If veterans and nonveterans are balanced in education group A but rare in group B, regression leans on group A for precision, while matching treats both groups similarly
+\end{itemize}
+
+\section*{\noindent\textbf{Regression vs. Matching III}}
+\addcontentsline{toc}{section}{Regression vs. Matching III}
+
+\textbf{Step 1. Variance of $D_i$ conditional on $X_i$}
+
+Since $D_i$ is binary:
+\[
+\sigma_D^2(X_i) = \mathbb{E}[(D_i - \mathbb{E}[D_i|X_i])^2 \mid X_i]
+\]
+
+But $\mathbb{E}[D_i|X_i] = P(D_i=1 \mid X_i)$.  
+So,
+\[
+\sigma_D^2(X_i) = P(D_i=1|X_i) \cdot (1-P(D_i=1|X_i))
+\]
+
+\textbf{Step 2. Regression estimand as weighted average}
+
+We had:
+\[
+\delta_R = \frac{\mathbb{E}[\sigma_D^2(X_i)\delta_X]}{\mathbb{E}[\sigma_D^2(X_i)]}
+\]
+
+Expanding over support of $X$:
+\[
+\delta_R = \frac{\sum_x \delta_x \, \sigma_D^2(x) \, P(X_i=x)}{\sum_x \sigma_D^2(x) \, P(X_i=x)}
+\]
+
+Explicitly:
+\[
+\delta_R = \frac{\sum_x \delta_x \, [P(D_i=1|X_i=x)(1-P(D_i=1|X_i=x))] P(X_i=x)}{\sum_x [P(D_i=1|X_i=x)(1-P(D_i=1|X_i=x))] P(X_i=x)}
+\]
+
+\hfill \textbf{\shortstack{Regression = weighted avg. \\ weights $\propto$ var$(D|X)$}}
+
+\textbf{Step 3. Matching / TOT definition}
+
+The treatment-on-the-treated (TOT) effect:
+\[
+\mathbb{E}[Y_{1i} - Y_{0i} \mid D_i=1] = \sum_x \delta_x \, P(X_i=x \mid D_i=1)
+\]
+
+\textbf{Step 4. Expand conditional probability}
+
+By Bayes rule:
+\[
+P(X_i=x \mid D_i=1) = \frac{P(D_i=1 \mid X_i=x) P(X_i=x)}{P(D_i=1)}
+\]
+
+So,
+\[
+\text{TOT} = \frac{\sum_x \delta_x P(D_i=1 \mid X_i=x) P(X_i=x)}{\sum_x P(D_i=1 \mid X_i=x) P(X_i=x)}
+\]
+
+\hfill \textbf{\shortstack{TOT = weighted avg. \\ weights $\propto P(D=1|X)P(X)$}}
+
+
+\textbf{Step 5. Comparison}
+
+- Regression estimator $\delta_R$ weights by \textit{overlap/variance}: $P(D=1|X)(1-P(D=1|X))P(X)$.  
+- TOT weights by \textit{treated mass}: $P(D=1|X)P(X)$.  
+
+\textbf{Intuition}
+
+\begin{itemize}
+    \item \textbf{Regression}: emphasizes strata $x$ where treatment is more \underline{balanced}, since variance of $D$ is maximized when $P(D=1|X)=0.5$.
+    \item \textbf{TOT}: emphasizes strata $x$ where more people are treated, regardless of balance.
+    \item If veterans are spread across education groups, regression will lean more on groups with mix of veterans and non-veterans, while TOT leans more on groups with many veterans (even if imbalance is large).
+\end{itemize}
+
+\section*{\noindent\textbf{Regresión vs. Matching IV}}
+\addcontentsline{toc}{section}{Regresión vs. Matching IV}
+
+\begin{itemize}
+    \item \textbf{TOT}: pondera cada celda de covariantes $x$ en proporción a la \textit{probabilidad de tratamiento}, $P(D_i=1|X_i=x)P(X_i=x)$.
+    \item \textbf{Regresión}: pondera cada celda en proporción a la \textit{varianza condicional del tratamiento}, 
+    \[
+    P(D_i=1|X_i=x)\big(1-P(D_i=1|X_i=x)\big)P(X_i=x).
+    \]
+    \item Esta varianza se maximiza cuando $P(D_i=1|X_i=x)=\tfrac{1}{2}$ (máximo balance).
+\end{itemize}
+
+\textbf{Ejemplo breve:}  
+\begin{itemize}
+    \item Supongamos 2 grupos $X=A,B$ con efectos $\delta_A=1000$ y $\delta_B=2000$.
+    \item En $A$, 90\% tratados; en $B$, 50\% tratados.
+    \item TOT da más peso al grupo $A$ (muchos tratados) $\Rightarrow$ estimador $\approx 1000$.
+    \item Regresión da más peso al grupo $B$ (más balance) $\Rightarrow$ estimador $\approx 2000$.
+\end{itemize}
+
+\textbf{Intuición}:  
+\begin{itemize}
+    \item \textbf{TOT} sigue a los tratados: mide “lo que realmente experimentaron”.
+    \item \textbf{Regresión} sigue al balance: se concentra en los grupos donde la comparación tratado/no tratado es más creíble.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image3}
+    \caption{\footnotesize Controlled contrasts by race and probability of service. 
+    These estimates are for pooled 1988--91 earnings.}
+    \label{fig:contrasts_prob_service}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Explanation:} The earnings gap is large and positive when the probability of service is low, but it shrinks and even disappears as the probability rises. This reflects selection: early entrants differ from later ones. 
+    \item \textbf{Intuition:} At first, only the most motivated or skilled joined, so veterans look richer. As more people serve, including less advantaged groups, the average veteran advantage fades.
+\end{itemize}
+
+\section*{\noindent\textbf{References}}
+\addcontentsline{toc}{section}{References}
+
+\begin{itemize}
+    \item \textbf{Angrist, Joshua D.} and \textbf{Joern-Steffen Pischke} (2009). 
+    \textit{Mostly Harmless Econometrics: An Empiricist’s Companion}, 
+    Princeton, NJ: Princeton University Press. Section 3.3.1.
+
+    \item \textbf{Angrist, Joshua D.} (1998). 
+    ``Estimating the Labor Market Impact of Voluntary Military Service using Social Security Data on Military Applicants.'' 
+    \textit{Econometrica}, 66(2): 249--288.
+\end{itemize}
+
+
+
+\end{document}
