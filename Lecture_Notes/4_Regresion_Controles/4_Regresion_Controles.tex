@@ -1,0 +1,933 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+   4 Regression with Controls I\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+   4 Regression with Controls I\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{4 Regression with Controls I} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{The Conditional Expectation Function (CEF)}}
+\addcontentsline{toc}{section}{The Conditional Expectation Function (CEF)}
+
+
+\begin{itemize}
+    \item The \textbf{Conditional Expectation Function} for a dependent outcome $Y_i$, given a $K \times 1$ vector of covariates $X_i$ (with entries $x_{ik}$), is written $E[Y_i|X_i]$ and is a function of $X_i$.
+    \item Since $X_i$ is random, the CEF is also random. For a dummy $D_i$, the CEF has two values: $E[Y_i|D_i=1]$ and $E[Y_i|D_i=0]$.
+    \item For a specific $X_i$, say $X_i = 42$, we denote it as $E[Y_i|X_i=42]$.
+    \item For continuous $Y_i$ with density $f_Y(\cdot|X_i=x)$, the CEF is $E[Y_i|X_i=x] = \int t f_Y(t|X_i=x) dt$.
+    \item If $Y_i$ is discrete, $E[Y_i|X_i=x]$ equals $\sum_t t f_Y(t|X_i=x)$.
+    \item The CEF residual is uncorrelated with any function of $X_i$. Let $\epsilon_i = Y_i - E[Y_i|X_i]$. For any function $h(x)$, we have $E[\epsilon_i h(X_i)] = E[(Y_i - E[Y_i|X_i])h(X_i)] = 0$.
+    \item \textbf{Intuition:} The CEF is the “best guess” of $Y$ given $X$. It averages possible $Y$ values conditional on $X$, whether continuous or discrete, and ensures that prediction errors are unrelated to $X$ itself.
+\end{itemize}
+
+\section*{\noindent\textbf{CEF of Wages and Education}}
+\addcontentsline{toc}{section}{CEF of Wages and Education}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figu1.jpg} 
+    \caption*{Raw data and the \textbf{CEF} of mean log weekly earnings by schooling. 
+    The sample consists of white males aged 40--49 in the 1990 IPUMS 5\% file.}
+\end{figure}
+
+\begin{itemize}
+    \item The plot shows the link between \textbf{years of education} and average \textit{log weekly wages}.
+    \item Each dot traces the \textbf{conditional expectation} of earnings for a given education level.
+    \item Shaded areas represent the \textit{distribution} of wages within each schooling group.
+    \item The figure highlights that wages rise steadily with schooling, with \textbf{plateaus} around high school and college completion.
+    \item \textbf{Intuition:} More education generally leads to higher wages, but gains are not uniform—big jumps often occur when completing key degrees (e.g., finishing high school or college).
+\end{itemize}
+
+\section*{\noindent\textbf{Population Regression}}
+\addcontentsline{toc}{section}{Population Regression}
+
+Define population regression (from here onwards regression) as the solution to the population least squares problem. Specifically, the K × 1 regression coefficient vector beta is defined by solving
+
+\singlespacing
+\begin{align}
+\beta &= \arg \min_b \, \mathbb{E}\big[(Y_i - X_i'b)^2\big] && \text{\textbf{Definición del problema de mínimos cuadrados}} 
+\end{align}
+
+\begin{align}
+L(b) &= \mathbb{E}\big[(Y_i - X_i'b)^2\big] && \text{\textbf{Función de pérdida}} \\
+     &= \mathbb{E}[Y_i^2 - 2Y_i X_i'b + (X_i'b)^2] && \text{\textbf{Expansión del cuadrado}} 
+\end{align}
+
+\begin{align}
+\frac{\partial L(b)}{\partial b} 
+    &= \frac{\partial}{\partial b} \Big( \mathbb{E}[Y_i^2] - 2\mathbb{E}[Y_i X_i'b] + \mathbb{E}[(X_i'b)^2] \Big) && \text{\textbf{Derivamos con respecto a $b$}} \\
+    &= -2\mathbb{E}[X_i Y_i] + 2\mathbb{E}[X_i X_i']b && \text{\textbf{Aplicamos reglas de derivación matricial}} 
+\end{align}
+
+\begin{align}
+\text{FOC: } &\quad -2\mathbb{E}[X_i Y_i] + 2\mathbb{E}[X_i X_i']b = 0 && \text{\textbf{Condición de primer orden}} 
+\end{align}
+
+\begin{align}
+\mathbb{E}[X_i X_i']b &= \mathbb{E}[X_i Y_i] && \text{\textbf{Reordenamos}} 
+\end{align}
+
+\begin{align}
+b &= \big(\mathbb{E}[X_i X_i']\big)^{-1}\mathbb{E}[X_i Y_i] && \text{\textbf{Solución explícita para $b$}} \\
+\beta &= b && \text{\textbf{Identificación del estimador poblacional}} 
+\end{align}
+
+\begin{align}
+\epsilon_i &= Y_i - X_i'\beta && \text{\textbf{Definimos residual poblacional}} \\
+\mathbb{E}[X_i \epsilon_i] &= \mathbb{E}[X_i(Y_i - X_i'\beta)] = 0 && \text{\textbf{Propiedad de ortogonalidad}} 
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Intuition:} Population regression chooses $\beta$ that minimizes the expected squared error between actual $Y$ and its linear prediction $X\beta$.  
+    \item The solution comes from the first-order condition: errors must be \textit{uncorrelated} with regressors.  
+    \item In simple words: regression picks coefficients so that on average, $X$ carries no leftover information about residuals.  
+\end{itemize}
+
+\section*{\noindent\textbf{Why Regression? Three Reasons}}
+\addcontentsline{toc}{section}{Why Regression? Three Reasons}
+
+\begin{itemize}
+    \item Regression solves the population least squares problem and is therefore the \textbf{Best Linear Predictor (BLP)} of $Y_i$ given $X_i$.
+    \item If the Conditional Expectation Function (CEF) is linear, then regression coincides with it.
+    \item Regression provides the \textbf{best linear approximation} to the CEF in general.
+\end{itemize}
+
+\noindent The first statement is by definition. The second follows from the orthogonality of the CEF. The third point is formalized in the following theorem:
+
+
+\subsection*{\noindent\textbf{The Regression-CEF Theorem (MHE 3.1.6)}}
+\addcontentsline{toc}{subsection}{The Regression-CEF Theorem (MHE 3.1.6)}
+
+\begin{quote}
+\textbf{Regression-CEF Theorem (MHE 3.1.6)}  
+The population regression function $X_i'\beta$ delivers the \textit{Minimum Mean Squared Error (MMSE)} linear approximation to $E[Y_i|X_i]$, that is:
+\[
+\beta = \arg \min_b \, \mathbb{E}\big[ (E[Y_i|X_i] - X_i'b)^2 \big].
+\]
+\end{quote}
+
+\begin{itemize}
+    \item \textbf{Intuition:} Regression works because it either \textbf{exactly equals the CEF} when the relation is linear, or otherwise it finds the \textbf{closest linear fit} to the true conditional expectation in terms of mean squared error. In plain words: regression is the best linear “shortcut” to describe how $Y$ depends on $X$.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Proof}}
+\addcontentsline{toc}{subsection}{Proof}
+
+\singlespacing
+\begin{align}
+\beta &= \arg \min_b \, \mathbb{E}\big[(Y_i - X_i'b)^2\big] && \text{\textbf{Starting point}} 
+\end{align}
+
+\begin{align}
+Y_i - X_i'b 
+    &= \big(Y_i - \mathbb{E}[Y_i|X_i]\big) + \big(\mathbb{E}[Y_i|X_i] - X_i'b\big) && \text{\textbf{Add and subtract $E[Y_i|X_i]$}} 
+\end{align}
+
+\begin{align}
+(Y_i - X_i'b)^2 
+    &= \Big(\big(Y_i - \mathbb{E}[Y_i|X_i]\big) + \big(\mathbb{E}[Y_i|X_i] - X_i'b\big)\Big)^2 && \text{\textbf{Square both sides}} 
+\end{align}
+
+\begin{align}
+&= (Y_i - \mathbb{E}[Y_i|X_i])^2 
+   + 2(Y_i - \mathbb{E}[Y_i|X_i])(\mathbb{E}[Y_i|X_i] - X_i'b) \\
+&\quad + (\mathbb{E}[Y_i|X_i] - X_i'b)^2 && \text{\textbf{Expansion of square}} 
+\end{align}
+
+\begin{align}
+\mathbb{E}[(Y_i - X_i'b)^2] 
+   &= \mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])^2] 
+   + 2\,\mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])(\mathbb{E}[Y_i|X_i] - X_i'b)] \\
+   &\quad + \mathbb{E}[(\mathbb{E}[Y_i|X_i] - X_i'b)^2] && \text{\textbf{Take expectation}} 
+\end{align}
+
+\begin{align}
+\mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])^2] 
+   &= \text{Var}(Y_i|X_i) && \text{\textbf{Does not depend on $b$}} 
+\end{align}
+
+\begin{align}
+\mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])(\mathbb{E}[Y_i|X_i] - X_i'b)] 
+   &= \mathbb{E}\Big[\mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])(\mathbb{E}[Y_i|X_i] - X_i'b) \mid X_i]\Big] \\
+   &= \mathbb{E}\Big[(\mathbb{E}[Y_i|X_i] - X_i'b)\,\mathbb{E}[Y_i - \mathbb{E}[Y_i|X_i]\mid X_i]\Big] && \shortstack[l]{\textbf{Law of iterated} \\ \textbf{expectations}} \\
+   &= \mathbb{E}\Big[(\mathbb{E}[Y_i|X_i] - X_i'b)\cdot 0\Big] = 0 && \shortstack[l]{\textbf{Property:} \\ residual has mean zero} 
+\end{align}
+
+\begin{align}
+\mathbb{E}[(Y_i - X_i'b)^2] 
+   &= \underbrace{\mathbb{E}[(Y_i - \mathbb{E}[Y_i|X_i])^2]}_{\text{irrelevant for $b$}} 
+   + \mathbb{E}[(\mathbb{E}[Y_i|X_i] - X_i'b)^2] 
+\end{align}
+
+\begin{align}
+\beta &= \arg \min_b \, \mathbb{E}[(\mathbb{E}[Y_i|X_i] - X_i'b)^2] && \text{\textbf{Final result}} 
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Intuition:} By adding and subtracting $E[Y|X]$, the error splits into two parts:  
+    (i) the variance around the conditional mean (independent of $b$), and  
+    (ii) the squared distance between the conditional mean and the linear predictor $Xb$.  
+    Minimizing the full expression is thus the same as making $Xb$ the \textbf{closest linear approximation} to $E[Y|X]$ in mean squared error.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figu2.jpg} % <- replace with actual filename
+    \caption*{Regression line (dashed) compared with the \textbf{CEF} of mean log weekly earnings by years of schooling. 
+    Sample restricted to white men aged 40--49, from the 1980 Census IPUMS 5\% file.}
+\end{figure}
+
+\begin{itemize}
+    \item The solid curve shows the \textbf{empirical CEF} of wages by education level.
+    \item The dashed line is the \textbf{linear regression fit} to that CEF.
+    \item The regression line smooths out local fluctuations and provides a simple linear summary of the relationship.
+    \item Although the true CEF is not perfectly linear, the regression still captures the main upward trend in wages with education.
+    \item \textbf{Intuition:} The regression acts like a “straight thread” through the curved conditional expectation. 
+    It cannot capture every bend, but it summarizes the overall slope: more schooling is strongly associated with higher wages on average.
+\end{itemize}
+
+\section*{\noindent\textbf{The CEF is All You Need}}
+\addcontentsline{toc}{section}{The CEF is All You Need}
+
+\begin{itemize}
+    \item The Regression–CEF Theorem shows that we can use $\mathbb{E}[Y_i|X_i]$ directly as the dependent variable instead of $Y_i$ (though the weighting is important).
+    \item Another way to express this result is:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\beta &= \big(\mathbb{E}[X_i X_i']\big)^{-1} \mathbb{E}[X_i Y_i] && \text{\textbf{Population regression formula}} \\
+      &= \big(\mathbb{E}[X_i X_i']\big)^{-1} \mathbb{E}[X_i \,\mathbb{E}[Y_i|X_i]] && \text{\textbf{Replace $Y_i$ with its CEF}}
+\end{align}
+
+\begin{itemize}
+    \item This equivalence implies that grouped–data regression (using averages of $Y_i$ within $X_i$ categories) is valid when micro–data cannot be analyzed.
+    \item For example, the schooling coefficient in a wage equation can be estimated using conditional means of log earnings across 21 education levels.
+    \item In practice, if we weight groups by the number of individuals at each level, the regression based on grouped data yields the same coefficients as regression on micro–data.
+    \item \textbf{Intuition:} The CEF contains all the relevant predictive information about $Y$ given $X$. Whether you regress $Y$ directly or its conditional expectation, you recover the same $\beta$ — as long as weights are respected. In plain words: you can “compress” the data into averages without losing information about the slope.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figu3.jpg} % <- replace with actual filename
+    \caption*{Comparison of regression results: \\
+    (A) Individual-level data with robust errors, \\
+    (B) Grouped means by schooling with weights.}
+\end{figure}
+
+\begin{itemize}
+    \item Panel A shows the regression of \textbf{individual earnings} on years of schooling using the full micro–sample ($N \approx 409{,}000$).  
+    \item The estimated coefficient on schooling is about $0.067$, with extremely high statistical significance.  
+    \item Panel B repeats the regression using \textbf{grouped averages} of earnings by schooling level ($N=21$ groups), weighting by group size.  
+    \item The estimated schooling coefficient is essentially the same ($0.067$), despite working with far fewer observations.  
+    \item This confirms the earlier theorem: regression using grouped CEF data produces coefficients identical to those from the underlying micro–data, provided correct weighting is applied.
+    \item \textbf{Intuition:} Whether we use millions of individuals or just a handful of averages, the slope is the same because the CEF already condenses all the information we need. Grouped data is like a “compressed file” — smaller in size but containing the same essential signal about the schooling–wage relationship.
+\end{itemize}
+
+\section*{\noindent\textbf{Saturated Models and Main Effects}}
+\addcontentsline{toc}{section}{Saturated Models and Main Effects}
+
+\begin{itemize}
+    \item A \textbf{saturated regression model} is one where the explanatory variable is discrete, and the regression includes a separate parameter for each possible value of that variable.  
+    \item In other words, the model perfectly matches group means by allowing one coefficient per category.  
+\end{itemize}
+
+\noindent \textbf{Example.} Suppose schooling $s_i \in \{0,1,2,\dots,\tau\}$. A saturated regression model is:
+
+\singlespacing
+\begin{align}
+Y_i &= \alpha + \beta_1 d_{1i} + \beta_2 d_{2i} + \dots + \beta_\tau d_{\tau i} + \epsilon_i 
+\end{align}
+
+\noindent where $d_{ji} = 1[s_i=j]$ is a dummy for being in schooling level $j$.  
+Here, $\beta_j$ represents the effect of schooling level $j$, and $\alpha$ is the reference category mean.  
+
+\begin{align}
+\beta_j &= \mathbb{E}[Y_i|s_i=j] - \mathbb{E}[Y_i|s_i=0] && \text{\shortstack[l]{\textbf{Difference in} \\ \textbf{group means}}} \\
+\alpha  &= \mathbb{E}[Y_i|s_i=0] && \text{\shortstack[l]{\textbf{Reference} \\ \textbf{group mean}}}
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Intuition:} A saturated regression is basically the same as comparing group averages. Each coefficient $\beta_j$ tells us how much higher or lower group $j$ is compared to the baseline group. Nothing is approximated — the model exactly fits the sample means for each category.
+\end{itemize}
+
+\section*{\noindent\textbf{Saturated Models II: Two Binary Regressors}}
+\addcontentsline{toc}{section}{Saturated Models II: Two Binary Regressors}
+
+\begin{itemize}
+    \item Let $x_{1i}$ indicate whether an individual is a \textbf{college graduate}.  
+    \item Let $x_{2i}$ indicate whether an individual is \textbf{female}.  
+    \item The CEF conditional on $(x_{1i},x_{2i})$ has four possible values:
+\end{itemize}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_i \mid x_{1i}=0, x_{2i}=0] &= \alpha && \text{\shortstack[l]{baseline: \\ no college, male}} \\
+\mathbb{E}[Y_i \mid x_{1i}=1, x_{2i}=0] &= \alpha + \beta_1 && \text{\shortstack[l]{effect of college, \\ men only}} \\
+\mathbb{E}[Y_i \mid x_{1i}=0, x_{2i}=1] &= \alpha + \gamma && \text{\shortstack[l]{effect of being female, \\ no college}} \\
+\mathbb{E}[Y_i \mid x_{1i}=1, x_{2i}=1] &= \alpha + \beta_1 + \gamma + \delta_1 && \text{\shortstack[l]{college + female \\ plus interaction}}
+\end{align}
+
+\noindent These four cases can be summarized with a saturated regression:
+\begin{align}
+\mathbb{E}[Y_i \mid x_{1i},x_{2i}] 
+    &= \alpha + \beta_1 x_{1i} + \gamma x_{2i} + \delta_1(x_{1i} \cdot x_{2i}) 
+\end{align}
+
+\begin{itemize}
+    \item The model contains two \textbf{main effects} ($\beta_1$ for college, $\gamma$ for female) and one \textbf{interaction} ($\delta_1$ for “female college graduate”).  
+    \item It is generally odd to include the interaction term without also including the main effects, since the meaning of the interaction depends on them.  
+    \item \textbf{Intuition:} This regression just assigns an average outcome to each of the four groups (male/non-college, male/college, female/non-college, female/college). The interaction term $\delta_1$ captures whether the combined effect of being both female and college-educated is more (or less) than the sum of the individual effects.
+\end{itemize}
+
+\section*{\noindent\textbf{Regression Anatomy: Coefficients as Partial Slopes}}
+\addcontentsline{toc}{section}{Regression Anatomy: Coefficients as Partial Slopes}
+
+\singlespacing
+\noindent \textbf{Step 1: Bivariate regression recap}  
+\begin{align}
+\beta_1 &= \frac{\text{Cov}(Y_i, X_i)}{\text{Var}(X_i)} && \text{\shortstack[l]{Slope coefficient \\ in simple regression}} \\
+\alpha  &= \mathbb{E}[Y_i] - \beta_1 \mathbb{E}[X_i] && \text{\shortstack[l]{Intercept from \\ mean restriction}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Multivariate regression model}  
+\begin{align}
+Y_i &= \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \dots + \beta_K X_{Ki} + \epsilon_i 
+\end{align}
+
+\noindent We want the general formula for the coefficient $\beta_k$.
+
+\vspace{1em}
+\noindent \textbf{Step 3: Residualizing $X_{ki}$}  
+\begin{align}
+\tilde{X}_{ki} &= X_{ki} - \hat{X}_{ki} && \text{\shortstack[l]{Residual from regression \\ of $X_{ki}$ on all other $X_{-k}$}} 
+\end{align}
+
+\noindent By construction, $\tilde{X}_{ki}$ is orthogonal to all other regressors $X_{-k}$.
+
+\vspace{1em}
+\noindent \textbf{Step 4: Regression anatomy claim}  
+\begin{align}
+\beta_k &= \frac{\text{Cov}(Y_i, \tilde{X}_{ki})}{\text{Var}(\tilde{X}_{ki})} && \text{\shortstack[l]{Formula for \\ partial slope}} 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 5: Verification algebra}  
+\begin{align}
+Y_i &= \beta_0 + \beta_1 X_{1i} + \dots + \beta_K X_{Ki} + \epsilon_i && \text{\shortstack[l]{Population regression}} \\
+\text{Cov}(Y_i, \tilde{X}_{ki}) 
+    &= \text{Cov}\big(\beta_0 + \sum_{j=1}^K \beta_j X_{ji} + \epsilon_i, \; \tilde{X}_{ki}\big) && \text{\shortstack[l]{Take covariance \\ with $\tilde{X}_{ki}$}}
+\end{align}
+
+\begin{align}
+&= \beta_0 \cdot \text{Cov}(1, \tilde{X}_{ki}) 
+   + \sum_{j=1}^K \beta_j \text{Cov}(X_{ji}, \tilde{X}_{ki})
+   + \text{Cov}(\epsilon_i, \tilde{X}_{ki}) 
+\end{align}
+
+\begin{align}
+&= \beta_k \,\text{Cov}(X_{ki}, \tilde{X}_{ki}) && \text{\shortstack[l]{Only $X_{ki}$ survives: \\ others orthogonal by construction \\ residual uncorrelated with regressors}} 
+\end{align}
+
+\begin{align}
+\text{Cov}(X_{ki}, \tilde{X}_{ki}) &= \text{Var}(\tilde{X}_{ki}) && \text{\shortstack[l]{Key property \\ of residualization}} 
+\end{align}
+
+\begin{align}
+\text{Cov}(Y_i, \tilde{X}_{ki}) &= \beta_k \,\text{Var}(\tilde{X}_{ki}) 
+\end{align}
+
+\begin{align}
+\beta_k &= \frac{\text{Cov}(Y_i, \tilde{X}_{ki})}{\text{Var}(\tilde{X}_{ki})} \quad \blacksquare
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Intuition:} Each regression coefficient $\beta_k$ is like a simple slope — but only after “partialling out” the influence of other regressors. By residualizing $X_{ki}$ against all other covariates, we isolate its unique variation. Then the coefficient is just the simple regression of $Y$ on this purified residual. In other words: multivariate regression is just bivariate regression, done on the leftover part of each variable.
+\end{itemize}
+
+\section*{\noindent\textbf{Omitted Variables Bias (OVB)}}
+\addcontentsline{toc}{section}{Omitted Variables Bias (OVB)}
+
+\noindent The OVB formula shows how regression coefficients differ when some controls are omitted.  
+
+\singlespacing
+\noindent \textbf{Step 1: Long regression (with ability $A_i$ included)}  
+\begin{align}
+Y_i &= \alpha + \rho s_i + A_i'\gamma + \epsilon_i && \text{\shortstack[l]{Wages on schooling $s_i$ \\ controlling for ability $A_i$}} 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Short regression (omit $A_i$)}  
+\begin{align}
+Y_i &= \alpha^* + \pi s_i + u_i && \text{\shortstack[l]{Coefficient on schooling changes to $\pi$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 3: Expression for short regression slope}  
+\begin{align}
+\pi &= \frac{\text{Cov}(Y_i, s_i)}{\text{Var}(s_i)} && \text{\shortstack[l]{Definition of slope \\ in simple regression}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 4: Substitute $Y_i$ from long regression}  
+\begin{align}
+\text{Cov}(Y_i, s_i) 
+   &= \text{Cov}(\alpha + \rho s_i + A_i'\gamma + \epsilon_i, \; s_i) \\
+   &= \rho \,\text{Cov}(s_i, s_i) + \text{Cov}(A_i'\gamma, s_i) + \text{Cov}(\epsilon_i, s_i) \\
+   &= \rho \,\text{Var}(s_i) + \gamma'\,\text{Cov}(A_i, s_i) && \text{\shortstack[l]{Assume $\epsilon_i$ uncorrelated with $s_i$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 5: Plug back into slope formula}  
+\begin{align}
+\pi &= \frac{\rho \,\text{Var}(s_i) + \gamma'\,\text{Cov}(A_i, s_i)}{\text{Var}(s_i)} \\
+    &= \rho + \gamma' \frac{\text{Cov}(A_i, s_i)}{\text{Var}(s_i)} 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 6: Define $\delta_{As}$ as regression of $A_i$ on $s_i$}  
+\begin{align}
+\delta_{As} &= \frac{\text{Cov}(A_i, s_i)}{\text{Var}(s_i)} && \text{\shortstack[l]{Slope vector from regressing \\ $A_i$ on $s_i$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Final Result (OVB formula)}  
+\begin{align}
+\pi &= \rho + \gamma' \delta_{As} && \text{\shortstack[l]{Short regression = true effect \\ + bias from omitted variables}}
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Intuition:} The coefficient on schooling changes when ability is omitted because part of the schooling effect captures the correlation between schooling and ability.  
+    \item If $s_i$ and $A_i$ are uncorrelated, then $\delta_{As}=0$ and short regression equals the long regression.  
+    \item Otherwise, the bias is the product of:  
+        (i) the effect of the omitted variable on $Y$ ($\gamma$), and  
+        (ii) the correlation between the omitted and included regressor ($\delta_{As}$).  
+    \item In plain words: omitted variables bias = \textbf{effect of the omitted} × \textbf{correlation with the included}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figu4.jpg}
+    \caption*{\textbf{Table 3.2.1:} Estimates of the returns to education for men in the NLSY (1979 cohort, 2002 survey).  
+    The table shows coefficients on years of schooling from regressions of log wages on schooling and various sets of controls.  
+    Standard errors are in parentheses. Data are weighted using NLSY sampling weights. Sample size: 2,434.  
+    *Additional controls include mother’s and father’s schooling, plus dummies for race and Census region.}
+\end{figure}
+
+\begin{itemize}
+    \item Column (1): No controls, estimated return $\approx 13.2\%$.  
+    \item Column (2): Adding age dummies barely changes the estimate.  
+    \item Column (3): Adding parental background and demographics reduces the estimate to $11.4\%$.  
+    \item Column (4): Adding AFQT (ability) lowers it further to $8.7\%$.  
+    \item Column (5): Adding occupation dummies yields about $6.6\%$.  
+    \item This progression shows how including controls changes the coefficient, illustrating omitted variables bias in action.  
+    \item \textbf{Intuition:} The “raw” estimate overstates the return to schooling because schooling is correlated with ability, family background, and occupation. As controls are added, the coefficient drops, showing how much of the apparent return to schooling was actually due to omitted factors.
+\end{itemize}
+
+\section*{\noindent\textbf{Regression and Causality}}
+\addcontentsline{toc}{section}{Regression and Causality}
+
+\begin{itemize}
+    \item Casual regressions are often exploratory or descriptive.  
+    \item Causal regressions are more ambitious: they describe counterfactual states of the world and are key for policy analysis.  
+    \item Example: Do private colleges increase earnings?  
+          Let $C_i$ indicate private attendance ($C_i=1$ if private, $C_i=0$ if not).  
+\end{itemize}
+
+\noindent \textbf{Potential outcomes framework:}  
+\begin{align}
+Y_{1i} &= \text{Earnings if $C_i=1$ (private college)} \\
+Y_{0i} &= \text{Earnings if $C_i=0$ (non-private college)}
+\end{align}
+
+\noindent \textbf{Observed outcome:}  
+\begin{align}
+Y_i &= 
+\begin{cases} 
+Y_{1i}, & \text{if } C_i = 1 \\ 
+Y_{0i}, & \text{if } C_i = 0 
+\end{cases}
+\end{align}
+
+\noindent This can be rewritten algebraically:  
+\begin{align}
+Y_i &= Y_{0i} + (Y_{1i} - Y_{0i})C_i && \text{\shortstack[l]{Add and subtract $Y_{0i}$}}
+\end{align}
+
+\noindent Define the \textbf{individual treatment effect:}  
+\begin{align}
+\tau_i &= Y_{1i} - Y_{0i} && \text{\shortstack[l]{Causal effect for \\ individual $i$}}
+\end{align}
+
+\noindent Then the observed outcome becomes:  
+\begin{align}
+Y_i &= Y_{0i} + \tau_i C_i && \text{\shortstack[l]{Observed outcome = \\ baseline + effect if treated}}
+\end{align}
+
+\begin{itemize}
+    \item We only observe one of $\{Y_{1i}, Y_{0i}\}$ for each individual.  
+    \item The parameter of interest is usually an \textbf{average treatment effect}.  
+    \item Example: the average effect of private college among those who attended:  
+    \[
+    \mathbb{E}[Y_{1i} - Y_{0i} \mid C_i=1] \quad \text{(Treatment on the Treated, TOT)}.
+    \]
+    \item \textbf{Intuition:} Causal regressions are about comparing “what happened” with “what would have happened otherwise.”  
+          We only observe one reality per person, so we rely on assumptions and design to recover average causal effects.
+\end{itemize}
+
+\section*{\noindent\textbf{Regression and Causality II: Selection Bias}}
+\addcontentsline{toc}{section}{Regression and Causality II: Selection Bias}
+
+\singlespacing
+\noindent \textbf{Step 1: Observed mean difference}  
+\begin{align}
+\Delta &= \mathbb{E}[Y_i \mid C_i=1] - \mathbb{E}[Y_i \mid C_i=0] && \text{\shortstack[l]{Naive comparison of \\ treated vs untreated}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Substitute potential outcomes}  
+\begin{align}
+\mathbb{E}[Y_i \mid C_i=1] &= \mathbb{E}[Y_{1i} \mid C_i=1] && \text{\shortstack[l]{If treated, we see $Y_{1i}$}} \\
+\mathbb{E}[Y_i \mid C_i=0] &= \mathbb{E}[Y_{0i} \mid C_i=0] && \text{\shortstack[l]{If untreated, we see $Y_{0i}$}}
+\end{align}
+
+\begin{align}
+\Delta &= \mathbb{E}[Y_{1i} \mid C_i=1] - \mathbb{E}[Y_{0i} \mid C_i=0] 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 3: Add and subtract $\mathbb{E}[Y_{0i}\mid C_i=1]$}  
+\begin{align}
+\Delta &= \Big( \mathbb{E}[Y_{1i} \mid C_i=1] - \mathbb{E}[Y_{0i} \mid C_i=1] \Big) 
+       + \Big( \mathbb{E}[Y_{0i} \mid C_i=1] - \mathbb{E}[Y_{0i} \mid C_i=0] \Big)
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 4: Identify components}  
+\begin{align}
+\Delta &= \underbrace{\mathbb{E}[Y_{1i} - Y_{0i} \mid C_i=1]}_{\text{Treatment on the Treated (TOT)}} 
+       + \underbrace{\Big(\mathbb{E}[Y_{0i} \mid C_i=1] - \mathbb{E}[Y_{0i} \mid C_i=0]\Big)}_{\text{Selection Bias}}
+\end{align}
+
+\noindent \textbf{Final decomposition:}  
+\begin{align}
+\mathbb{E}[Y_i \mid C_i=1] - \mathbb{E}[Y_i \mid C_i=0] 
+   &= \text{TOT} + \text{Selection Bias} \quad \blacksquare
+\end{align}
+
+\begin{itemize}
+    \item The naive comparison mixes causal effect with differences in baseline potential outcomes.  
+    \item If those who choose private college would have earned more anyway, the selection bias term is positive.  
+    \item In causal models, \textbf{selection bias is the analogue of OVB}.  
+    \item The Conditional Independence Assumption (CIA) states that after conditioning on $X_i$, treatment $C_i$ is independent of potential outcomes:  
+    \[
+    (Y_{0i}, Y_{1i}) \;\perp\!\!\!\perp\; C_i \mid X_i.
+    \]
+    Under CIA, the selection bias term disappears.
+    \item \textbf{Intuition:} Comparing outcomes between treated and untreated is misleading because the groups differ in ways beyond treatment. By adjusting for observables (CIA), we “balance” groups so that the only remaining difference is due to treatment itself.
+\end{itemize}
+
+\section*{\noindent\textbf{Using the CIA}}
+\addcontentsline{toc}{section}{Using the CIA}
+
+\singlespacing
+\noindent \textbf{Step 1: CIA assumption}  
+\begin{align}
+(Y_{0i}, Y_{1i}) \;\perp\!\!\!\perp\; C_i \mid X_i && \text{\shortstack[l]{Treatment assignment \\ is as good as random \\ within $X_i$-cells}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Conditional mean comparison}  
+\begin{align}
+\mathbb{E}[Y_i \mid X_i, C_i=1] - \mathbb{E}[Y_i \mid X_i, C_i=0] 
+   &= \mathbb{E}[Y_{1i} \mid X_i, C_i=1] - \mathbb{E}[Y_{0i} \mid X_i, C_i=0] \\
+   &= \mathbb{E}[Y_{1i} \mid X_i] - \mathbb{E}[Y_{0i} \mid X_i] && \text{\shortstack[l]{By CIA, potential outcomes \\ do not depend on $C_i$ given $X_i$}} \\
+   &= \mathbb{E}[Y_{1i} - Y_{0i} \mid X_i] 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 3: Interpretation}  
+\begin{align}
+\mathbb{E}[Y_{1i} - Y_{0i} \mid X_i, C_i=1] 
+   &= \mathbb{E}[Y_{1i} - Y_{0i} \mid X_i] && \text{\shortstack[l]{Effect for treated group \\ equals effect for all with $X_i$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 4: Marginalize over $X_i$}  
+\begin{align}
+\mathbb{E}\big[ \, \mathbb{E}[Y_i \mid X_i, C_i=1] - \mathbb{E}[Y_i \mid X_i, C_i=0] \, \big] 
+   &= \mathbb{E}\big[ \mathbb{E}[Y_{1i} - Y_{0i} \mid X_i] \big] \\
+   &= \mathbb{E}[Y_{1i} - Y_{0i}] && \text{\shortstack[l]{Law of iterated expectations}}
+\end{align}
+
+\begin{itemize}
+    \item Conditional-on-$X_i$, the comparison of treated vs untreated is unbiased.  
+    \item The CIA guarantees that within each $X_i$, treated and untreated differ only by treatment status.  
+    \item Averaging over $X_i$ gives us the overall Average Treatment Effect (ATE).  
+    \item \textbf{Intuition:} The CIA tells us that people with the same $X_i$ are comparable, regardless of whether they attend private college or not. This motivates methods like \textit{matching}, where we compare treated and untreated individuals with identical or very similar characteristics.
+\end{itemize}
+
+\section*{\noindent\textbf{Regression and the CIA}}
+\addcontentsline{toc}{section}{Regression and the CIA}
+
+\begin{itemize}
+    \item The CIA allows regression to be interpreted causally.  
+    \item To focus on selection, assume a \textbf{constant treatment effect}.  
+\end{itemize}
+
+\singlespacing
+\noindent \textbf{Step 1: Define potential outcomes}  
+\begin{align}
+Y_{0i} &= \alpha + \eta_i && \text{\shortstack[l]{Outcome if untreated \\ with individual noise $\eta_i$}} \\
+Y_{1i} &= Y_{0i} + \rho && \text{\shortstack[l]{Outcome if treated = baseline + constant effect $\rho$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Observed outcome rule}  
+\begin{align}
+Y_i &= Y_{0i} + (Y_{1i} - Y_{0i})C_i && \text{\shortstack[l]{From potential outcomes \\ see previous slides}} \\
+    &= Y_{0i} + \rho C_i && \text{\shortstack[l]{Substitute $Y_{1i} - Y_{0i} = \rho$}} \\
+    &= (\alpha + \eta_i) + \rho C_i && \text{\shortstack[l]{Substitute $Y_{0i} = \alpha + \eta_i$}} \\
+    &= \alpha + \rho C_i + \eta_i && \text{\shortstack[l]{Collect terms: observed equation}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 3: Interpretation}  
+\begin{itemize}
+    \item Equation above looks like a bivariate regression of $Y_i$ on $C_i$:  
+    \[
+    Y_i = \alpha + \rho C_i + \eta_i
+    \]
+    \item But it is not an actual regression equation — here $C_i$ may be correlated with the residual $\eta_i$ (selection into treatment).  
+    \item The CIA assumption is what allows us to treat this as a causal regression: under CIA, $C_i \perp \eta_i$, so $\rho$ is consistently estimated.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} With constant effects, the observed outcome looks just like a regression of $Y$ on $C$. The slope is the causal effect $\rho$. But unless assignment is “as good as random” (CIA), $C$ may be correlated with unobserved factors in $\eta_i$, biasing the estimate. The CIA guarantees that the regression coefficient recovers the true causal effect.
+\end{itemize}
+
+\section*{\noindent\textbf{Regression and the CIA II}}
+\addcontentsline{toc}{section}{Regression and the CIA II}
+
+\singlespacing
+\noindent \textbf{Step 1: CIA in constant-effects setup}  
+\begin{align}
+\mathbb{E}[\eta_i \mid C_i, X_i] &= \mathbb{E}[\eta_i \mid X_i] && \text{\shortstack[l]{CIA implies residual mean \\ independent of treatment $C_i$}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 2: Assume linear form for conditional mean}  
+\begin{align}
+\mathbb{E}[\eta_i \mid X_i] &= X_i' \gamma && \text{\shortstack[l]{Model the expectation of $\eta_i$ \\ as linear in covariates}}
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 3: Compute conditional expectation of $Y_i$}  
+\begin{align}
+\mathbb{E}[Y_i \mid X_i, C_i] 
+   &= \alpha + \rho C_i + \mathbb{E}[\eta_i \mid X_i] && \text{\shortstack[l]{From earlier: $Y_i=\alpha+\rho C_i+\eta_i$}} \\
+   &= \alpha + \rho C_i + X_i'\gamma 
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 4: Define regression error}  
+\begin{align}
+Y_i &= \alpha + \rho C_i + X_i'\gamma + \nu_i \\
+\nu_i &\equiv \eta_i - X_i'\gamma = \eta_i - \mathbb{E}[\eta_i \mid C_i, X_i]
+\end{align}
+
+\vspace{1em}
+\noindent \textbf{Step 5: Orthogonality condition}  
+\begin{align}
+\mathbb{E}[\nu_i \mid C_i, X_i] &= 0 && \text{\shortstack[l]{Error term is uncorrelated \\ with included regressors}}
+\end{align}
+
+\begin{itemize}
+    \item Under CIA, the same $\rho$ that appears in the potential outcomes setup also appears as the regression slope.  
+    \item The error $\nu_i$ is properly defined so it is orthogonal to both $C_i$ and $X_i$.  
+    \item This establishes the equivalence between regression coefficients and causal effects under CIA.  
+    \item \textbf{Intuition:} Once we control for $X_i$, treatment $C_i$ is “as good as random,” so the regression picks up the true causal effect $\rho$. The regression error is just the part of $\eta_i$ not explained by $X_i$, and it no longer contaminates the estimate.
+\end{itemize}
+
+\section*{\noindent\textbf{The College Matching Matrix}}
+\addcontentsline{toc}{section}{The College Matching Matrix}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figu5.jpg} % replace with actual file
+    \caption*{The college matching matrix shows applicant groups (A–D), their admission decisions across different types of private and public colleges, and their observed earnings in 1996. 
+    Note: Enrollment decisions are highlighted in gray.}
+\end{figure}
+
+\begin{itemize}
+    \item Groups A–D represent different applicant pools, with students admitted or rejected across college types (private vs public).  
+    \item Highlighted cells show the actual enrollment choices made by each student.  
+    \item Average earnings for private college enrollees exceed those for public enrollees by about \$19,500.  
+    \item Within matched groups, differences vary: for Group A, private students earn \$5,000 less, while for Group B they earn \$30,000 more, averaging to about \$12,500 overall.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} Simple comparisons of private vs public students suggest a big payoff, but when we compare students within similar applicant groups (matching on admission profiles), the private advantage shrinks. This illustrates that much of the raw difference comes from selection rather than causal effects.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Private School Effects: Barron’s Matches}}
+\addcontentsline{toc}{subsection}{Private School Effects: Barron’s Matches}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figu6.jpg} % replace with actual file
+    \caption*{This table reports estimates of the effect of attending a private college or university on earnings. 
+    Each column reports coefficients from a regression of log earnings on a private-school dummy and controls. 
+    Columns (1)–(3) exclude applicant selectivity controls; columns (4)–(6) include them. 
+    Standard errors in parentheses. Sample size: 5,583.}
+\end{figure}
+
+\begin{itemize}
+    \item Without selection controls, the private school effect appears positive and large (around $0.135$ log points).  
+    \item Once controls are added (SAT scores, family background, demographics, high school rank, etc.), the private coefficient drops toward zero (around $0.007$–$0.013$).  
+    \item Including applicant selectivity-group dummies (columns 4–6) confirms the result: little or no private school earnings advantage once comparable students are matched.  
+    \item The findings align with a \textbf{self-revelation model}: applicants have a good idea of their ability, and admissions outcomes largely reflect that, not private schooling per se.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} At first glance, private colleges seem to pay off. But once we compare students of similar ability and background, the effect mostly vanishes. The apparent private premium was due to selection — stronger students go to private schools, not because private schools themselves cause higher earnings.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Private School Effects: Average SAT Controls}}
+\addcontentsline{toc}{subsection}{Private School Effects: Average SAT Controls}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figu7.jpg} % reemplazar con nombre del archivo
+    \caption*{This table reports estimates of the effect of attending a private college or university 
+    on earnings. Each column shows coefficients from a regression of log earnings on a private-school dummy 
+    and controls. Columns (1)–(3) exclude selection controls, while columns (4)–(6) add them. 
+    Additional controls include average SAT score of schools applied to, number of applications, 
+    and background covariates. Sample size: 14,238. Standard errors in parentheses.}
+\end{figure}
+
+\begin{itemize}
+    \item Without selection controls (cols. 1–3), the private school effect appears positive (0.21–0.15 log points).  
+    \item With selection controls (cols. 4–6), the private school coefficient shrinks sharply (0.034–0.037, sometimes insignificant).  
+    \item The \textbf{average SAT score of schools applied to} is highly predictive of earnings (0.07–0.11), showing that application choices reveal ability and ambition.  
+    \item Other covariates (family income, gender, race, etc.) have smaller effects compared to these selection variables.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} The raw private-school premium is mostly selection bias. Students who apply to more competitive (high-SAT) schools already have higher potential earnings. Once we control for this revealed-preference measure, the apparent causal effect of attending a private school essentially disappears.
+\end{itemize}
+
+\subsection*{\noindent\textbf{School Selectivity Effects: Average SAT Controls}}
+\addcontentsline{toc}{subsection}{School Selectivity Effects: Average SAT Controls}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figu8.jpg} % reemplazar con nombre del archivo
+    \caption*{This table reports estimates of the effect of attending a more selective institution 
+    (measured by the average SAT score of enrolled students) on earnings. Each column shows coefficients 
+    from a regression of log earnings on school average SAT and controls. Columns (1)--(3) exclude 
+    selection controls, while columns (4)--(6) include them. Sample size: 14,238. Standard errors in parentheses.}
+\end{figure}
+
+\begin{itemize}
+    \item Without selection controls (cols. 1–3), the coefficient on school average SAT is positive and significant ($0.109$–$0.076$), suggesting that attending a more selective school is associated with higher earnings.  
+    \item With selection controls (cols. 4–6), the coefficient collapses toward zero ($-0.021$ to $-0.008$), and is no longer statistically significant.  
+    \item This shows that the apparent payoff from school selectivity is explained by student characteristics and preferences (selection), not by causal benefits of attending a higher-SAT peer group.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} At first glance, selective schools seem to “boost” earnings because they admit stronger students. But once we control for what types of students \textit{apply to and attend} these institutions, the effect of school selectivity disappears. In other words, \textit{it’s not the classmates, it’s the selection.}
+\end{itemize}
+
+\section*{\noindent\textbf{Private School Effects: Omitted Variable Bias}}
+\addcontentsline{toc}{section}{Private School Effects: Omitted Variable Bias}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figu9.jpg} % reemplazar con nombre del archivo
+    \caption*{This table reports regressions of (1)--(3) student ability (own SAT score) 
+    and (4)--(6) family background (log parental income) on private school attendance and controls. 
+    Large coefficients on ``Private school'' indicate that private attendance is strongly correlated 
+    with student ability and family income, suggesting omitted variable bias in simple regressions of earnings on private schooling.}
+\end{figure}
+
+\begin{itemize}
+    \item Columns (1)--(3) use \textbf{Own SAT score} as the dependent variable. Private school attendance is associated with more than a full standard deviation higher SAT score ($\approx 1.1$), even after adding controls.  
+    \item Columns (4)--(6) use \textbf{Log parental income} as the dependent variable. Private school attendance is also associated with much higher family income ($0.128$–$0.138$), though the effect shrinks with more controls ($0.028$ in col. 6).  
+    \item These results reveal that private schooling is not randomly assigned: it is strongly correlated with both ability and family background.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} If we simply regress earnings on private school attendance, we will overstate the causal effect. Why? Because part of the “private school premium” comes from omitted variables — smarter students (higher SATs) and richer families are more likely to attend private schools.  
+    \item This is a textbook case of \textit{omitted variable bias (OVB)}: the regression coefficient on private schooling loads onto ability and income differences that are not controlled for.  
+\end{itemize}
+
+\section*{Conclusions}
+\addcontentsline{toc}{section}{Conclusions}
+
+\begin{itemize}
+    \item \textbf{Regression} provides the best-in-class approximation to the \textit{Conditional Expectation Function (CEF)}.  
+    \item \textbf{Regressions} are usually the \textit{first step} in empirical analysis.  
+    \item \textbf{Regression} is our \textit{primary tool} for confronting the identification problem.  
+    \item If the regression you have is not delivering the desired relationship, then the underlying model itself is \textit{unsatisfactory}.  
+    \item In such cases: \textbf{Instrumental Variables (IV)} is the natural next step.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Intuition:} Regression is like the default starting point — it gives us the clearest linear view of how $Y$ relates to $X$. If this simple picture is misleading or biased, we need stronger tools. That’s where IV comes in: it helps us deal with hidden confounders and extract the true causal effect.  
+\end{itemize}
+
+
+
+
+
+
+
+
+\end{document}
