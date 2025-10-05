@@ -1,0 +1,1787 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+  8 Panel Data\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+  8 Panel Data\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{8 Panel Data} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Datos de panel}}
+\addcontentsline{toc}{section}{Datos de panel}
+
+\begin{itemize}
+    \item Los datos de panel incluyen observaciones de:
+    \begin{itemize}
+        \item Las mismas unidades (por ejemplo, individuos, empresas, países, ...) 
+        que se observan durante al menos dos periodos de tiempo (años, meses, días, ...).
+    \end{itemize}
+    
+    \item Los conjuntos de datos de panel vienen en dos formas:
+    \begin{itemize}
+        \item \textbf{Panel balanceado:} cada unidad se observa durante el mismo periodo de tiempo.
+        \item \textbf{Panel no balanceado:} se observan unidades para distintos periodos de tiempo.
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Un panel es una base de datos que combina información en dos dimensiones: transversal (diferentes unidades) y temporal (diferentes momentos en el tiempo).
+    \item \textbf{Intuición:} Es como tener el historial médico de varios pacientes: 
+    un \textit{panel balanceado} sería cuando todos tienen chequeos anuales; 
+    un \textit{no balanceado}, cuando algunos pacientes tienen años faltantes en sus registros.
+\end{itemize}
+
+\section*{\noindent\textbf{Métodos de datos panel}}
+\addcontentsline{toc}{section}{Métodos de datos panel}
+
+\begin{itemize}
+    \item A menudo, nuestra variable dependiente depende de factores no observados 
+    que también están correlacionados con nuestra variable explicativa de interés.
+    
+    \item Si estas variables omitidas son constantes en el tiempo, 
+    podemos usar los estimadores de datos de panel para estimar 
+    el efecto de nuestra variable explicativa.
+    
+    \item \textbf{Principales estimadores de datos de panel:}
+    \begin{enumerate}
+        \item MCO agrupados (\textit{pooled OLS})
+        \item Métodos de efectos fijos (FE)
+        \item Método de efectos aleatorios (RE)
+    \end{enumerate}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Los modelos de panel permiten controlar por heterogeneidad no observada entre individuos que no varía en el tiempo.
+    \item \textbf{Intuición:} Es como analizar el desempeño de estudiantes en varias materias a lo largo de los años: 
+    los \textit{efectos fijos} eliminan características propias del alumno que no cambian, 
+    mientras que los \textit{efectos aleatorios} suponen que esas diferencias son aleatorias.
+\end{itemize}
+
+\section*{\noindent\textbf{Modelo de efectos no observados: producción agrícola}}
+\addcontentsline{toc}{section}{Modelo de efectos no observados: producción agrícola}
+
+\[
+y_{it} = x_{it}\beta + c_i + u_{it}, 
+\quad t = 1,2,\dots,T
+\]
+
+\begin{itemize}
+    \item $y_{it}$: producción de la granja $i$ en el año $t$.
+    \item $x_{it}$: vector $1 \times K$ de insumos variables para la granja $i$ en el año $t$ 
+    (ej. mano de obra, fertilizante). Incluye la constante.
+    \item $\beta$: vector $K \times 1$ de efectos marginales de los insumos variables.
+    \item $c_i$: suma de insumos fijos en el tiempo, conocidos por el agricultor 
+    pero no observados por el investigador 
+    (ej. calidad del suelo, capacidad de gestión). $\rightarrow$ Heterogeneidad no observada.
+    \item $u_{it}$: insumos no observados que varían en el tiempo 
+    (ej. lluvia, plagas). Error idiosincrático.
+    \item \textbf{Pregunta central:} ¿Qué sucede cuando corremos una regresión de $y_{it}$ en $x_{it}$?
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} El término $c_i$ puede estar correlacionado con $x_{it}$, 
+    lo que genera sesgo en los estimadores MCO si no se controla.
+    \item \textbf{Intuición:} Cada granja tiene características fijas (suelo, gestión) que afectan la producción. 
+    Si no las controlamos, confundimos su efecto con el de los insumos variables.
+\end{itemize}
+
+\section*{\noindent\textbf{MCO agrupados (pooled OLS)}}
+\addcontentsline{toc}{section}{MCO agrupados (pooled OLS)}
+
+\[
+y_{it} = x_{it}\beta + v_{it}, \quad t = 1,2,\dots,T
+\]
+con \quad $v_{it} = c_i + u_{it}$
+
+\begin{itemize}
+    \item Ignoramos la estructura de panel y tratamos todos los datos como una muestra agrupada.
+    \item Supuestos clave para consistencia:
+    \begin{enumerate}
+        \item $E(x_{it}^T v_{it}) = 0, \quad t=1,2,\dots,T$
+        \item $rank\!\left[\sum_{t=1}^T E(x_{it}^T x_{it})\right] = K$
+    \end{enumerate}
+    \item Bajo estos supuestos, el error compuesto $v_{it}$ no debe estar correlacionado con los regresores.
+    \item Problema: si $x_{it}$ depende de características no observadas $c_i$ (ej. calidad del suelo), 
+    aparece sesgo de selección.
+    \item Entonces, $\hat{\beta}_{OLS}$ no es consistente.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Pooled OLS mezcla toda la variación sin separar lo fijo ($c_i$) de lo idiosincrático ($u_{it}$).
+    \item \textbf{Intuición:} Es como comparar granjas sin reconocer que cada una tiene “suelo distinto” constante en el tiempo. 
+    Esa heterogeneidad se cuela en el estimador y sesga los resultados.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Ninguna correlación entre $x_{it}$ y $v_{it}$ implica también que no haya correlación entre 
+    el efecto no observado $c_i$ y $x_{it}$.
+    \item Problema adicional: $v_{it}$ están correlacionados en serie para el mismo $i$, 
+    porque $c_i$ aparece en todos los periodos $t$.
+    \item Consecuencia: los errores estándar de MCO agrupados no son válidos.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Como $c_i$ se repite para cada individuo, los residuos están correlacionados dentro de cada $i$.
+    \item \textbf{Intuición:} Es como medir varias veces la misma granja: el “suelo” no cambia, 
+    por lo que los errores están inflados y los intervalos de confianza resultan engañosos.
+\end{itemize}
+
+\section*{\noindent\textbf{Modelo de efectos no observados: evaluación de un programa}}
+\addcontentsline{toc}{section}{Modelo de efectos no observados: evaluación de un programa}
+
+\[
+y_{it} = prog_{it} \beta + c_i + u_{it}, \quad t=1,2,\ldots,T
+\]
+
+\begin{itemize}
+    \item $y_{it}$: logaritmo del salario del individuo $i$ en el año $t$.
+    \item $prog_{it}$: indicador =1 si el individuo $i$ participa en el programa de entrenamiento en $t$, y 0 en caso contrario.
+    \item $\beta$: efecto del programa.
+    \item $c_i$: suma de todas las características no observadas e invariantes en el tiempo que afectan los salarios (ejemplo: habilidad).
+    \item Problema: si corremos una regresión de $y_{it}$ en $prog_{it}$, 
+    $\beta$ no es consistente porque $prog_{it}$ probablemente esté correlacionado con $c_i$.
+    \item Siempre preguntarse: ¿hay alguna variable no observada constante en el tiempo $c_i$ 
+    correlacionada con los regresores?  
+    Si la respuesta es sí, los MCO agrupados son problemáticos.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} $c_i$ captura heterogeneidad fija (ejemplo: habilidad), y si está correlacionada con $prog_{it}$, el estimador de MCO queda sesgado.
+    \item \textbf{Intuición:} Si los más hábiles tienen más probabilidad de entrar al programa, 
+    el efecto estimado confundirá “programa” con “habilidad”.
+\end{itemize}
+
+\section*{\noindent\textbf{Supuesto de exogeneidad estricta}}
+\addcontentsline{toc}{section}{Supuesto de exogeneidad estricta}
+
+\begin{itemize}
+    \item Para estimar los modelos de datos de panel más básicos (efectos fijos y efectos aleatorios), 
+    se asume \textbf{estricta exogeneidad}:
+    \[
+    E(y_{it} \mid x_{i1}, x_{i2}, ..., x_{iT}, c_i) 
+    = E(y_{it}\mid x_{it}, c_i) 
+    = x_{it}\beta + c_i
+    \]
+    \item En palabras: una vez que se controla por $x_{it}$ y $c_i$, ninguna otra $x_{is}$ 
+    con $s \neq t$ tiene efecto parcial sobre $y_{it}$.
+    \item En el modelo 
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it},
+    \]
+    la exogeneidad estricta se expresa como:
+    \[
+    E(u_{it} \mid x_{i1}, x_{i2},..., x_{iT}, c_i) = 0, 
+    \quad t=1,2,\ldots,T
+    \]
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Los regresores en cualquier periodo no deben estar correlacionados con el error idiosincrático en ningún periodo.
+    \item \textbf{Intuición:} El pasado, presente o futuro de $x_{it}$ no debe “predecir” shocks en $u_{it}$.  
+    Ejemplo: si una política se implementa cuando se anticipa una crisis, se viola la exogeneidad estricta.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Este supuesto implica que las variables explicativas en cada periodo de tiempo 
+    no están correlacionadas con el error idiosincrático $u_{it}$ en ningún periodo:
+    \[
+    E(x_{is}^T u_{it}) = 0, 
+    \quad s,t=1,\ldots,T
+    \]
+    \item Es decir, los regresores en el pasado, presente y futuro son exógenos con respecto a los errores de todos los periodos.
+    \item Este supuesto es mucho más fuerte que asumir simplemente \textbf{no correlación contemporánea}:
+    \[
+    E(x_{it}^T u_{it}) = 0, 
+    \quad t=1,\ldots,T
+    \]
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} Exogeneidad estricta excluye toda forma de retroalimentación o anticipación entre regresores y errores.
+    \item \textbf{Intuición:} No basta con que las $x_{it}$ sean “limpias” en el mismo periodo; también deben ser independientes de shocks pasados y futuros.  
+    Ejemplo: si los agricultores ajustan la mano de obra porque anticipan lluvias (shock futuro), se rompe la exogeneidad estricta.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos Fijos (FE)}}
+\addcontentsline{toc}{section}{Efectos Fijos (FE)}
+
+\begin{itemize}
+    \item Los efectos fijos abordan explícitamente el hecho de que $c_i$ puede correlacionarse con $x_{it}$.
+    \item Para los modelos de efectos fijos asumimos \textbf{estricta exogeneidad}:
+    \[
+    FE1: \quad E(u_{it} \mid x_i, c_i) = 0, \quad t=1,2,\ldots,T
+    \]
+    \item Donde $x_i = (x_{i1},x_{i2},\ldots,x_{iT})$
+    \item Se permite que $E(c_i \mid x_i)$ sea cualquier función de $x_i$.
+    \item \textbf{Costo:} no podemos incluir variables constantes en el tiempo en $x_{it}$ (por ejemplo, género, región fija).
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explicación:} FE elimina la heterogeneidad inobservable $c_i$ controlando por su correlación con los regresores.
+    \item \textbf{Intuición:} Comparamos cada unidad consigo misma a lo largo del tiempo. 
+    Ejemplo: si una escuela siempre tiene buena infraestructura ($c_i$), los FE eliminan ese efecto fijo y usan solo cambios dentro de la escuela.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos fijos - Formas de eliminar $c_i$}}
+\addcontentsline{toc}{section}{Efectos fijos - Formas de eliminar $c_i$}
+
+\begin{itemize}
+    \item En los modelos \textbf{FE} existen tres maneras de remover el término $c_i$, 
+    que genera \textbf{correlación} entre el error y los regresores.
+    \item \textbf{Opciones:}
+    \begin{itemize}
+        \item \textbf{Within-transformation} (\textbf{transformación FE}).
+        \item Estimación de $c_i$ mediante \textbf{dummies}.
+        \item Uso de \textbf{primeras diferencias}.
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Todas las técnicas buscan aislar la variación dentro de los individuos 
+    y así evitar la correlación entre $c_i$ y los regresores.
+    \item \textbf{Ejemplo:} Si seguimos a una persona en el tiempo, restar su propia media o usar su diferencia 
+    entre dos periodos elimina características fijas como su talento innato.
+\end{itemize}
+
+\subsection*{\noindent\textbf{1 Within Estimator}}
+\addcontentsline{toc}{subsection}{1 Within Estimator}
+
+\begin{itemize}
+    \item \textbf{Ecuación a estimar:} 
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it} \tag{1}
+    \]
+    
+    \item \textbf{Paso 1:} Promediar la ecuación (1) sobre $t = 1, \ldots, T$:
+    \[
+    \bar{y}_i = \bar{x}_i \beta + c_i + \bar{u}_i \tag{2}
+    \]
+    donde:
+    \[
+    \bar{y}_i = \frac{1}{T}\sum_{t=1}^T y_{it}, \quad 
+    \bar{x}_i = \frac{1}{T}\sum_{t=1}^T x_{it}, \quad 
+    \bar{u}_i = \frac{1}{T}\sum_{t=1}^T u_{it}
+    \]
+    
+    \item \textbf{Paso 2:} Restar la ecuación (2) de (1) para obtener:
+    \[
+    y_{it} - \bar{y}_i = (x_{it} - \bar{x}_i)\beta + (u_{it} - \bar{u}_i)
+    \]
+    \[
+    \tilde{y}_{it} = \tilde{x}_{it}\beta + \tilde{u}_{it}
+    \]
+    donde: 
+    \[
+    \tilde{y}_{it} = y_{it} - \bar{y}_i, \quad 
+    \tilde{x}_{it} = x_{it} - \bar{x}_i, \quad 
+    \tilde{u}_{it} = u_{it} - \bar{u}_i
+    \]
+    
+    \item \textbf{Paso 3:} Estimar una regresión de $\tilde{y}_{it}$ sobre $\tilde{x}_{it}$ usando \textbf{MCO agrupados}.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El método within elimina $c_i$ comparando a cada individuo consigo mismo a lo largo del tiempo.
+    \item \textbf{Ejemplo:} Es como medir el cambio de salario de una persona en distintos años, ignorando su talento fijo o características innatas.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Para que el estimador \textbf{FE} tenga buen comportamiento asintótico, se requiere la \textbf{condición de rango estándar}:  
+    \[
+    \text{FE2: } \quad \text{rank}\!\left(\sum_{t=1}^T E(\tilde{x}_{it}\tilde{x}_{it}^T)\right) = K
+    \]
+    
+    \item Si $x_{it}$ incluye un componente que no cambia en el tiempo para cada $i$, entonces su correspondiente en $\tilde{x}_{it}$ será \textbf{cero}, y la condición de rango no se cumplirá.
+    
+    \item Esto implica que no se pueden incluir \textbf{variables invariantes en el tiempo} en modelos de efectos fijos.
+    
+    \item Además, sin supuestos adicionales, el estimador \textbf{FE} no es necesariamente el más \textbf{eficiente}.  
+    El siguiente supuesto asegura eficiencia y una matriz de varianza apropiada:  
+    \[
+    \text{FE3: } \quad E(u_i u_i^T \,|\, x_i, c_i) = \sigma_u^2 I_T
+    \]
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Las condiciones FE2 y FE3 garantizan que el estimador FE pueda identificar correctamente los parámetros y obtener varianzas válidas.
+    \item \textbf{Ejemplo:} Si tratamos de usar género en un modelo FE, siempre será constante para cada individuo y no se podrá estimar su efecto.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Within Estimator: Errores estándar}}
+\addcontentsline{toc}{subsection}{Within Estimator: Errores estándar}
+
+\begin{itemize}
+    \item Los errores estándar de la regresión \textbf{MCO} en el paso 3 no son correctos.  
+    \item ¿Por qué ocurre? Al restar la media a cada observación (\textbf{demeaning}) se introduce \textbf{correlación serial} en los errores.
+    
+    \item \textbf{Varianza de $\tilde{u}_{it}$}:  
+    \[
+    E(\tilde{u}_{it}^2) = E[(u_{it} - \bar{u}_i)^2] 
+    = E(u_{it}^2) + E(\bar{u}_i^2) - 2E(u_{it}\bar{u}_i)
+    \]
+    \[
+    = \sigma_u^2 + \frac{\sigma_u^2}{T} - \frac{2\sigma_u^2}{T} 
+    = \sigma_u^2 \left(1 - \frac{1}{T}\right)
+    \]
+    
+    \item \textbf{Covarianza entre $\tilde{u}_{it}$ y $\tilde{u}_{is}$ para $t \neq s$}:  
+    \[
+    E(\tilde{u}_{it}\tilde{u}_{is}) = E[(u_{it} - \bar{u}_i)(u_{is} - \bar{u}_i)]
+    \]
+    \[
+    = E(u_{it}u_{is}) - E(u_{it}\bar{u}_i) - E(u_{is}\bar{u}_i) + E(\bar{u}_i^2)
+    \]
+    \[
+    = 0 - \frac{\sigma_u^2}{T} - \frac{\sigma_u^2}{T} + \frac{\sigma_u^2}{T} 
+    = -\frac{\sigma_u^2}{T}
+    \]
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El proceso de restar medias genera correlación artificial entre los errores dentro del mismo individuo, lo cual sesga los errores estándar simples.
+    \item \textbf{Ejemplo:} Es como calcular la desviación de cada examen respecto al promedio de un estudiante: esas desviaciones no son independientes entre sí.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Como resultado, la \textbf{correlación} entre $\tilde{u}_{it}$ y $\tilde{u}_{is}$ es:
+    \[
+    \text{Corr}(\tilde{u}_{it}, \tilde{u}_{is}) 
+    = \frac{\text{Cov}(\tilde{u}_{it}, \tilde{u}_{is})}{\sqrt{\text{Var}(\tilde{u}_{it})\text{Var}(\tilde{u}_{is})}}
+    \]
+    \[
+    = \frac{-\sigma_u^2 / T}{\sigma_u^2 (1 - 1/T)} 
+    = -\frac{1}{T-1}
+    \]
+    
+    \item El \textbf{supuesto 3} nos permite derivar el estimador de la varianza asintótica:
+    \[
+    \text{Avar}(\hat{\beta}_{FE}) 
+    = \hat{\sigma}_u^2 \left( \sum_{i=1}^N \sum_{t=1}^T \tilde{x}_{it}\tilde{x}_{it}^T \right)^{-1}
+    \]
+    
+    \item Notar que $\hat{\sigma}_u^2$ es un \textbf{estimador consistente} para la varianza de $u_{it}$, no de $\tilde{u}_{it}$.
+    
+    \item Por lo tanto, no es posible obtener $\hat{\sigma}_u^2$ directamente de la regresión MCO del paso 3.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La correlación negativa entre los errores transformados surge del demeaning, y por eso debemos ajustar la estimación de la varianza.
+    \item \textbf{Ejemplo:} Es como medir notas relativas al promedio: si una observación está arriba de la media, otra debe estar abajo, generando correlación automática.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item El \textbf{estimador estándar} de la varianza en la regresión del paso 3 es:
+    \[
+    \frac{SSR}{NT - K}
+    \]
+    
+    \item Sin embargo, este es un \textbf{estimador incorrecto}, pues necesitamos la varianza de $\hat{\sigma}_u$ y no la de $\hat{\tilde{\sigma}}_u$.
+    
+    \item La resta de $K$ en el denominador no afecta asintóticamente,  
+    pero es habitual aplicar esa \textbf{corrección} en la práctica.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El error estándar calculado directamente tras el paso 3 no refleja la varianza verdadera de los errores originales, por lo que debe ajustarse.
+    \item \textbf{Ejemplo:} Es como calcular una desviación típica con datos transformados: el ajuste asegura que la medida corresponda a la variabilidad real.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Recordemos que la varianza de $\tilde{u}_{it}$ es:  
+    \[
+    \sigma_u^2 (1 - 1/T)
+    \]
+    Sumando sobre $t$ obtenemos:
+    \[
+    \sum_{t=1}^T E(\tilde{u}_{it}^2) = \sigma_u^2 (T-1)
+    \]
+
+    \item Si además sumamos sobre todos los individuos $N$:
+    \[
+    \sum_{i=1}^N \sum_{t=1}^T E(\tilde{u}_{it}^2) 
+    = \sigma_u^2 (T-1)N
+    \quad \Rightarrow \quad
+    \sigma_u^2 = 
+    \frac{\sum_{i=1}^N \sum_{t=1}^T E(\tilde{u}_{it}^2)}{(T-1)N}
+    \]
+
+    \item Así, podemos obtener un \textbf{estimador consistente} de $\sigma_u^2$ a partir de la regresión en el paso 3:  
+    \[
+    \hat{\sigma}_u^2 = \frac{SSR}{N(T-1) - K}
+    \]
+
+    \item La diferencia con el uso de $SSR/(NT-K)$ es pequeña, pero este ajuste asegura la correcta varianza bajo el modelo within.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Al eliminar un grado de libertad por individuo al restar la media, el denominador se ajusta de $NT$ a $N(T-1)$.
+    \item \textbf{Ejemplo:} Es como calcular la varianza dentro de cada grupo: al perder una observación efectiva por grupo, se corrige el divisor total.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Los paquetes de regresión habituales (como \textbf{STATA}) hacen el \textbf{ajuste de errores estándar} de manera automática cuando se especifica un modelo de efectos fijos.
+    
+    \item Si se desea estimar el modelo \textbf{paso a paso}, se pueden aplicar los tres pasos descritos y luego corregir los errores estándar de la regresión obtenida en el paso 3.
+    
+    \item El ajuste se logra multiplicando los errores estándar por el factor:
+    \[
+    \left(\frac{NT - K}{N(T-1) - K}\right)^{1/2}
+    \]
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El ajuste corrige la diferencia entre usar $NT$ y $N(T-1)$ observaciones efectivas en el cálculo de varianza.
+    \item \textbf{Ejemplo:} Es como estandarizar notas con un divisor ligeramente distinto: el software lo hace automático, pero manualmente hay que escalar los resultados.
+\end{itemize}
+
+\section*{\noindent\textbf{2 Estimador de Variables Dummy}}
+\addcontentsline{toc}{section}{2 Estimador de Variables Dummy}
+
+\begin{itemize}
+    \item Una forma alternativa de estimar modelos de \textbf{efectos fijos} (en particular cuando $N$ es pequeño o si se desean los efectos fijos explícitos) es estimar $c_i$ mediante un conjunto de \textbf{dummies} para cada individuo.
+    
+    \item Esto implica incluir $N$ dummies (una por cada $i$ en la muestra) dentro de la regresión y estimar:
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it} \tag{3}
+    \]
+    usando \textbf{MCO}. A este procedimiento se le llama \textbf{estimador de variables dummy}.
+    
+    \item Una ventaja de este método es que entrega los \textbf{errores estándar correctos}, ya que emplea 
+    \[
+    NT - N - K = N(T-1) - K
+    \]
+    grados de libertad.
+    
+    \item El costo es que, si $N$ es grande, la regresión requiere un \textbf{alto poder computacional}.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Con las dummies se controla directamente por $c_i$, permitiendo estimar efectos fijos sin transformar los datos.
+    \item \textbf{Ejemplo:} Es como dar a cada persona un “identificador único” en la regresión, lo que elimina la influencia de sus características permanentes.
+\end{itemize}
+
+\section*{\noindent\textbf{3 Primeras Diferencias}}
+\addcontentsline{toc}{section}{3 Primeras Diferencias}
+
+\begin{itemize}
+    \item Otra alternativa para estimar modelos de \textbf{efectos fijos} es usar las \textbf{primeras diferencias}.
+    
+    \item Bajo el supuesto de \textbf{exogeneidad estricta} condicional a $c_i$:  
+    \[
+    \text{FD1: } \; E(u_{it} \mid x_i, c_i) = 0, \quad t = 1,2,\ldots,T
+    \]
+    
+    \item Rezagando el modelo original 
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it}
+    \]
+    un periodo y restando, se obtiene:
+    \[
+    y_{it} - y_{i,t-1} = (x_{it} - x_{i,t-1})\beta + (c_i - c_i) + (u_{it} - u_{i,t-1})
+    \]
+    \[
+    \Delta y_{it} = \Delta x_{it}\beta + \Delta u_{it}
+    \]
+    
+    \item Tomar \textbf{primeras diferencias} elimina $c_i$ automáticamente.
+    
+    \item Como consecuencia, se pierde la primera observación temporal de cada unidad de corte transversal.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Al restar observaciones consecutivas, desaparecen los efectos invariables en el tiempo, dejando solo la variación relevante.
+    \item \textbf{Ejemplo:} Es como analizar cuánto cambió el ingreso de un individuo respecto al año anterior: su talento fijo se cancela al comparar diferencias.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item El \textbf{estimador FD} $\hat{\beta}_{FD}$ se obtiene como el estimador de \textbf{MCO agrupados} de la regresión:
+    \[
+    \Delta y_{it} \; \text{en} \; \Delta x_{it}
+    \]
+    
+    \item Bajo el supuesto \textbf{FD1}, la estimación por MCO agrupados es \textbf{consistente} e \textbf{insesgada}.
+    
+    \item Como en el caso within, se requiere una \textbf{condición de rango} para el estimador FD:
+    \[
+    \text{FD2:} \quad \text{rank}\left(\sum_{t=2}^T E(\Delta x_{it}^T \Delta x_{it})\right) = K
+    \]
+    
+    \item Esta condición también excluye a las \textbf{variables invariantes en el tiempo} y evita la \textbf{multicolinealidad perfecta} entre las variables que sí cambian en el tiempo.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El estimador FD usa solo la variación de un periodo a otro, y necesita que esa variación aporte información independiente para identificar los parámetros.
+    \item \textbf{Ejemplo:} Si todas las personas tuvieran exactamente el mismo cambio en ingresos de un año a otro, no se podría estimar el efecto de las variables explicativas.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Primeras Diferencias: Errores estándar}}
+\addcontentsline{toc}{subsection}{Primeras Diferencias: Errores estándar}
+
+\begin{itemize}
+    \item Bajo los supuestos \textbf{FE1–FE3}, el estimador de efectos fijos (\textbf{within}) es asintóticamente \textbf{eficiente}.
+    
+    \item Sin embargo, el supuesto \textbf{FE3} establece que los $u_{it}$ no presentan \textbf{correlación serial}.
+    
+    \item Si en su lugar suponemos que los $\Delta u_{it}$ no están serialmente correlacionados, entonces el estimador de \textbf{Primeras Diferencias (FD)} sería \textbf{eficiente}.
+    
+    \item Además, puede demostrarse que cuando solo existen \textbf{dos periodos}, el estimador FD y el estimador FE son \textbf{idénticos}.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La eficiencia del estimador depende de cómo se comporten los errores en el tiempo: si la correlación está en $u_{it}$ favorece FE, si está en $\Delta u_{it}$ favorece FD.
+    \item \textbf{Ejemplo:} Con solo dos años de datos, calcular diferencias o restar la media es lo mismo: en ambos casos se elimina el efecto fijo $c_i$.
+\end{itemize}
+
+\section*{\noindent\textbf{Regresión de efectos fijos: puntos principales}}
+\addcontentsline{toc}{section}{Regresión de efectos fijos: puntos principales}
+
+\begin{itemize}
+    \item En \textbf{inferencia}, los errores estándar deben estar \textbf{agrupados por unidad de panel} (ejemplo: granja) para permitir correlación en los $u_{it}$ dentro de un mismo $i$.
+    
+    \item En \textbf{STATA}:  
+    \[
+    \texttt{xtreg, fe i(PanelID) cluster(PanelID)}
+    \]
+    Esto produce inferencia válida siempre que el número de clusters sea suficientemente grande.
+    
+    \item Normalmente el interés está en $\beta$, pero los efectos $c_i$ también pueden ser relevantes:
+    \begin{itemize}
+        \item $\hat{c}_i$ del estimador de \textbf{variables dummy} es insesgado, pero no consistente para $c_i$ (con $T$ fijo y $N \to \infty$).
+        \item \texttt{xtreg, fe} sustrae medias antes de estimar, por lo que no reporta $\hat{c}_i$.
+        \item La constante reporta el promedio de los $\hat{c}_i$ entre unidades.
+        \item Podemos recuperar $\hat{c}_i$ con:  
+        \[
+        \hat{c}_i = \bar{y}_i - \bar{x}_i \hat{\beta}
+        \quad \; \; \; (\texttt{predict ci, u})
+        \]
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La inferencia en panel requiere ajustar por correlación interna de los errores; además, los efectos $c_i$ pueden recuperarse pero no siempre son consistentes.
+    \item \textbf{Ejemplo:} Al analizar productividad de granjas, los errores dentro de una misma granja están correlacionados; además, el efecto fijo de cada granja se puede calcular a partir de sus medias.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Ejemplo: Democracia Directa y Naturalizaciones}}
+\addcontentsline{toc}{subsection}{Ejemplo: Democracia Directa y Naturalizaciones}
+
+\begin{itemize}
+    \item Pregunta central: ¿\textbf{están en peor situación las minorías} bajo \textbf{democracia directa} que bajo \textbf{democracia representativa}?
+    
+    \item \textbf{Hainmueller y Hangartner (2012)} analizan datos de solicitudes de naturalización de inmigrantes en Suiza.
+    
+    \item En algunos municipios las solicitudes se votan en:
+    \begin{itemize}
+        \item \textbf{Referéndums} (\textbf{democracia directa}).
+        \item \textbf{Consejos municipales electos} (\textbf{democracia representativa}).
+    \end{itemize}
+    
+    \item Base de datos: panel anual de \textbf{1,400 municipios} en el periodo 1991–2009.
+    
+    \item Definición de variables:
+    \[
+    y_{it} = \text{tasa de naturalización} 
+    = \frac{\text{número de naturalizaciones}_{it}}{\text{población extranjera elegible}_{it-1}}
+    \]
+    \[
+    x_{it} =
+    \begin{cases}
+        1 & \text{si el municipio usa democracia representativa en } t \\
+        0 & \text{si el municipio usa democracia directa en } t
+    \end{cases}
+    \]
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El diseño permite comparar cómo cambia la tasa de naturalización dependiendo del mecanismo de decisión política en el municipio.
+    \item \textbf{Ejemplo:} Dos municipios con características similares pueden diferir solo en el tipo de democracia, lo que permite identificar el efecto de la regla institucional.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Datos de panel de naturalizaciones}}
+\addcontentsline{toc}{subsection}{Datos de panel de naturalizaciones}
+
+\begin{itemize}
+    \item Base de datos en formato \textbf{panel} con información de municipios en Suiza.
+    \item Variables principales:
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l l}
+\hline
+\textbf{Variable} & \textbf{Tipo} & \textbf{Descripción} \\
+\hline
+\texttt{muniID}   & float  & Código del municipio \\
+\texttt{muni\_name} & string & Nombre del municipio (1,430 municipios) \\
+\texttt{year}     & int    & Año de observación \\
+\texttt{nat\_rate} & float  & Tasa de naturalización (\%) \\
+\texttt{repdem}   & float  & 1 = democracia representativa, 0 = democracia directa \\
+\hline
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El panel combina municipios y años, permitiendo analizar cómo la institución política ($repdem$) afecta la tasa de naturalización.
+    \item \textbf{Ejemplo:} Si un municipio cambia de democracia directa a representativa, podemos observar cómo varía su tasa de naturalización en el tiempo.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Datos de Panel. Long Format}}
+\addcontentsline{toc}{subsection}{Datos de Panel. Long Format}
+
+. \texttt{list muniID muni\_name year nat\_rate repdem in 31/40}
+
+% --- Tabla de Datos con [H] ---
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|l|c|c|c|}
+        \hline
+        \textbf{muniID} & \textbf{muni\_name} & \textbf{year} & \textbf{nat\_rate} & \textbf{repdem} \\
+        \hline
+        2 & Affoltern A.A. & 2002 & 4.638365 & 0 \\
+        2 & Affoltern A.A. & 2003 & 4.844814 & 0 \\
+        2 & Affoltern A.A. & 2004 & 5.621302 & 0 \\
+        2 & Affoltern A.A. & 2005 & 4.387827 & 0 \\
+        2 & Affoltern A.A. & 2006 & 8.115358 & 1 \\
+        \hline
+        2 & Affoltern A.A. & 2007 & 7.067371 & 1 \\
+        2 & Affoltern A.A. & 2008 & 8.977719 & 1 \\
+        2 & Affoltern A.A. & 2009 & 6.119704 & 1 \\
+        3 & Bonstetten & 1991 & 0.833334 & 0 \\
+        3 & Bonstetten & 1992 & 0.8403362 & 0 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+% --- Intuición: Sin subsección, solo texto en negrita y lista ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item La clave del formato \textbf{Long} es que cada observación individual (\textbf{muniID-year}) tiene su propia \textbf{fila}, facilitando el seguimiento de los cambios temporales.
+    \item El panel permite observar \textbf{variación en el tiempo} (diferentes años para el mismo municipio) y \textbf{variación entre unidades} (diferentes \textbf{muniID}).
+\end{itemize}
+
+\subsection*{\noindent\textbf{MCO Agrupados}}
+\addcontentsline{toc}{subsection}{MCO Agrupados}
+
+\begin{verbatim}
+. reg nat_rate repdem , cl(muniID)
+\end{verbatim}
+
+\begin{center}
+    \textbf{Regresión Lineal}
+\end{center}
+
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Resultados de Regresión Lineal con Errores Agrupados}
+    \resizebox{\textwidth}{!}{% Ajusta el tamaño de la tabla al ancho de texto si es necesario
+    \begin{tabular}{lr @{\hskip 1cm} | @{\hskip 1cm} r}
+        \multicolumn{2}{l}{Number of obs = 4655} \\
+        \multicolumn{2}{l}{F( 1, 244) = 130.04} \\
+        \multicolumn{2}{l}{Prob > F = 0.0000} \\
+        \multicolumn{2}{l}{R-squared = 0.0748} \\
+        \multicolumn{2}{l}{Root MSE = 3.98} \\
+        \hline
+        \multicolumn{5}{c}{(Std. Err. adjusted for 245 clusters in muniID)} \\
+        \hline
+        \textbf{nat\_rate} & \textbf{Coef.} & \textbf{Robust Std. Err.} & \textbf{t} & \textbf{P>|t|} & \textbf{[95\% Conf. Interval]} \\
+        \hline
+        repdem & 2.503318 & 0.2195202 & 11.40 & 0.000 & [2.070921 \ 2.935714] \\
+        \_cons & 2.222683 & 0.10088 & 22.03 & 0.000 & [2.023976 \ 2.421389] \\
+        \hline
+    \end{tabular}
+    } % Cierre de resizebox
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Efecto Estimado:} El coeficiente de \textbf{repdem} (2.50) indica que la democracia representativa está asociada con un aumento de \textbf{2.5 puntos porcentuales} en la tasa de naturalización.
+    \item \textbf{Agrupamiento (Clustering):} El uso de `cl(muniID)` corrige los errores estándar por \textbf{autocorrelación} dentro del municipio (correlación entre las observaciones a lo largo del tiempo para el mismo municipio), haciendo que la inferencia sea \textbf{válida} y \textbf{conservadora}.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Descomposición de Varianza (within, between)}}
+\addcontentsline{toc}{subsection}{Descomposición de Varianza (within, between)}
+
+\begin{verbatim}
+. tsset muniID year , yearly
+panel variable: muniID (strongly balanced)
+time variable: year, 1991 to 2009
+delta: 1 year
+\end{verbatim}
+
+\begin{verbatim}
+. xtsum nat_rate
+\end{verbatim}
+
+% --- Tabla de Resultados de xtsum ---
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Descomposición de Varianza de la Tasa de Naturalización (\texttt{nat\_rate})}
+    \begin{tabular}{l | c c c c | r}
+        \hline
+        \textbf{Variable} & \textbf{Mean} & \textbf{Std. Dev.} & \textbf{Min} & \textbf{Max} & \textbf{Observations} \\
+        \hline
+        \textbf{nat\_rate} \_overall & 2.938992 & 4.137305 & 0 & 24.13793 & N = 4655 \\
+        \hspace{5mm} between & & 1.622939 & 0 & 7.567746 & n = 245 \\
+        \hspace{5mm} within & & 3.807039 & -3.711323 & 24.80134 & T = 19 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Varianza Between ($\sigma_{\mu}$):} Mide la variación \textbf{entre} municipios. Su desviación estándar (1.62) es relativamente \textbf{menor} que la *within*, sugiriendo que las diferencias \textbf{promedio} entre municipios son limitadas.
+    \item \textbf{Varianza Within ($\sigma_{\epsilon}$):} Mide la variación \textbf{dentro} de cada municipio a lo largo del tiempo. Su desviación estándar (3.81) es \textbf{mayor} que la *between*, indicando que la mayor parte de la variación en \textbf{nat\_rate} proviene de los \textbf{cambios anuales} de la propia unidad.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Within Estimator}}
+\addcontentsline{toc}{subsection}{Within Estimator}
+
+% Comandos Stata
+\begin{verbatim}
+. * get municipality means
+. egen means_nat_rate = mean(nat_rate) , by(muniID)
+
+. * compute deviations from means
+. gen dm_nat_rate = nat_rate - means_nat_rate
+
+. list muniID muni_name year nat_rate means_nat_rate dm_nat_rate in 20/40 , ab(20)
+\end{verbatim}
+
+% --- Tabla de Desviaciones de la Media ---
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Ilustración de la Transformación de Desviación de la Media}
+    \begin{tabular}{|c|l|c|c|c|c|}
+        \hline
+        \textbf{muniID} & \textbf{muni\_name} & \textbf{year} & \textbf{nat\_rate} & \textbf{means\_nat\_rate} & \textbf{dm\_nat\_rate} \\
+        \hline
+        \hline
+        2 & Affoltern A.A. & 1991 & 0.2173913 & 3.595932 & -3.37854 \\
+        2 & Affoltern A.A. & 1992 & 0.9473684 & 3.595932 & -2.648563 \\
+        2 & Affoltern A.A. & 1993 & 1.04712 & 3.595932 & -2.548811 \\
+        2 & Affoltern A.A. & 1994 & 0.8342023 & 3.595932 & -2.761729 \\
+        2 & Affoltern A.A. & 1995 & 2.002002 & 3.595932 & -1.59393 \\
+        \hline
+        2 & Affoltern A.A. & 1996 & 1.7769 & 3.595932 & -1.819031 \\
+        2 & Affoltern A.A. & 1997 & 1.862745 & 3.595932 & -1.733186 \\
+        2 & Affoltern A.A. & 1998 & 2.054155 & 3.595932 & -1.541776 \\
+        2 & Affoltern A.A. & 1999 & 2.402135 & 3.595932 & -1.193796 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Eliminación del Sesgo:} La columna \textbf{dm\_nat\_rate} (\textbf{D}eviación de la \textbf{M}edia) representa la tasa de naturalización, pero eliminando la media de cada municipio (\textbf{means\_nat\_rate}).
+    \item \textbf{Base de la Regresión:} Al restar la media de grupo, se eliminan los \textbf{efectos fijos} o características \textbf{invariantes en el tiempo} de cada municipio. La regresión del Estimador Within se ejecuta solo sobre estas variables **transformadas**.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Efectos Fijos. Within Estimator}}
+\addcontentsline{toc}{subsection}{Efectos Fijos. Within Estimator}
+
+% Comandos Stata
+\begin{verbatim}
+. egen means_repdem = mean(repdem) , by(muniID)
+. gen dm_repdem = repdem - means_repdem
+
+. * regression with demeaned data
+. reg dm_nat_rate dm_repdem , cl(muniID)
+\end{verbatim}
+
+\begin{center}
+    \textbf{Regresión Lineal con Variables Transformadas}
+\end{center}
+
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Resultados del Estimador Within (Efectos Fijos)}
+    % Se ajusta la tabla para mayor claridad en las columnas numéricas
+    \begin{tabular}{l c c c c c}
+        \multicolumn{6}{l}{\textbf{Linear regression}} \\
+        \hline
+        \multicolumn{3}{l}{} & \multicolumn{3}{r}{Number of obs = 4655} \\
+        \multicolumn{3}{l}{} & \multicolumn{3}{r}{F( 1, 244) = 265.18} \\
+        \multicolumn{3}{l}{} & \multicolumn{3}{r}{Prob > F = 0.0000} \\
+        \multicolumn{3}{l}{} & \multicolumn{3}{r}{R-squared = 0.1052} \\
+        \multicolumn{3}{l}{} & \multicolumn{3}{r}{Root MSE = 3.6017} \\
+        \hline
+        \multicolumn{6}{c}{(Std. Err. adjusted for 245 clusters in muniID)} \\
+        \hline
+        \textbf{dm\_nat\_rate} & \textbf{Coef.} & \textbf{Robust Std. Err.} & \textbf{t} & \textbf{P>|t|} & \textbf{[95\% Conf. Interval]} \\
+        \hline
+        dm\_repdem & 3.0228 & 0.1856244 & 16.28 & 0.000 & [2.657169 \ 3.388431] \\
+        \_cons & 6.65e-10 & 5.81e-09 & 0.11 & 0.909 & [-1.08e-08 \ 1.21e-08] \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Interpretación del Coeficiente ($\mathbf{\text{dm\_repdem}}$):} El coeficiente de $\mathbf{3.02}$ mide el efecto causal puro de la \textbf{variación temporal} en la democracia (\textbf{repdem}) sobre la \textbf{variación temporal} en la tasa de naturalización, **eliminando** las características permanentes del municipio.
+    \item \textbf{Comparación con MCO:} El efecto ($3.02$) es mayor que el MCO agrupado ($2.50$), sugiriendo que el MCO estaba sesgado a la baja (subestimado) el verdadero efecto, posiblemente debido a que factores \textbf{no observados} e invariantes estaban correlacionados con ambas variables.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Efectos Fijos. Rutina programada: Stata}}
+\addcontentsline{toc}{subsection}{Efectos Fijos. Rutina programada: Stata}
+
+% Comando Stata
+\begin{verbatim}
+. xtreg nat_rate repdem , fe cl(muniID) i(muniID)
+\end{verbatim}
+
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Resultados del Estimador de Efectos Fijos (xtreg, fe)}
+    \begin{tabular}{l l r}
+        \multicolumn{3}{l}{\textbf{Fixed-effects (within) regression}} \\
+        \multicolumn{3}{l}{Group variable: muniID} \\
+        \hline
+        \multicolumn{3}{l}{R-sq: \hspace{5mm} within = 0.1052} \\
+        \multicolumn{3}{l}{\hspace{17mm} between = 0.0005} \\
+        \multicolumn{3}{l}{\hspace{17mm} overall = 0.0748} \\
+        \multicolumn{3}{l}{corr(u\_i, Xb) = -0.1373} \\
+    \end{tabular}
+    % Segunda parte del encabezado
+    \begin{tabular}{r @{\hskip 1cm} r}
+        Number of obs = 4655 & F(1, 244) = 265.18 \\
+        Number of groups = 245 & Prob > F = 0.0000 \\
+        Obs per group: min = 19 & \\
+        \hspace{16mm} avg = 19.0 & \\
+        \hspace{16mm} max = 19 & \\
+    \end{tabular}
+
+    \vspace{0.2cm}
+    \begin{tabular}{l c c c c c}
+        \multicolumn{6}{c}{(Std. Err. adjusted for 245 clusters in muniID)} \\
+        \hline
+        \textbf{nat\_rate} & \textbf{Coef.} & \textbf{Robust Std. Err.} & \textbf{t} & \textbf{P>|t|} & \textbf{[95\% Conf. Interval]} \\
+        \hline
+        repdem & 3.0228 & 0.1856244 & 16.28 & 0.000 & [2.657169 \ 3.388431] \\
+        \_cons & 2.074036 & 0.0531153 & 39.05 & 0.000 & [1.969413 \ 2.178659] \\
+        \hline
+        \multicolumn{6}{l}{} \\
+        \multicolumn{6}{l}{\textbf{sigma\_u} = 1.7129711} \\
+        \multicolumn{6}{l}{\textbf{sigma\_e} = 3.69998} \\
+        \multicolumn{6}{l}{\textbf{rho} = 0.17650677 \hspace{2mm} (fraction of variance due to u\_i)} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Consistencia:} Los resultados de \textbf{xtreg, fe} confirman el coeficiente de **3.0228** encontrado con la regresión *demeaned*, validando la implementación de los \textbf{Efectos Fijos}.
+    \item \textbf{Rho ($\rho$):} El valor de $\mathbf{\rho \approx 0.177}$ indica que aproximadamente el **17.7\%** de la varianza total del error se debe a los \textbf{efectos no observados invariantes} específicos de cada municipio ($\sigma_u$), lo que justifica el uso de un modelo de panel.
+\end{itemize}
+
+\subsection*{\noindent\textbf{Efectos Fijos. Rutina programada: Stata}}
+\addcontentsline{toc}{subsection}{Efectos Fijos. Rutina programada: Stata}
+
+% Comando Stata
+\begin{verbatim}
+. xtreg nat_rate repdem , fe cl(muniID) i(muniID)
+\end{verbatim}
+
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Resultados del Estimador de Efectos Fijos (xtreg, fe)}
+    \begin{tabular}{l l r}
+        \multicolumn{3}{l}{\textbf{Fixed-effects (within) regression}} \\
+        \multicolumn{3}{l}{Group variable: muniID} \\
+        \hline
+        \multicolumn{3}{l}{R-sq: \hspace{5mm} within = 0.1052} \\
+        \multicolumn{3}{l}{\hspace{17mm} between = 0.0005} \\
+        \multicolumn{3}{l}{\hspace{17mm} overall = 0.0748} \\
+        \multicolumn{3}{l}{corr(u\_i, Xb) = -0.1373} \\
+    \end{tabular}
+    % Segunda parte del encabezado
+    \begin{tabular}{r @{\hskip 1cm} r}
+        Number of obs = 4655 & F(1, 244) = 265.18 \\
+        Number of groups = 245 & Prob > F = 0.0000 \\
+        Obs per group: min = 19 & \\
+        \hspace{16mm} avg = 19.0 & \\
+        \hspace{16mm} max = 19 & \\
+    \end{tabular}
+
+    \vspace{0.2cm}
+    \begin{tabular}{l c c c c c}
+        \multicolumn{6}{c}{(Std. Err. adjusted for 245 clusters in muniID)} \\
+        \hline
+        \textbf{nat\_rate} & \textbf{Coef.} & \textbf{Robust Std. Err.} & \textbf{t} & \textbf{P>|t|} & \textbf{[95\% Conf. Interval]} \\
+        \hline
+        repdem & 3.0228 & 0.1856244 & 16.28 & 0.000 & [2.657169 \ 3.388431] \\
+        \_cons & 2.074036 & 0.0531153 & 39.05 & 0.000 & [1.969413 \ 2.178659] \\
+        \hline
+        \multicolumn{6}{l}{} \\
+        \multicolumn{6}{l}{\textbf{sigma\_u} = 1.7129711} \\
+        \multicolumn{6}{l}{\textbf{sigma\_e} = 3.69998} \\
+        \multicolumn{6}{l}{\textbf{rho} = 0.17650677 \hspace{2mm} (fraction of variance due to u\_i)} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Consistencia:} Los resultados de \textbf{xtreg, fe} confirman el coeficiente de **3.0228** encontrado con la regresión *demeaned*, validando la implementación de los \textbf{Efectos Fijos}.
+    \item \textbf{Rho ($\rho$):} El valor de $\mathbf{\rho \approx 0.177}$ indica que aproximadamente el **17.7\%** de la varianza total del error se debe a los \textbf{efectos no observados invariantes} específicos de cada municipio ($\sigma_u$), lo que justifica el uso de un modelo de panel.
+\end{itemize}
+
+\section*{\noindent\textbf{Aplicando efectos fijos}}
+\addcontentsline{toc}{section}{Aplicando efectos fijos}
+
+\begin{itemize}
+    \item Los \textbf{efectos fijos} también pueden aplicarse en otras estructuras de datos, permitiendo restringir las comparaciones dentro de la misma unidad.
+    
+    \item \textbf{Ejemplos:}
+    \begin{itemize}
+        \item \textbf{Parejas apareadas:} usar efectos fijos de gemelos para controlar características familiares no observadas.
+        \item \textbf{Escuelas:} incluir efectos fijos de escuela para capturar factores no observados propios de cada institución.
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El método de efectos fijos funciona como un “control interno” que elimina factores constantes dentro de cada unidad.
+    \item \textbf{Ejemplo:} Comparar gemelos elimina el efecto de los antecedentes familiares; comparar alumnos dentro de la misma escuela elimina el efecto del contexto escolar fijo.
+\end{itemize}
+
+\section*{\noindent\textbf{Problemas que los efectos fijos no resuelven}}
+\addcontentsline{toc}{section}{Problemas que los efectos fijos no resuelven}
+
+\begin{itemize}
+    \item Modelo de referencia:
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it}, \quad t = 1,2,\ldots,T
+    \]
+    donde:
+    \[
+    y_{it} = \text{tasa de homicidios}, \quad x_{it} = \text{gasto en policía per cápita}
+    \]
+    
+    \item Si corremos una regresión de $y$ sobre $x$ con efectos fijos por ciudad, el estimador $\hat{\beta}_{FE}$ será \textbf{inconsistente} salvo que se cumpla la \textbf{estricta exogeneidad}:
+    \[
+    E(u_{it} \mid x_{i1}, x_{i2}, \ldots, x_{iT}, c_i) = 0, \quad t = 1,2,\ldots,T
+    \]
+    
+    \item Esto implica que $u_{it}$ no debe estar correlacionado con regresores pasados, actuales ni futuros.
+    
+    \item \textbf{Violaciones comunes:}
+    \begin{enumerate}
+        \item \textbf{Variables omitidas que varían en el tiempo:} un boom económico puede llevar a más gasto policial y, al mismo tiempo, a menos homicidios.
+        \item \textbf{Simultaneidad:} si la ciudad ajusta el gasto policial en respuesta a tasas de homicidios pasadas, entonces $x_{t+1}$ estará correlacionado con $u_t$.  
+        Una $x$ estrictamente exógena no puede reaccionar a lo que le ocurre a $y$ en el pasado o el futuro.
+    \end{enumerate}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Los efectos fijos eliminan solo factores constantes; no corrigen problemas de variables omitidas dinámicas ni de causalidad inversa.
+    \item \textbf{Ejemplo:} Si una ciudad aumenta la policía porque hubo más homicidios el año pasado, el gasto y los errores pasados estarán correlacionados, rompiendo la exogeneidad.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos Aleatorios}}
+\addcontentsline{toc}{section}{Efectos Aleatorios}
+
+\begin{itemize}
+    \item Consideremos nuevamente el modelo:
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it}, \quad t = 1,2,\ldots,T
+    \]
+    
+    \item Un problema del modelo de \textbf{efectos fijos} es que no puede estimar el impacto de \textbf{regresores invariantes en el tiempo} (ejemplo: calidad del suelo, ubicación de la granja).
+    
+    \item Como el estimador FE permite correlación entre $c_i$ y $x_{it}$, no es posible separar el efecto de esos regresores constantes del efecto fijo $c_i$.
+    
+    \item Para estimarlos, necesitamos el supuesto de \textbf{ortogonalidad}:  
+    \[
+    \text{Cov}(x_{it}, c_i) = 0, \quad \forall t=1,\ldots,T
+    \]
+    
+    \item Este es un \textbf{supuesto fuerte}: se requiere que los efectos no observados $c_i$ no estén correlacionados con ninguna variable explicativa en $x_{it}$ en ningún periodo.
+    
+    \item Ejemplo: si incluimos \textbf{calidad del suelo} en $x_{it}$, debemos suponer que no se correlaciona con otros insumos invariantes en el tiempo (como ubicación geográfica).
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El modelo de efectos aleatorios permite identificar variables constantes en el tiempo, pero exige independencia fuerte entre $c_i$ y los regresores.
+    \item \textbf{Ejemplo:} Es como analizar granjas con diferentes calidades de suelo: para que el modelo funcione, debemos asumir que la calidad del suelo no está relacionada con otros factores fijos como el clima de la región.
+\end{itemize}
+
+\section*{\noindent\textbf{Métodos de efectos aleatorios (RE)}}
+\addcontentsline{toc}{section}{Métodos de efectos aleatorios (RE)}
+
+\begin{itemize}
+    \item Los modelos de \textbf{efectos aleatorios} incluyen $c_i$ dentro del término de error, bajo el supuesto de que $c_i$ es \textbf{ortogonal} a $x_{it}$, y corrigen la \textbf{correlación serial} en el error compuesto.
+    
+    \item Estos modelos imponen dos condiciones: \textbf{exogeneidad estricta} y \textbf{ortogonalidad} entre $c_i$ y $x_{it}$.
+    
+    \item Supuestos (RE1):
+    \[
+    E(u_{it} \mid x_i, c_i) = 0, \quad t=1,2,\ldots,T
+    \]
+    \[
+    E(c_i \mid x_i) = E(c_i) = 0, \quad \text{con } x_i = (x_{i1}, x_{i2}, \ldots, x_{iT})
+    \]
+    
+    \item Lo importante es que:
+    \[
+    E(c_i \mid x_i) = E(c_i)
+    \]
+    El supuesto $E(c_i)=0$ no implica pérdida de generalidad siempre que haya una constante incluida en $x_{it}$.
+    
+    \item Bajo este supuesto, incluso \textbf{MCO} sería \textbf{consistente}, pero no \textbf{eficiente}.  
+    Por eso, se emplea \textbf{MCG (GLS)} para obtener eficiencia.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El modelo RE trata los efectos individuales como parte del error, suponiendo que no están correlacionados con los regresores, y usa GLS para mejorar la eficiencia.
+    \item \textbf{Ejemplo:} Es como analizar escuelas donde la “calidad promedio” de cada escuela se asume independiente del gasto en insumos: si se cumple, se puede estimar con más precisión que con FE.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item El enfoque de \textbf{efectos aleatorios} considera explícitamente la \textbf{correlación serial} en el error compuesto:
+    \[
+    v_{it} = c_i + u_{it}
+    \]
+    
+    \item El modelo de regresión puede escribirse como:
+    \[
+    y_{it} = x_{it}\beta + v_{it}
+    \]
+    
+    \item Bajo los supuestos de efectos aleatorios:
+    \[
+    E(v_{it} \mid x_i) = 0, \quad t=1,2,\ldots,T
+    \]
+    
+    \item En consecuencia, podemos aplicar \textbf{MCG (GLS)} para tener en cuenta la estructura particular del error compuesto $v_{it} = c_i + u_{it}$.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El error compuesto $v_{it}$ tiene una parte común ($c_i$) y otra idiosincrática ($u_{it}$), lo que genera correlación entre periodos para un mismo individuo.
+    \item \textbf{Ejemplo:} Es como medir la productividad de una persona: siempre habrá un componente fijo de talento ($c_i$) más choques aleatorios cada año ($u_{it}$); GLS ajusta por esa estructura.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item El modelo puede escribirse para todos los periodos como:
+    \[
+    y_i = X_i \beta + v_i
+    \]
+    donde $y_i$ es un vector $T \times 1$, $X_i$ es una matriz $T \times K$, y $v_i$ el vector de errores compuestos.
+    
+    \item Definimos la matriz de varianza no condicional de $v_i$ como:
+    \[
+    \Omega \equiv E(v_i v_i^T)
+    \]
+    
+    \item $\Omega$ es una matriz de dimensión $T \times T$, y es \textbf{la misma para todos los individuos $i$} porque se asume \textbf{muestreo aleatorio} en la dimensión transversal.
+    
+    \item Para la consistencia del estimador GLS necesitamos la condición de rango habitual:
+    \[
+    \text{RE2: } \quad \text{rank}\!\left( E(X_i^T \Omega^{-1} X_i) \right) = K
+    \]
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La estructura del error compuesto implica una matriz de covarianza común para todos los individuos; GLS usa esta matriz para ponderar correctamente las observaciones.
+    \item \textbf{Ejemplo:} Es como dar más o menos peso a observaciones de un mismo individuo dependiendo de cuánta correlación exista entre sus periodos.
+\end{itemize}
+
+\hrule
+
+
+\begin{itemize}
+    \item Un análisis estándar de efectos aleatorios añade supuestos sobre los \textbf{errores idiosincráticos}, lo que da a $\Omega$ una forma particular.
+    
+    \item Supuestos (RE3):
+    \[
+    E(u_i u_i^T \mid x_i, c_i) = \sigma_u^2 I_T
+    \]
+    \[
+    E(c_i^2 \mid x_i) = \sigma_c^2
+    \]
+    
+    \item Bajo estos supuestos, la matriz de varianza $\Omega$ es:
+    \[
+    \Omega =
+    \begin{bmatrix}
+    \sigma_c^2 + \sigma_u^2 & \sigma_c^2 & \cdots & \sigma_c^2 \\
+    \sigma_c^2 & \sigma_c^2 + \sigma_u^2 & \cdots & \sigma_c^2 \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \sigma_c^2 & \sigma_c^2 & \cdots & \sigma_c^2 + \sigma_u^2
+    \end{bmatrix}
+    \]
+    
+    \item Es decir, la matriz $\Omega$ tiene $\sigma_c^2 + \sigma_u^2$ en la diagonal, y $\sigma_c^2$ en todas las posiciones fuera de la diagonal.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La parte fija $c_i$ genera correlación perfecta entre todos los periodos de un mismo individuo, mientras que $u_{it}$ añade variación idiosincrática independiente.
+    \item \textbf{Ejemplo:} Para un trabajador, $c_i$ puede reflejar su productividad innata (común a todos los años), mientras que $u_{it}$ recoge shocks de productividad que cambian cada año.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item Si contamos con estimadores consistentes de $\sigma_c^2$ y $\sigma_u^2$  
+    (ver \textbf{Wooldridge, p. 260} sobre cómo obtenerlos), podemos construir un estimador consistente de la matriz de varianza:
+    \[
+    \hat{\Omega} \equiv \hat{\sigma}_u^2 I_T + \hat{\sigma}_c^2 j_T j_T^T
+    \]
+    donde $j_T j_T^T$ es una matriz $T \times T$ con unos en todas sus entradas.
+    
+    \item Con esta matriz, el estimador de \textbf{efectos aleatorios} es:
+    \[
+    \hat{\beta}_{RE} 
+    = \left( \sum_{i=1}^N X_i^T \hat{\Omega}^{-1} X_i \right)^{-1} 
+      \left( \sum_{i=1}^N X_i^T \hat{\Omega}^{-1} y_i \right)
+    \]
+    
+    \item El estimador RE es un caso particular de \textbf{GLS factible}, donde solo se deben estimar dos parámetros en la matriz de varianza-covarianza.
+    
+    \item Si los supuestos de RE se cumplen, este estimador es \textbf{consistente} y \textbf{eficiente}.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} El método RE estima la estructura de la varianza entre y dentro de individuos y aplica GLS factible para ponderar las observaciones.
+    \item \textbf{Ejemplo:} Es como ajustar la importancia relativa de variaciones entre municipios y dentro de cada municipio al estimar el efecto de una política.
+\end{itemize}
+
+\section*{\noindent\textbf{Regresión de efectos aleatorios (RE)}}
+\addcontentsline{toc}{section}{Regresión de efectos aleatorios (RE)}
+
+% Comando Stata
+\begin{verbatim}
+. xtreg nat_rate repdem , re cl(muniID) i(muniID)
+\end{verbatim}
+
+% --- Tabla de Resultados de xtreg, re ---
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Resultados del Estimador de Efectos Aleatorios (xtreg, re)}
+    \begin{tabular}{l l r}
+        \multicolumn{3}{l}{\textbf{Random-effects GLS regression}} \\
+        \multicolumn{3}{l}{Group variable: muniID} \\
+        \hline
+        \multicolumn{3}{l}{R-sq: \hspace{5mm} within = 0.1052} \\
+        \multicolumn{3}{l}{\hspace{17mm} between = 0.0005} \\
+        \multicolumn{3}{l}{\hspace{17mm} overall = 0.0748} \\
+        \multicolumn{3}{l}{corr(u\_i, X) = 0 (assumed)} \\
+    \end{tabular}
+    % Segunda parte del encabezado
+    \begin{tabular}{r @{\hskip 1cm} r}
+        Number of obs = 4655 & Wald chi2(1) = 227.99 \\
+        Number of groups = 245 & Prob > chi2 = 0.0000 \\
+        Obs per group: min = 19 & \\
+        \hspace{16mm} avg = 19.0 & \\
+        \hspace{16mm} max = 19 & \\
+    \end{tabular}
+
+    \vspace{0.2cm}
+    \begin{tabular}{l c c c c c}
+        \multicolumn{6}{c}{(Std. Err. adjusted for 245 clusters in muniID)} \\
+        \hline
+        \textbf{nat\_rate} & \textbf{Coef.} & \textbf{Robust Std. Err.} & \textbf{z} & \textbf{P>|z|} & \textbf{[95\% Conf. Interval]} \\
+        \hline
+        repdem & 2.859397 & 0.1893742 & 15.10 & 0.000 & [2.48823 \ 3.230564] \\
+        \_cons & 2.120793 & 0.0972959 & 21.80 & 0.000 & [1.930096 \ 2.311489] \\
+        \hline
+        \multicolumn{6}{l}{\textbf{sigma\_u} = 1.3866768} \\
+        \multicolumn{6}{l}{\textbf{sigma\_e} = 3.69998} \\
+        \multicolumn{6}{l}{\textbf{rho} = 0.1231606 \hspace{2mm} (fraction of variance due to u\_i)} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Supuesto Clave:} El estimador de \textbf{Efectos Aleatorios (RE)} asume que los efectos no observados ($\mathbf{u_i}$) **no están correlacionados** con la variable explicativa ($\mathbf{repdem}$). Esta es la principal diferencia con el modelo FE.
+    \item \textbf{Eficiencia vs. Sesgo:} El coeficiente RE ($\mathbf{2.86}$) está entre el MCO ($2.50$) y el FE ($3.02$). RE es más **eficiente** (usa variación entre y dentro), pero si el supuesto de no correlación es falso (como sugiere la prueba de Hausman), sus estimaciones serán **sesgadas**.
+\end{itemize}
+
+\section*{\noindent\textbf{RE versus FE, FD o Variables Dummy}}
+\addcontentsline{toc}{section}{RE versus FE, FD o Variables Dummy}
+
+\begin{itemize}
+    \item El supuesto central de \textbf{RE}, $E(c_i \mid x_i) = E(c_i) = 0$, es muy \textbf{fuerte} y poco realista en muchos contextos.
+    
+    \item Por ello, en la práctica suelen preferirse los \textbf{estimadores de efectos fijos}.
+    
+    \item Pregunta clave: ¿\textbf{qué estimador de efectos fijos elegir}?
+    
+    \item Con solo \textbf{dos periodos}, los estimadores \textbf{FE}, \textbf{FD} y de \textbf{variables dummy} son idénticos.
+    
+    \item Si $T > 2$, la elección depende de los \textbf{supuestos sobre los errores} $u_{it}$:
+    \begin{itemize}
+        \item En la práctica, se suele asumir \textbf{FE3} (no autocorrelación serial) y usar el estimador \textbf{within (FE)}.
+        \item Si el interés está en recuperar los $c_i$, puede emplearse el estimador de \textbf{variables dummy}.
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Los métodos FE, FD y dummies son robustos a la correlación entre $c_i$ y $x_{it}$; RE solo funciona bajo el supuesto más restrictivo de independencia.
+    \item \textbf{Ejemplo:} Con pocos años de datos, todas las técnicas dan lo mismo; con más periodos, la elección depende de cómo supongamos que se comportan los errores.
+\end{itemize}
+
+\section*{\noindent\textbf{Prueba de Hausman}}
+\addcontentsline{toc}{section}{Prueba de Hausman}
+
+\begin{itemize}
+    \item Comparación entre estimadores \textbf{RE} y \textbf{FE}:
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\hline
+ & $\hat{\beta}_{RE}$ & $\hat{\beta}_{FE}$ \\
+\hline
+$H_0: \; \text{Cov}[x_{it}, c_i] = 0$ & Consistente y eficiente & Consistente \\
+$H_1: \; \text{Cov}[x_{it}, c_i] \neq 0$ & Inconsistente & Consistente \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item Bajo $H_0$, la diferencia $\hat{\beta}_{RE} - \hat{\beta}_{FE}$ debe ser cercana a cero.
+    \item Bajo $H_1$, esta diferencia será significativa.
+    
+    \item El estadístico de prueba (para muestras grandes) es:
+    \[
+    (\hat{\beta}_{FE} - \hat{\beta}_{RE})^T 
+    \left( \widehat{\text{Var}}[\hat{\beta}_{FE}] - \widehat{\text{Var}}[\hat{\beta}_{RE}] \right)^{-1} 
+    (\hat{\beta}_{FE} - \hat{\beta}_{RE})
+    \;\; \overset{d}{\longrightarrow} \; \chi^2_k
+    \]
+    donde $k$ es el número de regresores que varían en el tiempo.
+    
+    \item Si se rechaza $H_0$, concluimos que los efectos aleatorios no son apropiados y preferimos la especificación \textbf{FE}.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La prueba de Hausman compara directamente los estimadores RE y FE; si difieren mucho, RE es inconsistente.
+    \item \textbf{Ejemplo:} Es como contrastar dos termómetros: si uno siempre mide más alto que otro, asumimos que está mal calibrado (RE) y confiamos en el más robusto (FE).
+\end{itemize}
+
+\subsection*{\noindent\textbf{Regresión de efectos aleatorios (RE)}}
+\addcontentsline{toc}{subsection}{Regresión de efectos aleatorios (RE)}
+
+% Comandos Stata
+\begin{verbatim}
+. quietly: xtreg nat_rate repdem , fe i(muniID)
+. estimates store FE
+
+. quietly: xtreg nat_rate repdem , re i(muniID)
+. estimates store RE
+
+. hausman FE RE
+\end{verbatim}
+
+% --- Tabla de Resultados de la Prueba de Hausman ---
+\begin{table}[H] % [H] requiere \usepackage{float}
+    \centering
+    \caption{Prueba de Hausman para la Elección del Modelo de Panel}
+    \begin{tabular}{l c c c c}
+        \multicolumn{5}{c}{\hrulefill \textbf{Coefficients} \hrulefill} \\
+        & (b) & (B) & (b-B) & sqrt(diag(V\_b-V\_B)) \\
+        & \textbf{FE} & \textbf{RE} & \textbf{Difference} & \textbf{S.E.} \\
+        \hline
+        repdem & 3.0228 & 2.859397 & 0.1634027 & 0.0304517 \\
+        \hline
+    \end{tabular}
+
+    \vspace{0.2cm}
+    \begin{itemize}
+        \item[] b = consistent under Ho and Ha; obtained from xtreg
+        \item[] B = inconsistent under Ha, efficient under Ho; obtained from xtreg
+    \end{itemize}
+
+    \vspace{0.2cm}
+    \noindent\textbf{Test:} Ho: difference in coefficients not systematic
+
+    \begin{verbatim}
+    chi2(1) = (b-B)'[(V_b-V_B)^(-1)](b-B)
+            = 28.79
+    \end{verbatim}
+\end{table}
+
+\vspace{0.3cm}
+
+% --- Intuición ---
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Hipótesis Nula ($\mathbf{H_0}$):} La diferencia entre los coeficientes $\mathbf{FE}$ y $\mathbf{RE}$ \textbf{no es sistemática} (RE es consistente y eficiente).
+    \item \textbf{Conclusión:} Dado que el estadístico $\mathbf{\chi^2(1) = 28.79}$ es grande y el valor $\mathbf{p}$ asociado es muy pequeño (no visible, pero el valor es significativo), se \textbf{rechaza la hipótesis nula ($\mathbf{H_0}$)}. Por lo tanto, el modelo de \textbf{Efectos Fijos (FE)} es el estimador \textbf{consistente} preferido.
+\end{itemize}
+
+\section*{\noindent\textbf{Prueba de Hausman}}
+\addcontentsline{toc}{section}{Prueba de Hausman}
+
+\begin{itemize}
+    \item La \textbf{prueba de Hausman} no evalúa si el modelo de efectos fijos es correcto; lo que asume es que el estimador de efectos fijos es \textbf{consistente}.
+    
+    \item La versión convencional de la prueba usa un modelo de \textbf{errores homocedásticos} y no permite el uso de \textbf{clustering}.
+    
+    \item Existen variantes de la prueba (como la \textbf{Sargan-Hansen}) que permiten aplicar \textbf{clustering} a los errores estándar.
+    
+    \item Ejemplo en \textbf{STATA}:
+    \begin{verbatim}
+    * hausman test with clustering
+    quietly: xtreg nat_rate repdem , re i(muniID) cl(muniID)
+    xtoverid
+    \end{verbatim}
+    
+    \item Resultado de prueba (ejemplo):  
+    \[
+    \text{Sargan-Hansen statistic} = 26.560, \quad \chi^2(1), \quad p\text{-value} = 0.0000
+    \]
+    lo que lleva a rechazar la hipótesis nula y preferir la especificación de efectos fijos.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} La Hausman clásica compara RE vs FE, pero para datos de panel con correlación interna se recomienda una versión robusta al clustering.
+    \item \textbf{Ejemplo:} En los municipios suizos, si el p-valor es muy bajo, concluimos que los efectos aleatorios no son válidos y que debemos usar efectos fijos.
+\end{itemize}
+
+\section*{\noindent\textbf{Añadiendo efectos fijos en el tiempo}}
+\addcontentsline{toc}{section}{Añadiendo efectos fijos en el tiempo}
+
+\begin{itemize}
+    \item Modelo de referencia:
+    \[
+    y_{it} = x_{it}\beta + c_i + u_{it}, \quad t = 1,2,\ldots,T
+    \]
+    
+    \item Supuesto de efectos fijos:
+    \[
+    E(u_{it} \mid x_{i1}, x_{i2}, \ldots, x_{iT}, c_i) = 0, 
+    \quad t=1,2,\ldots,T
+    \]
+    donde $u_{it}$ no se correlaciona con regresores pasados, presentes ni futuros.  
+    Es decir, los regresores son \textbf{estrictamente exógenos} condicionados a $c_i$.
+    
+    \item \textbf{Violación típica:} choques comunes que afectan a todas las unidades de manera similar y están correlacionados con $x_{it}$.
+    
+    \item Ejemplos de choques comunes:
+    \begin{itemize}
+        \item \textbf{Tendencias tecnológicas o climáticas} que influyen en la productividad agrícola.
+        \item \textbf{Tendencias migratorias} que impactan las tasas de naturalización.
+    \end{itemize}
+    
+    \item Para capturar estos efectos, podemos incluir \textbf{efectos fijos de tiempo} en el modelo.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Los efectos fijos de tiempo permiten controlar choques comunes a todas las unidades en un periodo, evitando que sesguen la estimación.
+    \item \textbf{Ejemplo:} Si en un año hay una reforma migratoria que afecta a todos los municipios, el efecto fijo de tiempo controla ese cambio común y evita confundirlo con el impacto de $x_{it}$.
+\end{itemize}
+
+\hrule
+
+\begin{itemize}
+    \item \textbf{Tendencia lineal común:}
+    \[
+    y_{it} = x_{it}\beta + c_i + t + u_{it}, \quad t=1,2,\ldots,T
+    \]
+    Una tendencia de tiempo lineal que aplica a todas las unidades.
+
+    \item \textbf{Efectos fijos de tiempo:}
+    \[
+    y_{it} = x_{it}\beta + c_i + \tau_t + u_{it}, \quad t=1,2,\ldots,T
+    \]
+    Captura choques comunes a todas las unidades en cada periodo.  
+    Este modelo puede interpretarse como una \textbf{generalización de diferencias en diferencias}.
+    
+    \item \textbf{Tendencias específicas por unidad:}
+    \[
+    y_{it} = x_{it}\beta + c_i + g_i \times t + \tau_t + u_{it}, \quad t=1,2,\ldots,T
+    \]
+    Permite que cada unidad $i$ tenga su propia tendencia lineal en el tiempo.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Los efectos fijos de tiempo y las tendencias permiten capturar dinámicas comunes o específicas que evolucionan con el tiempo y podrían sesgar la estimación.
+    \item \textbf{Ejemplo:} Una política nacional que afecta a todos los municipios se recoge con $\tau_t$, mientras que un municipio en crecimiento constante en su productividad agrícola se modela con una tendencia $g_i \times t$.
+\end{itemize}
+
+\section*{\noindent\textbf{Modelando los efectos en el tiempo}}
+\addcontentsline{toc}{section}{Modelando los efectos en el tiempo}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{image1}
+    \caption{\footnotesize Representación gráfica de tendencias temporales: 
+    (1) tendencia lineal común, 
+    (2) efectos fijos de tiempo, 
+    (3) tendencias lineales específicas por unidad.}
+\end{figure}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Una tendencia común en el tiempo afecta a todas las unidades igual; los efectos fijos de tiempo permiten choques puntuales en cada periodo; las tendencias específicas dejan que cada unidad evolucione de forma diferente.
+    \item \textbf{Ejemplo:} Todos los países pueden enfrentar un shock global en un año (efecto fijo de tiempo), pero algunos países pueden mostrar trayectorias crecientes y otros decrecientes en productividad (tendencias específicas).
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos fijos: añadiendo efectos en el tiempo}}
+\addcontentsline{toc}{section}{Efectos fijos: añadiendo efectos en el tiempo}
+
+\begin{itemize}
+    \item Para incluir \textbf{efectos fijos de tiempo}, podemos crear una variable que agrupe los años de la muestra.
+    
+    \item En \textbf{STATA}:
+    \begin{verbatim}
+    . egen time = group(year)
+    . list muniID muni_name year time in 20/40 , ab(20)
+    \end{verbatim}
+    
+    \item Ejemplo de salida:
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\hline
+\textbf{muniID} & \textbf{muni\_name} & \textbf{year} & \textbf{time} \\
+\hline
+2 & Affoltern A.A. & 1991 & 1 \\
+2 & Affoltern A.A. & 1992 & 2 \\
+2 & Affoltern A.A. & 1993 & 3 \\
+2 & Affoltern A.A. & 1994 & 4 \\
+2 & Affoltern A.A. & 1995 & 5 \\
+2 & Affoltern A.A. & 1996 & 6 \\
+2 & Affoltern A.A. & 1997 & 7 \\
+2 & Affoltern A.A. & 1998 & 8 \\
+2 & Affoltern A.A. & 1999 & 9 \\
+2 & Affoltern A.A. & 2000 & 10 \\
+2 & Affoltern A.A. & 2001 & 11 \\
+\hline
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Al agrupar los años en una variable $time$, podemos incluir \textbf{dummies por periodo}, capturando choques comunes en cada año.
+    \item \textbf{Ejemplo:} Si en 1995 hubo una crisis que afectó a todos los municipios, un efecto fijo de tiempo recoge ese impacto común.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos fijos: tendencia lineal en el tiempo}}
+\addcontentsline{toc}{section}{Efectos fijos: tendencia lineal en el tiempo}
+
+\begin{itemize}
+    \item Ejemplo en \textbf{STATA} con tendencia lineal:
+    \begin{verbatim}
+    . xtreg nat_rate repdem time , fe cl(muniID) i(muniID)
+    \end{verbatim}
+    
+    \item Resultados principales:
+    \begin{itemize}
+        \item $R^2_{within} = 0.1604$, $R^2_{between} = 0.0005$, $R^2_{overall} = 0.1350$.
+        \item Test global: $F(2,244) = 247.57$, p-valor = 0.0000.
+        \item Coeficientes estimados:
+        \[
+        \begin{aligned}
+        \hat{\beta}_{repdem} &= 0.8248 \quad (p = 0.002) \\
+        \hat{\beta}_{time} &= 0.2314 \quad (p = 0.000) \\
+        \text{constante} &= 0.3893 \quad (p = 0.003)
+        \end{aligned}
+        \]
+        \item Estimaciones de varianzas:
+        \[
+        \sigma_u = 1.627, \quad \sigma_e = 3.584, \quad \rho = 0.171
+        \]
+        donde $\rho$ mide la proporción de varianza atribuida al componente $u_i$.
+    \end{itemize}
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Incluir una tendencia lineal en el tiempo permite capturar una evolución sistemática en la tasa de naturalización, además de los efectos fijos por municipio.
+    \item \textbf{Ejemplo:} Si existe un aumento gradual en la naturalización de inmigrantes en todos los municipios a lo largo del tiempo, el término $time$ lo recoge y evita sesgo en la estimación de $repdem$.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos fijos: efectos fijos por año}}
+\addcontentsline{toc}{section}{Efectos fijos: efectos fijos por año}
+
+\begin{itemize}
+    \item Ejemplo en \textbf{STATA} con efectos fijos de tiempo:
+    \begin{verbatim}
+    . xtreg nat_rate repdem i.time , fe cl(muniID) i(muniID)
+    \end{verbatim}
+    
+    \item Resultados principales:
+    \begin{itemize}
+        \item $R^2_{within} = 0.1885$, $R^2_{between} = 0.0005$, $R^2_{overall} = 0.1575$.
+        \item Test global: $F(19,244) = 31.48$, p-valor = 0.0000.
+        \item Coeficientes estimados:
+        \[
+        \hat{\beta}_{repdem} = 1.2037 \quad (p = 0.000)
+        \]
+        \item Ejemplos de efectos fijos de tiempo:
+        \[
+        \text{time2} = 0.3829 \quad (p = 0.027), \quad
+        \text{time3} = 0.2789 \quad (p = 0.188), \quad
+        \text{time4} = 0.7034 \quad (p = 0.000)
+        \]
+    \end{itemize}
+    
+    \item Estos coeficientes capturan \textbf{choques específicos por año}, comunes a todos los municipios.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Incluir dummies de año permite controlar factores comunes en cada periodo (reformas, crisis, cambios políticos) que podrían sesgar las estimaciones.
+    \item \textbf{Ejemplo:} Si en 1994 hubo una reforma migratoria que afectó a todos los municipios, el efecto fijo de ese año lo captura y evita atribuirlo erróneamente a $repdem$.
+\end{itemize}
+
+\section*{\noindent\textbf{Efectos fijos: efectos de tiempo por unidad}}
+\addcontentsline{toc}{section}{Efectos fijos: efectos de tiempo por unidad}
+
+\begin{itemize}
+    \item Ejemplo en \textbf{STATA} con interacción unidad × tiempo:
+    \begin{verbatim}
+    . xtreg nat_rate repdem muniID#c.time i.time , fe cl(muniID) i(muniID)
+    \end{verbatim}
+    
+    \item Este modelo permite que cada unidad (municipio) tenga su \textbf{propia tendencia temporal}.
+    
+    \item Resultados principales:
+    \begin{itemize}
+        \item $R^2_{within} = 0.2650$, $R^2_{between} = 0.5185$, $R^2_{overall} = 0.2864$.
+        \item Coeficiente de interés:
+        \[
+        \hat{\beta}_{repdem} = 0.9865 \quad (p = 0.002)
+        \]
+        \item Ejemplos de pendientes unitarias estimadas (interacciones municipio × tiempo):
+        \[
+        1: 0.3334 \quad (p = 0.000), \quad
+        2: 0.2914 \quad (p = 0.000), \quad
+        3: 0.2499 \quad (p = 0.000)
+        \]
+    \end{itemize}
+    
+    \item Nota: la categoría de referencia (año 19) fue omitida por colinealidad.
+\end{itemize}
+
+\noindent\textbf{Intuición}
+\begin{itemize}
+    \item \textbf{Explicación:} Este modelo es una versión extendida de efectos fijos que permite que cada unidad tenga su propia tendencia temporal, capturando evoluciones heterogéneas.
+    \item \textbf{Ejemplo:} Mientras un municipio puede mostrar una tendencia creciente en naturalizaciones, otro puede permanecer estable o incluso decrecer; las interacciones capturan estas diferencias.
+\end{itemize}
+
+
+
+
+
+\end{document}
