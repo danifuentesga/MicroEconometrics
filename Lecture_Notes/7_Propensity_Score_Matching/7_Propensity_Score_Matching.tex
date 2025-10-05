@@ -1,0 +1,917 @@
+\documentclass[12pt]{article}
+
+% --- Paquetes ---
+\usepackage{pifont} 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usepackage[spanish,es-tabla]{babel}   % español
+\usepackage[utf8]{inputenc}            % acentos
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage[table]{xcolor} % para \cellcolor y \rowcolor
+\usepackage{colortbl}      % colores en tablas
+\usepackage{float}         % para usar [H] si quieres fijar la tabla
+\usepackage{array}         % mejor control de columnas
+\usepackage{amssymb}       % para palomita
+\usepackage{graphicx}      % para logo github
+\usepackage{hyperref}
+\usepackage{setspace} % para hipervinculo
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}       % Asegúrate de tener este paquete en el preámbulo
+\usepackage{booktabs}
+\sisetup{
+    output-decimal-marker = {.},
+    group-separator = {,},
+    group-minimum-digits = 4,
+    detect-all
+}
+
+% Etiqueta en el caption (en la tabla misma)
+\usepackage{caption}
+\captionsetup[table]{name=Tabla, labelfont=bf, labelsep=period}
+
+% Prefijo en la *Lista de tablas*
+\usepackage{tocloft}
+\renewcommand{\cfttabpresnum}{Tabla~} % texto antes del número
+\renewcommand{\cfttabaftersnum}{.}    % punto después del número
+\setlength{\cfttabnumwidth}{5em}      % ancho para "Tabla 10." ajusta si hace falta
+
+
+
+% --- Márgenes y encabezado ---
+\geometry{left=1in, right=1in, top=1in, bottom=1in}
+
+% Alturas del encabezado (un poco más por las 2–3 líneas del header)
+\setlength{\headheight}{32pt}
+\setlength{\headsep}{20pt}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Regla del encabezado (opcional)
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Encabezado izquierdo
+\fancyhead[L]{%
+  \textcolor{maroon}{\textbf{El Colegio de México}}\\
+  \textbf{Microeconometrics for Evaluation}
+}
+
+% Encabezado derecho
+\fancyhead[R]{%
+  7 Propensity Score Matching\\
+  \textbf{Jose Daniel Fuentes García}\\
+  Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+}
+
+% Número de página al centro del pie
+\fancyfoot[C]{\thepage}
+
+% --- APLICAR EL MISMO ESTILO A PÁGINAS "PLAIN" (TOC, LOT, LOF) ---
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyhead[L]{%
+    \textcolor{maroon}{\textbf{El Colegio de México}}\\
+    \textbf{Microeconometrics for Evaluation}
+  }
+  \fancyhead[R]{%
+   7 Propensity Score Matching\\
+    \textbf{Jose Daniel Fuentes García}\\
+    Github : \includegraphics[height=1em]{github.png}~\href{https://github.com/danifuentesga}{\texttt{danifuentesga}}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+% Pie de página centrado
+\fancyfoot[C]{\thepage\ de \pageref{LastPage}}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Color principal ---
+\definecolor{formalblue}{RGB}{0,51,102} % azul marino sobrio
+
+% --- Estilo de títulos ---
+\titleformat{\section}[hang]{\bfseries\Large\color{formalblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\bfseries\large\color{formalblue}}{\thesubsection}{1em}{}
+
+
+% --- Listas ---
+\setlist[itemize]{leftmargin=1.2em}
+
+% --- Sin portada ---
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{-1cm}
+    \noindent
+    \begin{minipage}[t]{0.49\textwidth}
+        \includegraphics[height=2.2cm]{colmex.jpg}
+    \end{minipage}%
+    \begin{minipage}[t]{0.49\textwidth}
+        \raggedleft
+        \includegraphics[height=2.2cm]{cee.jpg}
+    \end{minipage}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        \Huge \textbf{CENTRO DE ESTUDIOS ECONÓMICOS} \\[1.5em]
+        \Large Maestría en Economía 2024--2026 \\[2em]
+        \Large Microeconometrics for Evaluation \\[3em]
+        \LARGE \textbf{7 Propensity Score Matching} \\[3em]
+        \large \textbf{Disclaimer:} I AM NOT the original intellectual author of the material presented in these notes. The content is STRONGLY based on a combination of lecture notes (from Aurora Ramirez), textbook references, and personal annotations for learning purposes. Any errors or omissions are entirely my own responsibility.\\[0.9em]
+        
+    \end{center}
+
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{4}
+\tableofcontents
+
+\newpage
+
+\section*{\noindent\textbf{Agenda}}
+\addcontentsline{toc}{section}{Agenda}
+
+\begin{itemize}
+    \item Why do we use the \textbf{propensity score}?
+    \item How do we build the \textbf{propensity score}?
+    \item How is the estimation of the \textbf{propensity score} implemented in Stata?
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explanation:} The agenda sets up the session: purpose, construction, and software implementation of the propensity score.
+    \item \textbf{Intuition:} Think of it like learning a tool: first why it matters, then how to make it, and finally how to use it in practice.
+\end{itemize}
+
+\section*{\noindent\textbf{Purpose of the Propensity Score}}
+\addcontentsline{toc}{section}{Purpose of the Propensity Score}
+
+\begin{itemize}
+    \item When the treatment is not random, \textbf{propensity score matching} can be used to compare a treatment group and a control group that are equivalent in observable characteristics.
+    \item \textbf{Propensity score matching} also summarizes the covariate information about treatment selection into a single scalar.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Explanation:} The propensity score balances treated and control groups on observed covariates, making them comparable. It condenses multiple variables into one score.
+    \item \textbf{Intuition:} Imagine condensing many student attributes (age, grades, background) into one “similarity score” so you can match students fairly across groups.
+\end{itemize}
+
+\section*{\noindent\textbf{Propensity Score}}
+\addcontentsline{toc}{section}{Propensity Score}
+
+\begin{itemize}
+    \item Matching on $X_i$ means comparing “close” units based on distance to the nearest neighbor of $X_i$, but this suffers from the curse of dimensionality.
+    \item With \textbf{propensity score matching}, we compare units that, based only on observables, have very similar probabilities of being treated.
+    \item If, conditional on $X_i$, two units have a similar probability of treatment, we say their \textbf{propensity scores} are similar.
+    \item Comparing a treated unit with a control unit that has a similar \textbf{propensity score} makes the remaining variation—conditional on the score—random (if the selection-on-observables assumption holds).
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Tiny Math Example:} Suppose Unit A has $p=0.72$ and Unit B has $p=0.70$. Even if their raw covariates differ, they can be matched because their treatment probabilities are almost identical.
+    \item \textbf{Intuition:} Instead of comparing dozens of traits directly, we compress them into one probability and match units with nearly the same score.
+\end{itemize}
+
+\section*{\noindent\textbf{Definition and Assumptions}}
+\addcontentsline{toc}{section}{Definition and Assumptions}
+
+\textbf{Definition of the Propensity Score} \\
+The propensity score is defined as the probability of treatment conditional on covariates:
+\[
+p(X_i) = \Pr(D_i = 1 \mid X_i) = \mathbb{E}(D_i \mid X_i).
+\]
+
+\textbf{Identification Assumptions}
+\begin{enumerate}
+    \item $(Y_{0i}, Y_{1i}) \perp D_i \mid X_i$ \hfill (conditional independence)
+    \item $0 < \Pr(D_i = 1 \mid X_i) < 1$ \hfill (common support)
+\end{enumerate}
+
+\begin{itemize}
+    \item \textbf{Example:} If $X_i$ = age and education, and we observe $p(X_i)=0.65$, this means the unit has a $65\%$ chance of being treated given those covariates.
+    \item \textbf{Intuition:} The score is just a summary probability. The two assumptions say (1) once we control for $X_i$, treatment is as good as random, and (2) every unit has a positive chance to be in either group.
+\end{itemize}
+
+\section*{\noindent\textbf{Conditional Independence (Rosenbaum \& Rubin, 1983)}}
+\addcontentsline{toc}{section}{Conditional Independence}
+
+\textbf{Idea} \\
+There exists a set $X$ of observable covariates such that, once we control for $X$, treatment assignment is independent of potential outcomes:
+\[
+(Y_{0i}, Y_{1i}) \perp D_i \mid X_i.
+\]
+
+\begin{itemize}
+    \item \textbf{Interpretation:} Given $X_i$, assignment is “as good as random.”
+    \item \textbf{Implication:} We can build an unbiased counterfactual for treated units using non-experimental controls.
+    \item Also called treatment ignorability, selection on observables, exogeneity, or \textit{unconfoundedness}.
+    \item Not empirically testable.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Example:} If two individuals have the same $X_i$ (say age = 30, income = 40k), then $\Pr(D_i=1 \mid X_i)$ is the same for both, regardless of their unobserved outcomes.
+    \item \textbf{Intuition:} Once you match on the right covariates, treatment looks like it was randomly assigned, even if it wasn’t in reality.
+\end{itemize}
+
+\section*{\noindent\textbf{Common Support}}
+\addcontentsline{toc}{section}{Common Support}
+
+\textbf{Condition} \\
+For each $X$, there is a positive probability of being treated and not treated:
+\[
+0 < \Pr(D_i = 1 \mid X_i) < 1.
+\]
+
+\begin{itemize}
+    \item Ensures sufficient overlap to find appropriate “pairs.”
+    \item Can be diagnosed with graphs/tables of score overlap.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Example:} If for young individuals $\Pr(D=1|X)=0.9$ and for old individuals $\Pr(D=1|X)=0.1$, both groups still have a chance of being treated and untreated — overlap exists.
+    \item \textbf{Intuition:} To compare fairly, both groups must have some overlap; otherwise, we cannot find valid matches across treatment and control.
+\end{itemize}
+
+\section*{\noindent\textbf{Identification under Strong Ignorability}}
+\addcontentsline{toc}{section}{Identification under Strong Ignorability}
+
+When both assumptions hold (CIA and common support), treatment assignment is \textbf{strongly ignorable} (Rosenbaum \& Rubin, 1983).
+
+\textbf{By definition:}
+\singlespacing
+\begin{align}
+\delta(x) 
+  &= \mathbb{E}[Y_{1i} - Y_{0i} \mid X_i = x] 
+  & \text{\textbf{\shortstack{Def. of \\ treatment effect}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta(x) 
+  &= \mathbb{E}[Y_{1i} \mid X_i = x] - \mathbb{E}[Y_{0i} \mid X_i = x] 
+  & \text{\textbf{\shortstack{Linearity \\ of expectation}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_{1i} \mid X_i = x] 
+  &= \mathbb{E}[Y_{1i} \mid D_i=1, X_i=x] 
+  & \text{\textbf{\shortstack{Unconfoundedness: \\ replace with treated}}} \\[6pt]
+\mathbb{E}[Y_{0i} \mid X_i = x] 
+  &= \mathbb{E}[Y_{0i} \mid D_i=0, X_i=x] 
+  & \text{\textbf{\shortstack{Unconfoundedness: \\ replace with controls}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta(x) 
+  &= \mathbb{E}[Y_{1i} \mid D_i=1, X_i=x] 
+     - \mathbb{E}[Y_{0i} \mid D_i=0, X_i=x] 
+  & \text{\textbf{\shortstack{Substitute \\ into $\delta(x)$}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta 
+  &= \mathbb{E}[\delta(X_i)] 
+  & \text{\textbf{\shortstack{Take expectation \\ over $X_i$ (common support)}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\delta 
+  &= \mathbb{E}[Y_i \mid D_i=1, X_i] 
+     - \mathbb{E}[Y_i \mid D_i=0, X_i] 
+  & \text{\textbf{\shortstack{Observed \\ conditional means}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+Y_i 
+  &= \alpha + \delta D_i + \beta X_i + \varepsilon_i 
+  & \text{\textbf{\shortstack{Link with \\ regression model}}}
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Example:} If at $X=12$ years schooling, treated mean = 50 and control mean = 45, then $\delta(12)=5$. Averaging across $X$ gives the overall effect $\delta$.
+    \item \textbf{Intuition:} Within each $X$ group, treatment vs. control looks random. Their outcome difference is causal, and averaging these differences yields the treatment effect.
+\end{itemize}
+
+\section*{\noindent\textbf{Propensity Score Theorem (Rosenbaum \& Rubin, 1983)}}
+\addcontentsline{toc}{section}{Propensity Score Theorem}
+
+\textbf{Statement} \\
+If $(Y_{1i}, Y_{0i}) \perp D_i \mid X_i$, then:
+\[
+(Y_{1i}, Y_{0i}) \perp D_i \mid p(X_i), 
+\quad p(X_i) = \Pr(D_i=1 \mid X_i).
+\]
+
+\singlespacing
+\begin{align}
+(Y_{1i}, Y_{0i}) \perp D_i \mid X_i 
+   & & \text{\textbf{\shortstack{Unconf. \\ assumption}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+p(X_i) &= \Pr(D_i=1 \mid X_i) 
+   & \text{\textbf{\shortstack{By def. \\ of score}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\Pr(D_i=1 \mid X_i) &= p(X_i) 
+   & \text{\textbf{By def.}} \\[6pt]
+\Pr(D_i=1 \mid p(X_i)) &= p(X_i) 
+   & \text{\textbf{\shortstack{Iterated \\ exp.}}}
+\end{align}
+
+\singlespacing
+\begin{align}
+\mathbb{E}[Y_{1i} \mid D_i, p(X_i)] 
+   &= \mathbb{E}[Y_{1i} \mid p(X_i)] 
+   & \text{\textbf{Substitute}} \\[6pt]
+\mathbb{E}[Y_{0i} \mid D_i, p(X_i)] 
+   &= \mathbb{E}[Y_{0i} \mid p(X_i)] 
+   & \text{\textbf{Substitute}}
+\end{align}
+
+\[
+\Rightarrow (Y_{1i}, Y_{0i}) \perp D_i \mid p(X_i).
+\]
+
+\textbf{Dimension Reduction}  
+\begin{itemize}
+    \item Stratifying on $X_i$ suffers from sparse cells in finite samples.  
+    \item $p(X_i)$ is scalar; stratifying by score is more feasible.  
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $X_i=$ age, income, education. Instead of stratifying on all three, we use $p(X_i)=0.65$. Matching only on this scalar preserves conditional independence.  
+    \item \textbf{Intuition:} Many variables collapse into one number that balances treatment and control, making matching practical.  
+\end{itemize}
+
+\subsection*{\noindent\textbf{Sketch of Proof}}
+\addcontentsline{toc}{subsection}{Sketch of Proof}
+
+Assume $(Y_{1i}, Y_{0i}) \perp D_i \mid X_i$.  
+We want to show:
+\[
+\Pr(D_i=1 \mid Y_{0i}, Y_{1i}, p(X_i)) = p(X_i).
+\]
+
+\singlespacing
+\begin{align}
+\Pr(D_i=1 \mid Y_{0i}, Y_{1i}, p(X_i)) 
+   &= \mathbb{E}[D_i \mid Y_{0i}, Y_{1i}, p(X_i)] 
+   & \text{\textbf{Def. of cond. prob.}} \\[6pt]
+   &= \mathbb{E}\!\left[\, \mathbb{E}[D_i \mid Y_{0i}, Y_{1i}, X_i] \,\middle|\, Y_{0i}, Y_{1i}, p(X_i)\right] 
+   & \text{\textbf{Law of iter. exp.}} \\[6pt]
+   &= \mathbb{E}\!\left[\, \Pr(D_i=1 \mid Y_{0i}, Y_{1i}, X_i) \,\middle|\, Y_{0i}, Y_{1i}, p(X_i)\right] 
+   & \text{\textbf{Def. of cond. prob.}} \\[6pt]
+   &= \mathbb{E}\!\left[\, \Pr(D_i=1 \mid X_i) \,\middle|\, Y_{0i}, Y_{1i}, p(X_i)\right] 
+   & \text{\textbf{Ignorability}} \\[6pt]
+   &= \mathbb{E}[\, p(X_i) \mid Y_{0i}, Y_{1i}, p(X_i)] 
+   & \text{\textbf{Def. of score}} \\[6pt]
+   &= \int p(x)\, dF(x \mid Y_{0i}, Y_{1i}, p(X_i)) 
+   & \text{\textbf{Expand cond. exp.}} \\[6pt]
+   &= p(X_i) 
+   & \text{\textbf{Measurability: $p(X_i)$ known}} 
+\end{align}
+
+\[
+\Rightarrow (Y_{1i}, Y_{0i}) \perp D_i \mid p(X_i). 
+\qquad \blacksquare
+\]
+
+\begin{itemize}
+    \item \textbf{Example:} If $p(X_i)=0.6$, then even conditioning on outcomes $(Y_{0i},Y_{1i})$, the probability of treatment is still $0.6$. Outcomes add no predictive power once $p(X_i)$ is known.  
+    \item \textbf{Intuition:} $p(X_i)$ is a sufficient statistic of $X_i$ for treatment assignment. Knowing $Y$’s cannot change the probability, because $p(X_i)$ already summarizes all $X$-based information.  
+\end{itemize}
+
+\subsection*{\noindent\textbf{Balancing Property — Full Proof}}
+\addcontentsline{toc}{subsection}{Balancing Property — Full Proof}
+
+\textbf{Lemma.}  
+If $p(X_i)=\Pr(D_i=1 \mid X_i)$ is the propensity score, then:
+\[
+D_i \perp X_i \mid p(X_i).
+\]
+
+\textbf{Goal.} Show that:
+\[
+\Pr(D_i=1 \mid X_i, p(X_i)) = \Pr(D_i=1 \mid p(X_i)).
+\]
+
+\textbf{Left-hand side (LHS):}
+\singlespacing
+\begin{align}
+\Pr(D_i=1 \mid X_i, p(X_i)) 
+  &= \Pr(D_i=1 \mid X_i) 
+  & \text{\textbf{Knowing $X_i$ $\Rightarrow$ $p(X_i)$}} \\[6pt]
+  &= p(X_i) 
+  & \text{\textbf{Def. of score}}
+\end{align}
+
+\textbf{Right-hand side (RHS):}
+\singlespacing
+\begin{align}
+\Pr(D_i=1 \mid p(X_i)) 
+  &= \mathbb{E}[D_i \mid p(X_i)] 
+  & \text{\textbf{Def. of cond. prob.}} \\[6pt]
+  &= \mathbb{E}\!\Big[\, \mathbb{E}[D_i \mid X_i, p(X_i)] \,\Big|\, p(X_i)\Big] 
+  & \text{\textbf{Law of iter. exp.}} \\[6pt]
+  &= \mathbb{E}\!\Big[\, \Pr(D_i=1 \mid X_i, p(X_i)) \,\Big|\, p(X_i)\Big] 
+  & \text{\textbf{Replace inner exp.}} \\[6pt]
+  &= \mathbb{E}\!\Big[\, \Pr(D_i=1 \mid X_i) \,\Big|\, p(X_i)\Big] 
+  & \text{\textbf{$p(X_i)$ encodes $X_i$}} \\[6pt]
+  &= \mathbb{E}[\, p(X_i) \mid p(X_i)] 
+  & \text{\textbf{Def. of score}} \\[6pt]
+  &= \int p(x)\, dF(x \mid p(X_i)) 
+  & \text{\textbf{Expand cond. exp.}} \\[6pt]
+  &= p(X_i) 
+  & \text{\textbf{Measurability: $p(X_i)$ known}}
+\end{align}
+
+\textbf{Conclusion.}
+\[
+\Pr(D_i=1 \mid X_i, p(X_i)) = \Pr(D_i=1 \mid p(X_i)) = p(X_i),
+\]
+so
+\[
+D_i \perp X_i \mid p(X_i).
+\qquad \blacksquare
+\]
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $X_i=$ age, income. If $p(X_i)=0.3$, then $\Pr(D=1 \mid X_i, p(X_i))=\Pr(D=1 \mid p(X_i))=0.3$. Conditioning on $X_i$ adds nothing once the score is known.  
+    \item \textbf{Intuition:} The score $p(X)$ is a \textit{sufficient statistic} for treatment. Once you know it, $X$ gives no further information about $D$.  
+\end{itemize}
+
+\subsection*{\noindent\textbf{Consequence of Balancing}}
+\addcontentsline{toc}{subsection}{Consequence of Balancing}
+
+\textbf{Claim.}  
+Conditional on $p(X_i)$, the distribution of $X_i$ is the same for treated and controls:
+\[
+\Pr(X_i \mid D_i=1, p(X_i)) = \Pr(X_i \mid D_i=0, p(X_i)).
+\]
+
+\textbf{Proof.}
+
+From the balancing property:
+\[
+D_i \perp X_i \mid p(X_i).
+\]
+
+\singlespacing
+\begin{align}
+\Pr(X_i \mid D_i, p(X_i)) 
+  &= \Pr(X_i \mid p(X_i)) 
+  & \text{\textbf{Def. of cond. indep.}} \\[6pt]
+  &= \frac{\Pr(X_i, p(X_i))}{\Pr(p(X_i))} 
+  & \text{\textbf{Cond. prob. rule}} \\[6pt]
+  &= \frac{\Pr(p(X_i) \mid X_i)\Pr(X_i)}{\Pr(p(X_i))} 
+  & \text{\textbf{Bayes’ rule}} \\[6pt]
+  &= \frac{1 \cdot \Pr(X_i)}{\Pr(p(X_i))} 
+  & \text{\textbf{$p(X_i)$ determined by $X_i$}} \\[6pt]
+  &= \frac{\Pr(X_i)}{\Pr(p(X_i))} 
+  & \text{\textbf{Simplify}}
+\end{align}
+
+This expression does not depend on $D_i$, hence:
+\[
+\Pr(X_i \mid D_i=1, p(X_i)) = \Pr(X_i \mid D_i=0, p(X_i)).
+\qquad \blacksquare
+\]
+
+\begin{itemize}
+    \item \textbf{Example:} If $p(X_i)=0.5$, then within that group the distribution of age/income ($X_i$) looks the same for treated and control units.  
+    \item \textbf{Intuition:} Conditioning on the score balances the covariates — treatment vs. control groups look statistically identical in $X$.  
+\end{itemize}
+
+\section*{\noindent\textbf{Practical Implementation}}
+\addcontentsline{toc}{section}{Practical Implementation}
+
+\begin{enumerate}
+    \item Estimate the \textbf{propensity score}.
+    \item Compute the causal effect by averaging differences in $Y$ between units with similar scores.
+\end{enumerate}
+
+\textbf{Estimation of $p(X_i)$:}
+
+\singlespacing
+\begin{align}
+\Pr(D_i=1 \mid X_i) 
+   &= F\{\,h(X_i)\,\} 
+   & \text{\textbf{Generic form}}
+\end{align}
+
+\singlespacing
+\begin{align}
+F(\cdot) &= \text{logit or probit CDF} 
+   & \text{\textbf{Choice of link}} \\[6pt]
+h(X_i) &= \text{linear terms + higher-order + interactions} 
+   & \text{\textbf{Specification}}
+\end{align}
+
+\begin{itemize}
+    \item Select $h(\cdot)$ to achieve \textbf{balance}, not merely based on statistical significance.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $h(X_i) = \beta_0 + \beta_1 \text{age} + \beta_2 \text{income}$, with logit link $F(z)=\frac{1}{1+e^{-z}}$. Then $p(X_i)$ gives each individual’s treatment probability.
+    \item \textbf{Intuition:} Estimate the probability of treatment with a flexible model. The goal is not prediction accuracy, but ensuring treated and control groups look similar after matching on $p(X)$.  
+\end{itemize}
+
+\section*{\noindent\textbf{Testing the Balancing Property}}
+\addcontentsline{toc}{section}{Testing the Balancing Property}
+
+\begin{enumerate}
+    \item Estimate the score (logit/probit).
+    \item Sort by score and divide into blocks of similar size (e.g., 5).
+    \item In each block, test equality of means of $X$ between $D=1$ and $D=0$.
+    \item If the test fails, subdivide the block and re-test.
+    \item If a covariate fails systematically, enrich $h(\cdot)$ (higher-order terms/interactions) and repeat.
+\end{enumerate}
+
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose after estimating $p(X)$ you form 5 blocks. In block 3, $\bar{X}_{D=1}=10.2$ and $\bar{X}_{D=0}=10.1$. A t-test shows no significant difference → balance holds in that block.
+    \item \textbf{Intuition:} Balance is checked block by block. If covariates are not balanced, you refine the model until treated and control groups look statistically similar within each score stratum.
+\end{itemize}
+
+\section*{\noindent\textbf{Inverse Probability Weighting (IPW)}}
+\addcontentsline{toc}{section}{Inverse Probability Weighting (IPW)}
+
+Assume $(Y_{1i},Y_{0i}) \perp D_i \mid X_i$.
+
+\textbf{ATE via IPW}
+
+\singlespacing
+\begin{align}
+\delta_{ATE} 
+   &= \mathbb{E}[Y_{1i} - Y_{0i}] 
+   & \text{\textbf{Def. of ATE}} \\[6pt]
+   &= \mathbb{E}\!\left[\frac{Y_i D_i}{p(X_i)} - \frac{Y_i (1-D_i)}{1-p(X_i)}\right] 
+   & \text{\textbf{Re-weighted form}}
+\end{align}
+
+\textbf{Derivation.}
+
+\singlespacing
+\begin{align}
+\mathbb{E}\!\left[\frac{Y_i D_i}{p(X_i)}\right] 
+   &= \mathbb{E}\!\left[\,\mathbb{E}\!\left[\frac{Y_i D_i}{p(X_i)} \;\middle|\; X_i\right]\right] 
+   & \text{\textbf{Iterated exp.}} \\[6pt]
+   &= \mathbb{E}\!\left[\frac{1}{p(X_i)} \cdot \mathbb{E}[Y_i D_i \mid X_i]\right] 
+   & \text{\textbf{Factor $1/p(X_i)$}} \\[6pt]
+   &= \mathbb{E}\!\left[\frac{1}{p(X_i)} \cdot \Pr(D_i=1 \mid X_i)\, \mathbb{E}[Y_i \mid D_i=1,X_i]\right] 
+   & \text{\textbf{Def. of cond. exp.}} \\[6pt]
+   &= \mathbb{E}\!\left[\mathbb{E}[Y_i \mid D_i=1,X_i]\right] 
+   & \text{\textbf{Cancel $p(X_i)$}} \\[6pt]
+   &= \mathbb{E}[Y_{1i}] 
+   & \text{\textbf{Unconfoundedness}}
+\end{align}
+
+Analogously:
+\singlespacing
+\begin{align}
+\mathbb{E}\!\left[-\frac{Y_i (1-D_i)}{1-p(X_i)}\right] 
+   &= -\,\mathbb{E}[Y_{0i}].
+\end{align}
+
+Thus:
+\[
+\delta_{ATE} = \mathbb{E}[Y_{1i}] - \mathbb{E}[Y_{0i}].
+\qquad \blacksquare
+\]
+
+\textbf{Alternative form.}
+\singlespacing
+\begin{align}
+\delta_{ATE} 
+   &= \mathbb{E}\!\left[\frac{(D_i - p(X_i))}{p(X_i)(1-p(X_i))}\,Y_i\right] 
+   & \text{\textbf{Algebra rearrangement}}
+\end{align}
+
+\textbf{TOT via IPW}
+
+\singlespacing
+\begin{align}
+\delta_{TOT} 
+   &= \mathbb{E}[Y_{1i}-Y_{0i} \mid D_i=1] 
+   & \text{\textbf{Def. of TOT}} \\[6pt]
+   &= \mathbb{E}\!\left[\frac{(D_i-p(X_i))}{1-p(X_i)} \cdot \frac{Y_i}{\Pr(D_i=1)}\right] 
+   & \text{\textbf{IPW representation}}
+\end{align}
+
+\begin{itemize}
+    \item \textbf{Example:} If $p(X_i)=0.2$, then treated units get weight $1/0.2=5$, controls get weight $1/0.8=1.25$. This makes treated and controls comparable “as if” randomized.
+    \item \textbf{Intuition:} Units that are unlikely to receive the treatment but did are “rare” and thus receive high weight. IPW reconstructs a pseudo-population where treatment is independent of $X$.
+\end{itemize}
+
+\section*{\noindent\textbf{Sample Analogues (IPW)}}
+\addcontentsline{toc}{section}{Sample Analogues (IPW)}
+
+\textbf{ATE estimator.}
+
+From population form:
+\[
+\delta_{ATE} 
+   = \mathbb{E}\!\left[\frac{(D_i-p(X_i))}{p(X_i)(1-p(X_i))}\,Y_i\right].
+\]
+
+\singlespacing
+\begin{align}
+\hat{\delta}_{ATE} 
+   &= \frac{1}{N}\sum_{i=1}^N 
+      \frac{(D_i - \hat{p}(X_i))}{\hat{p}(X_i)(1-\hat{p}(X_i))}\,Y_i
+   & \text{\textbf{Sample analogue}}
+\end{align}
+
+\textbf{TOT estimator.}
+
+From population form:
+\[
+\delta_{TOT} 
+   = \mathbb{E}\!\left[\frac{(D_i-p(X_i))}{1-p(X_i)}\cdot \frac{Y_i}{\Pr(D_i=1)}\right].
+\]
+
+\singlespacing
+\begin{align}
+\hat{\delta}_{TOT} 
+   &= \frac{1}{N^T}\sum_{i:D_i=1} 
+      \frac{(D_i - \hat{p}(X_i))}{1-\hat{p}(X_i)}\,Y_i 
+   & \text{\textbf{Sample analogue}}
+\end{align}
+
+where $N^T=\sum_i D_i$ is the number of treated units.
+
+\textbf{Implementation.}
+\begin{enumerate}
+    \item Estimate $\hat{p}(X_i)$ from a first-stage logit/probit.
+    \item Plug $\hat{p}(X_i)$ into the formulas above.
+    \item Compute standard errors with bootstrap over both stages.
+\end{enumerate}
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $N=4$ with $\hat{p}(X)=(0.2,0.5,0.7,0.3)$ and outcomes $Y=(10,8,9,7)$. Then each $Y_i$ is weighted by $\frac{D_i-\hat{p}(X_i)}{\hat{p}(X_i)(1-\hat{p}(X_i))}$, giving more influence to rare treatment assignments.
+    \item \textbf{Intuition:} Replace expectations with averages. Units with unexpected treatment status get large weights, reconstructing the pseudo-population for causal inference.
+\end{itemize}
+
+\section*{\noindent\textbf{Other Matching Methods with the Score}}
+\addcontentsline{toc}{section}{Other Matching Methods with the Score}
+
+Exact matches on $p(X_i)$ are almost impossible, so algorithms are used:
+
+\begin{enumerate}
+    \item \textbf{Nearest-neighbor matching}  
+          Match each treated unit with the closest control in terms of $p(X_i)$.
+    \item \textbf{Radius matching}  
+          Match treated and control units if their $p(X_i)$ differ by less than a fixed radius $r$.
+    \item \textbf{Kernel matching}  
+          Use weighted averages of controls, with weights decreasing as distance in $p(X_i)$ grows.
+    \item \textbf{Stratification matching}  
+          Divide the sample into intervals (strata) of $p(X_i)$ and compare treated vs. control within each stratum.
+\end{enumerate}
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $p(X)=0.62$ for a treated unit.  
+      - Nearest neighbor: pick the control with $p(X)=0.60$.  
+      - Radius: accept all controls with $|p(X)-0.62|<0.05$.  
+      - Kernel: weight controls by distance, e.g. weight $\exp[-(0.62-0.60)^2]$.  
+      - Stratification: put both into the $[0.6,0.7]$ block and compare means.  
+    \item \textbf{Intuition:} Instead of requiring exact matches, use approximate methods (closest neighbor, tolerance bands, weighted averages, or bins) to ensure treated and controls are comparable.
+\end{itemize}
+
+\section*{\noindent\textbf{Nearest Neighbor and Radius Matching}}
+\addcontentsline{toc}{section}{Nearest Neighbor and Radius Matching}
+
+\textbf{Notation:}  
+\begin{itemize}
+    \item $T$: treated units, $C$: controls.
+    \item $Y_i^T$: treated outcome, $Y_j^C$: control outcome.
+    \item $C(i)$: set of controls matched to treated unit $i$ with score $p_i$.
+\end{itemize}
+
+\textbf{Nearest Neighbor:}
+\[
+C(i) = \arg\min_{j \in C} \|\,p_i - p_j\,\|
+\]
+\begin{itemize}
+    \item Match each treated unit $i$ with the control $j$ whose score $p_j$ is closest.
+\end{itemize}
+
+\textbf{Radius Matching:}
+\[
+C(i) = \{\, j \in C : \|\,p_i - p_j\,\| < r \,\}
+\]
+\begin{itemize}
+    \item Match treated unit $i$ with all controls $j$ whose scores fall within a tolerance band of radius $r$.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose $p_i=0.62$ for a treated unit.  
+      - Nearest neighbor: if controls have scores $(0.58, 0.67, 0.40)$, the match is $0.58$.  
+      - Radius ($r=0.05$): accept all controls with scores in $[0.57,0.67]$, so matches are $(0.58,0.67)$.  
+    \item \textbf{Intuition:} Nearest neighbor forces one best match; radius allows multiple acceptable matches within a tolerance window.  
+\end{itemize}
+
+\section*{\noindent\textbf{TOT Estimator by Matching (NN/Radius)}}
+\addcontentsline{toc}{section}{TOT Estimator by Matching (NN/Radius)}
+
+\textbf{Estimator:}
+\[
+\hat{\delta}_{TOT}^M 
+   = \frac{1}{N^T} \sum_{i \in T} 
+     \left( Y_i^T - \sum_{j \in C(i)} w_{ij} Y_j^C \right),
+\]
+where $M \in \{\text{NN}, \text{Radius}\}$.
+
+\textbf{Definitions:}
+\begin{itemize}
+    \item $T$: set of treated units, $C$: set of controls.
+    \item $N^T = \#\{i \in T\}$: number of treated units.
+    \item $C(i)$: set of control matches for treated unit $i$ (depends on method $M$).
+    \item $N_i^C = \#\{ j \in C(i)\}$: number of controls matched to unit $i$.
+    \item $w_{ij} = 1/N_i^C$ if $j \in C(i)$, and $0$ otherwise (equal weights).
+\end{itemize}
+
+\textbf{Algebraic view.}
+
+\singlespacing
+\begin{align}
+\hat{\delta}_{TOT}^M 
+   &= \frac{1}{N^T} \sum_{i \in T} 
+      \left( Y_i^T - \frac{1}{N_i^C} \sum_{j \in C(i)} Y_j^C \right)
+   & \text{\textbf{Plug in $w_{ij}$}} \\[6pt]
+   &= \frac{1}{N^T} \sum_{i \in T} 
+      \left( Y_i^T - \bar{Y}_{C(i)}^C \right)
+   & \text{\textbf{Control mean for $i$}}
+\end{align}
+
+So the TOT estimator is the average across treated units of the outcome difference between each treated unit and the mean of its matched controls.
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose 2 treated units with $Y^T=(10,12)$.  
+      - Matches: $C(1)=(8,9)$, $C(2)=(11)$.  
+      - Control means: $\bar{Y}_{C(1)}=8.5$, $\bar{Y}_{C(2)}=11$.  
+      - Differences: $(10-8.5)=1.5$, $(12-11)=1$.  
+      - Average: $\hat{\delta}_{TOT}=1.25$.  
+    \item \textbf{Intuition:} For each treated unit, build a synthetic control outcome from its matches. Then average differences across all treated to recover TOT.  
+\end{itemize}
+
+\section*{\noindent\textbf{Kernel Matching (TOT Estimator)}}
+\addcontentsline{toc}{section}{Kernel Matching (TOT Estimator)}
+
+\textbf{Estimator:}
+\[
+\hat{\delta}_{TOT}^K 
+   = \frac{1}{N^T} \sum_{i \in T} 
+     \left( Y_i^T - 
+     \frac{\sum_{j \in C} Y_j^C \, G\!\left(\tfrac{p_j - p_i}{h_n}\right)}
+          {\sum_{k \in C} G\!\left(\tfrac{p_k - p_i}{h_n}\right)} 
+     \right).
+\]
+
+\textbf{Definitions:}
+\begin{itemize}
+    \item $N^T$: number of treated units.  
+    \item $p_i$: propensity score for treated unit $i$.  
+    \item $p_j$: propensity score for control unit $j$.  
+    \item $G(\cdot)$: kernel function (e.g. Gaussian, Epanechnikov).  
+    \item $h_n$: bandwidth parameter controlling smoothness.  
+\end{itemize}
+
+\textbf{Algebraic view.}
+
+\singlespacing
+\begin{align}
+\hat{\delta}_{TOT}^K 
+   &= \frac{1}{N^T} \sum_{i \in T} 
+      \left( Y_i^T - \sum_{j \in C} w_{ij} Y_j^C \right) 
+   & \text{\textbf{Rewrite with weights}} \\[6pt]
+w_{ij} 
+   &= \frac{G\!\left(\tfrac{p_j - p_i}{h_n}\right)}
+           {\sum_{k \in C} G\!\left(\tfrac{p_k - p_i}{h_n}\right)} 
+   & \text{\textbf{Normalized kernel weights}}
+\end{align}
+
+So each treated unit $i$ is compared to a weighted average of controls, where weights are higher for controls with $p_j$ closer to $p_i$.
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose treated $p_i=0.60$, controls $p_j=(0.58,0.80)$.  
+      - With Gaussian kernel $G(z)=e^{-z^2}$ and $h_n=0.1$:  
+        $G((0.58-0.60)/0.1)=e^{-0.2^2}=0.9608$,  
+        $G((0.80-0.60)/0.1)=e^{-2^2}=e^{-4}\approx0.0183$.  
+      - Normalized weights: $w_{i1}=0.981$, $w_{i2}=0.019$.  
+      - The matched control outcome is essentially a weighted average dominated by $p_j=0.58$.  
+    \item \textbf{Intuition:} Instead of one “nearest” match, all controls contribute, but closer scores get much higher weight. Bandwidth $h_n$ controls how local the comparison is.  
+\end{itemize}
+
+\section*{\noindent\textbf{Stratification Matching}}
+\addcontentsline{toc}{section}{Stratification Matching}
+
+\textbf{Idea:}  
+Based on the same blocks used to test balance of the score.
+
+\textbf{Within block $q$:}
+\[
+\hat{\delta}_q^S 
+   = \frac{1}{N_q^T} \sum_{i \in T(q)} Y_i^T 
+     - \frac{1}{N_q^C} \sum_{i \in C(q)} Y_i^C,
+\]
+where:
+\begin{itemize}
+    \item $T(q)$: set of treated in block $q$,
+    \item $C(q)$: set of controls in block $q$,
+    \item $N_q^T = \#\{i \in T(q)\}$,
+    \item $N_q^C = \#\{i \in C(q)\}$.
+\end{itemize}
+
+\textbf{Aggregation across blocks:}
+\[
+\hat{\delta}_{TOT}^S 
+   = \sum_{q=1}^Q \hat{\delta}_q^S 
+      \cdot \frac{\sum_{i \in T(q)} D_i}{\sum_i D_i}.
+\]
+
+This weights each block’s effect by the share of treated units in that block.
+
+\textbf{Algebraic view.}
+
+\singlespacing
+\begin{align}
+\hat{\delta}_{TOT}^S 
+   &= \sum_{q=1}^Q 
+      \left( \frac{1}{N_q^T}\sum_{i \in T(q)} Y_i^T 
+           - \frac{1}{N_q^C}\sum_{i \in C(q)} Y_i^C \right)
+      \cdot \frac{N_q^T}{N^T} 
+   & \text{\textbf{Substitute weights}} \\[6pt]
+   &= \frac{1}{N^T}\sum_{q=1}^Q 
+       \left( \sum_{i \in T(q)} Y_i^T 
+           - \frac{N_q^T}{N_q^C}\sum_{i \in C(q)} Y_i^C \right)
+   & \text{\textbf{Rearrange sums}}
+\end{align}
+
+So stratification matching is a weighted average of block-level treated vs. control differences.
+
+\begin{itemize}
+    \item \textbf{Example:} Suppose two blocks:  
+      - Block 1: $N^T_1=2$, $N^C_1=3$, $\bar{Y}_T=12$, $\bar{Y}_C=10$.  
+        $\hat{\delta}_1=2$.  
+      - Block 2: $N^T_2=1$, $N^C_2=2$, $\bar{Y}_T=15$, $\bar{Y}_C=14$.  
+        $\hat{\delta}_2=1$.  
+      - Weights: Block 1 has $2/3$ of treated, Block 2 has $1/3$.  
+      - Aggregate: $\hat{\delta}_{TOT}=2\cdot(2/3)+1\cdot(1/3)=1.67$.  
+    \item \textbf{Intuition:} Estimate treatment effects block by block, then average them giving more weight to blocks with more treated units.  
+\end{itemize}
+
+\section*{\noindent\textbf{Diagnosing Common Support}}
+\addcontentsline{toc}{section}{Diagnosing Common Support}
+
+\begin{itemize}
+    \item Summarize the score for $D=1$ and $D=0$, and count how many units fall outside the overlap region.
+    \item Example: if treated scores lie in $[0.10, 0.85]$, then trim controls with scores below $0.10$ or above $0.85$.
+    \item Histograms or density plots by group ($D=1$ vs. $D=0$) help visualize overlap.
+\end{itemize}
+
+\textbf{Formal condition:}
+\[
+\min p(X_i \mid D=1) \;\; \leq \;\; p(X_i) \;\; \leq \;\; \max p(X_i \mid D=1),
+\]
+ensuring controls exist in the same score range as treated units.
+
+\begin{itemize}
+    \item \textbf{Tiny Math Example:} Suppose treated scores range from $0.20$ to $0.75$. A control with $p(X)=0.90$ is trimmed (outside support), while one with $p(X)=0.40$ is kept (inside overlap).  
+    \item \textbf{Intuition:} Common support means both groups must be comparable. Units without overlap cannot be matched and should be dropped.  
+\end{itemize}
+
+
+
+
+
+\end{document}
